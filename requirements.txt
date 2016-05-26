@@ -1,0 +1,5 @@
+# Set up project requirements
+# To Run: 'pip install -r requirements.txt'
+
+selenium
+pytest
