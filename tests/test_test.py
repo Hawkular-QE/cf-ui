@@ -12,5 +12,5 @@ def web_session(request):
 
     return web_session
 
-def test_test1(web_session):
+def test_test(web_session):
     assert True, "Sanity Login Test"
