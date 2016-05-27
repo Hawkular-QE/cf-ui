@@ -46,9 +46,15 @@ class session(properties):
 
     def __logger__(self):
 
-        logging.basicConfig(level=self.logging_level)
-        self.logger = logging.getLogger(__name__)
-        self.logger.info("Logging Configured")
+        self.logger = logging.getLogger('cf-ui')
+        self.logger.setLevel(logging.DEBUG)
+
+        # create formatter
+        formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+        ch = logging.StreamHandler()
+        ch.setLevel(self.logging_level)
+        ch.setFormatter(formatter)
+        self.logger.addHandler(ch)
 
         """ Quite Selenium Logging """
         LOGGER.setLevel(logging.ERROR)
