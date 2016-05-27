@@ -8,7 +8,7 @@ def web_session(request):
     web_session = session()
 
     def closeSession():
-        print ("Close browser session")
+        web_session.logger.info("Close browser session")
         web_session.close_web_driver()
     request.addfinalizer(closeSession)
 

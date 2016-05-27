@@ -7,26 +7,26 @@ class providers():
         self.web_session = web_session
 
     def add_provider(self):
-        print "TBD"
+        self.web_session.logger.info("To Do")
         # navigate_to_provider_new()
         # add_provider()
 
     def delete_provider(self):
-        print "TBD"
+        self.web_session.logger.info("To Do")
         # navigate_to_providers
         # delete_provider()
 
     def update_provider(self):
-        print "TBD"
+        self.web_session.logger.info("To Do")
         # navigate_to_providers
         # update_provider
 
     def add_provider_if_not_present(self):
-        print "TBD"
+        self.web_session.logger.info("To Do")
         # navigate_to_providers
         # If provider is not present, add provider
 
     def does_provider_exist(self):
-        print "TBD"
+        self.web_session.logger.info("To Do")
         # navigate_to_providers
         # is_provider_present (note: use ui_utils.isTextOnPage OR create new ui_utils.isElementPresent)

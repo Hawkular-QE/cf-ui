@@ -3,6 +3,9 @@ from common.miq_login import miq_login
 from conf.properties import properties
 from selenium import webdriver
 from views.providers import providers
+import logging
+import logging.config
+from selenium.webdriver.remote.remote_connection import LOGGER
 
 class session(properties):
 
@@ -12,14 +15,19 @@ class session(properties):
     web_driver = None
     login = None
 
+    logger = None
+    logging_level = logging.DEBUG
+
     def __init__(self, login=True, add_provider=True):
         self.login = login
 
         self.MIQ_URL = "http://{}:{}/".format(self.MIQ_HOSTNAME, self.MIQ_PORT)
         self.HAWKULAR_URL = "http://{}:{}/".format(self.HAWKULAR_HOSTNAME, self.HAWKULAR_PORT)
 
+        self.__logger__()
+
         ''' Get the Selenium Web Driver, and then navegate to the MIQ URL '''
-        self.web_driver = self.__get_web_driver__()
+        self.__get_web_driver__()
 
         ''' Add provider, if the provider has not all ready been added '''
         if (add_provider):
@@ -27,14 +35,23 @@ class session(properties):
 
     def __get_web_driver__(self):
 
-        driver = webdriver.Firefox()
-        print "URL: %s", self.MIQ_URL
-        driver.get(self.MIQ_URL)
+        self.web_driver = webdriver.Firefox()
+        self.logger.info("MIQ URL: %s", self.MIQ_URL)
+        self.web_driver.get(self.MIQ_URL)
 
         if (self.login):
-            miq_login(driver).login(self.MIQ_USERNAME, self.MIQ_PASSWORD)
+            miq_login(self).login(self.MIQ_USERNAME, self.MIQ_PASSWORD)
 
-        return driver
+        return
+
+    def __logger__(self):
+
+        logging.basicConfig(level=self.logging_level)
+        self.logger = logging.getLogger(__name__)
+        self.logger.info("Logging Configured")
+
+        """ Quite Selenium Logging """
+        LOGGER.setLevel(logging.ERROR)
 
     def close_web_driver(self):
         self.web_driver.close()
