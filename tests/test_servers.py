@@ -1,7 +1,9 @@
 import pytest
 from common.session import session
+from views.servers import servers
 
-@pytest.fixture
+
+@pytest.fixture (scope='session')
 def web_session(request):
     web_session = session()
 
@@ -12,5 +14,5 @@ def web_session(request):
 
     return web_session
 
-def test_test(web_session):
-    assert True, "Sanity Login Test"
+def test_servers_something(web_session):
+    servs = servers(web_session)

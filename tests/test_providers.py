@@ -1,7 +1,9 @@
 import pytest
 from common.session import session
+from views.providers import providers
 
-@pytest.fixture
+
+@pytest.fixture (scope='session')
 def web_session(request):
     web_session = session()
 
@@ -12,5 +14,7 @@ def web_session(request):
 
     return web_session
 
-def test_test(web_session):
-    assert True, "Sanity Login Test"
+def test_add_provider(web_session):
+    provs = providers(web_session)
+    provs.add_provider()
+    assert True, "Validate Success - To-Do"

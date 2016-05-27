@@ -2,7 +2,7 @@
 from common.miq_login import miq_login
 from conf.properties import properties
 from selenium import webdriver
-from views.servers import servers
+from views.providers import providers
 
 class session(properties):
 
@@ -23,7 +23,7 @@ class session(properties):
 
         ''' Add provider, if the provider has not all ready been added '''
         if (add_provider):
-            servers(self).add_provider_if_not_present()
+            providers(self).add_provider_if_not_present()
 
     def __get_web_driver__(self):
 
