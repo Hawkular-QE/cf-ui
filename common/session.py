@@ -56,8 +56,5 @@ class session(properties):
         ch.setFormatter(formatter)
         self.logger.addHandler(ch)
 
-        """ Quite Selenium Logging """
-        LOGGER.setLevel(logging.ERROR)
-
     def close_web_driver(self):
         self.web_driver.close()
