@@ -31,7 +31,7 @@ class NavigationTree:
             print " on name '{}' at location '{}' - do '{}!' ".format(k, v._point._value, v._operation._operation)
         pass
 
-    def navigate(self, target_page):
+    def navigate(self, target_page, delay=2):
 
         pivot = self.web_driver
         hover = ActionChains(pivot)
@@ -40,12 +40,11 @@ class NavigationTree:
             action = self._tree.get(step)
             point = action._point._value
             operation = action._operation._operation
-            #print "\n '{}' ->  on '{}' - make {} ".format(step, point, operation)
             if operation=="Hover":
                 elem = pivot.find_element_by_xpath(point)
                 hover.move_to_element(elem).perform()
                 pivot = elem
-                sleep(3)
+                sleep(delay)
             else:
                 if operation=="Click":
                     elem = pivot.find_element_by_xpath(point)
