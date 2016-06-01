@@ -16,5 +16,5 @@ def web_session(request):
 
 def test_add_provider(web_session):
     provs = providers(web_session)
-    provs.add_provider()
+    provs.add_provider("TestProvider", "livingontheedge.hawkular.org", "80")
     assert True, "Validate Success - To-Do"
