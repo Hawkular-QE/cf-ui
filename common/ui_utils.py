@@ -1,4 +1,5 @@
 import time
+from selenium.common.exceptions import NoSuchElementException
 
 class ui_utils():
 
@@ -27,12 +28,12 @@ class ui_utils():
 
         return True
 
-    def isElementOnPage(self, el):
-        ## Flesh out - web_driver.isElementPresent(el)
-        if True:
-            return True
-        else:
+    def isElementPresent(self, locatormethod, locatorvalue):
+        try:
+            self.web_driver.find_element(by=locatormethod, value=locatorvalue)
+        except NoSuchElementException:
             return False
+        return True
 
     def waitForElementOnPage(self, el, waitTime):
         print "To Do"

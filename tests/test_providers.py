@@ -5,7 +5,7 @@ from views.providers import providers
 
 @pytest.fixture (scope='session')
 def web_session(request):
-    web_session = session()
+    web_session = session(add_provider=False)
 
     def closeSession():
         web_session.logger.info("Close browser session")
@@ -16,5 +16,4 @@ def web_session(request):
 
 def test_add_provider(web_session):
     provs = providers(web_session)
-    provs.add_provider("TestProvider", "livingontheedge.hawkular.org", "80")
-    assert True, "Validate Success - To-Do"
+    provs.add_provider()
