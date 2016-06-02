@@ -14,5 +14,7 @@ def web_session(request):
 
     return web_session
 
-def test_servers_something(web_session):
+def test_servers_view(web_session):
     servs = servers(web_session)
+    assert (servs.validate_servers_list())
+
