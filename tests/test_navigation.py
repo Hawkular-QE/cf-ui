@@ -20,29 +20,29 @@ def web_session(request):
 
 def test_deployments (web_session):
     driver = web_session.web_driver
-    tree = NavigationTree(driver)
-    tree.navigate_to_middleware_deployment_view()
+    nav = NavigationTree(driver)
+    nav.navigate_to_middleware_deployment_view()
 
 def sleep_test_providers (web_session):
     driver = web_session.web_driver
-    tree = NavigationTree(driver)
-    tree.navigate_to_middleware_providers_view()
+    nav = NavigationTree(driver)
+    nav.navigate_to_middleware_providers_view()
 
 def sleep_test_servers (web_session):
     driver = web_session.web_driver
-    tree = NavigationTree(driver)
-    tree.navigate_to_middleware_servers_view()
-    sleep(3)
+    nav = NavigationTree(driver)
+    nav.navigate_to_middleware_servers_view()
+
 
 def sleep_test_topology(web_session):
     driver = web_session.web_driver
-    tree = NavigationTree(driver)
-    tree.navigate_to_topology_view()
-    sleep(5)
+    nav = NavigationTree(driver)
+    nav.navigate_to_topology_view()
+
 
 def sleep_test_datasources(web_session):
     driver = web_session.web_driver
-    tree = NavigationTree(driver)
-    tree.navigate_to_middleware_datasources_view()
-    sleep(5)
+    nav = NavigationTree(driver)
+    nav.navigate_to_middleware_datasources_view()
+
 
