@@ -10,4 +10,3 @@ class properties(object):
     HAWKULAR_USERNAME = "jdoe"
     HAWKULAR_PASSWORD = "password"
     HAWKULAR_PROVIDER_NAME = "Hawkular-Provider"
-
