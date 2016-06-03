@@ -7,5 +7,6 @@ pytest
 # this will install chrome driver (default into .cf-ui directory) and it is necessary to set PATH to it
 # export PATH=$PATH:${CF_UI}/.cf-ui
 # more: https://sites.google.com/a/chromium.org/chromedriver/home
-# setting PATH is buggy for IDE, you can also set path to driver as method attribute in session.py (g.e.: webdriver.Chrome("/path/to/.cf-ui/") )
+# setting PATH is buggy for IDE, you can also set path to driver as method attribute in session.py
+# (g.e.: webdriver.Chrome("/path/to/.cf-ui/") )
 # chromedriver
