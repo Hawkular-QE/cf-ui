@@ -35,7 +35,8 @@ class session(properties):
 
     def __get_web_driver__(self):
 
-        self.web_driver = webdriver.Firefox()
+        self.logger.info("Using Browser: %s", self.USED_BROWSER)
+        self.web_driver = getattr(webdriver,self.USED_BROWSER)()
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
         self.web_driver.get(self.MIQ_URL)
 
