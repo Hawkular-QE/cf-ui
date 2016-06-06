@@ -1,6 +1,5 @@
 import pytest
 from common.session import session
-from time import sleep
 from navigation.navigation import NavigationTree
 
 @pytest.fixture (scope='session')
@@ -10,13 +9,9 @@ def web_session(request):
     def closeSession():
         print ("Close browser session")
         web_session.close_web_driver()
+
     request.addfinalizer(closeSession)
     return web_session
-
-# to run 1 test at a time
-# (by removing "sleep_*")
-# due to the fact that Session closes browser (driver)
-# TODO: clarify!
 
 def test_deployments (web_session):
     driver = web_session.web_driver

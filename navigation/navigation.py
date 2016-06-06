@@ -18,7 +18,6 @@ class UI_Point():
         return self._value
 
 
-
 class UI_Operation():
     """ Possible enumeration (radio) options: Click or HoverMouse. """
     # TODO: enumeration
@@ -66,6 +65,7 @@ class NavigationTree():
     """ Reflection of CF UI, structure and content """
     _tree = dict([])
     web_driver = None
+    _pivot = None
 
     def add_point(self, name, location, action):
         self._tree.update({ name : UI_Action( UI_Point(name, location), UI_Operation(action)) } )
@@ -73,48 +73,31 @@ class NavigationTree():
 
     def __init__(self, driver):
 
+        self._pivot = driver
         self.web_driver = driver
-        self.add_point("compute", ".//*[@id='maintab']/li[3]/a/span[2]", "Hover")
-
-        """ following points are dependant and should be such used """
-
-        self.add_point("middleware", "//span[contains(.,'Middleware')]", "Hover")
+        self.add_point(   "compute", ".//*[@id='maintab']/li[3]/a/span[2]", "Hover")
+        self.add_point("middleware", "id('#menu-compute')/ul/li[4]/a/span", "Hover")
+#                                    "id('#menu-compute')/ul/li[4]/a/span"
 
         self.add_point("middleware_providers",   "id('#menu-compute')/ul/li[4]/div/ul/li[1]/a/span", "Click")
-
-        self.add_point("middleware_servers",     "//span[contains(.,'Middleware Servers')]",         "Click")
-
-        self.add_point("middleware_deployments", "//span[contains(.,'Middleware Deployments')]",     "Click")
-
+        self.add_point("middleware_servers",     "id('#menu-compute')/ul/li[4]/div/ul/li[2]/a/span", "Click")
+        self.add_point("middleware_deployments", "id('#menu-compute')/ul/li[4]/div/ul/li[3]/a/span", "Click")
         self.add_point("middleware_datasources", "id('#menu-compute')/ul/li[4]/div/ul/li[4]/a/span", "Click")
-
         self.add_point(              "topology", "id('#menu-compute')/ul/li[4]/div/ul/li[5]/a/span", "Click")
 
+    def navigate(self, route):
+        driver = self.web_driver
 
-
-    def dump(self):
-        container = self._tree
-        for k in container.keys():
-            v = container.get(k)
-            print " on name '{}' at location '{}' - do '{}!' ".format(k, v._point._value, v._operation._operation)
-
-
-
-    def navigate(self, target_page):
-        pivot = self.web_driver
-        hover = ActionChains(pivot)
-
-        for step in target_page.steps:
+        for step in route.steps:
+            hover = ActionChains(driver)
             action = self._tree.get(step)
-            point = action._point._value
+            target = action._point._value
             operation = action._operation._operation
-
-            elem = pivot.find_element_by_xpath(point)
+            elem = driver.find_element_by_xpath(target)
             hover.move_to_element(elem).perform()
-            sleep(2)
-            if operation=="Click":
+            if operation == "Click":
                 elem.click()
-            pivot = elem
+            sleep(2)
 
 
     def navigate_to_middleware_providers_view(self):
@@ -131,5 +114,6 @@ class NavigationTree():
 
     def navigate_to_topology_view(self):
         self.navigate(UI_Route("compute").add("middleware").add("topology"))
+
 
 
