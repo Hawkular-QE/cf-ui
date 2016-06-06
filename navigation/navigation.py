@@ -3,7 +3,9 @@ from time import sleep
 
 
 class UI_Point():
+
     """ Representation of any addressable place in UI, """
+
     _value = None
     _name = None
 
@@ -19,8 +21,9 @@ class UI_Point():
 
 
 class UI_Operation():
+
     """ Possible enumeration (radio) options: Click or HoverMouse. """
-    # TODO: enumeration
+
     Click, Hover = range(2)
     _operation = None
 
@@ -31,7 +34,9 @@ class UI_Operation():
             raise ValueError("Value of Operation is out of range!")
 
 class UI_Action():
+
     """ composition of UI_Points and UI_Operations into user actions """
+
     _point = None
     _operation = None
     def __init__(self, point, op):
@@ -40,14 +45,11 @@ class UI_Action():
 
 
 class UI_Route():
+
     """ Set of chains of user actions sucessfully  leading to necessary result (place or page) """
-    target = None
-    steps = []
 
     def __init__(self, point):
-        self.target = point
-        self.steps.append(point)
-        pass
+        self.steps = [point]
 
     def target_point(self, point):
         """ Last point of route, final goal """
@@ -113,6 +115,4 @@ class NavigationTree():
 
     def navigate_to_topology_view(self):
         self.navigate(UI_Route("compute").add("middleware").add("topology"))
-
-
 
