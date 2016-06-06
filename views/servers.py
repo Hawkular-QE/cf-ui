@@ -7,7 +7,7 @@ class servers():
     ui_utils = None
 
     PROVIDER = "Hawkular"
-    
+
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
@@ -32,10 +32,10 @@ class servers():
             # Search the each item in the row, for Product "Hawkular"
             for value in row:
                 if value == self.web_session.PROVIDER:
-                    self.web_session.logger.info("Found {} Provider".format(self.web_session.PROVIDER))
+                    self.web_session.logger.info("Found {} Provider".format(self.PROVIDER))
                     return True
 
-        self.web_session.logger.info("No {} Provider found".format(self.web_session.PROVIDER))
+        self.web_session.logger.info("No {} Provider found".format(self.PROVIDER))
         return False
 
 
