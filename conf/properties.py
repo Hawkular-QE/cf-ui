@@ -1,6 +1,6 @@
 class properties(object):
 
-    MIQ_HOSTNAME = "10.16.5.131"
+    MIQ_HOSTNAME = ""
     MIQ_PORT = "80"
     MIQ_USERNAME = "admin"
     MIQ_PASSWORD = "smartvm"
