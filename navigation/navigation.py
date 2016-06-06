@@ -77,7 +77,6 @@ class NavigationTree():
         self.web_driver = driver
         self.add_point(   "compute", ".//*[@id='maintab']/li[3]/a/span[2]", "Hover")
         self.add_point("middleware", "id('#menu-compute')/ul/li[4]/a/span", "Hover")
-#                                    "id('#menu-compute')/ul/li[4]/a/span"
 
         self.add_point("middleware_providers",   "id('#menu-compute')/ul/li[4]/div/ul/li[1]/a/span", "Click")
         self.add_point("middleware_servers",     "id('#menu-compute')/ul/li[4]/div/ul/li[2]/a/span", "Click")
