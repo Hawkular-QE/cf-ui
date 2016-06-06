@@ -11,6 +11,7 @@ class session(properties):
 
     MIQ_URL = None
     HAWKULAR_URL = None
+    PROVIDER = "Hawkular"
 
     web_driver = None
     login = None
