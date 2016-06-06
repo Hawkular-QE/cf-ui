@@ -18,8 +18,6 @@ class servers():
         ## Vaidate that a Hawkular Provider is in the Servers list
         ## To-Do: Validate Servers list contains all expected Servers
 
-        ## Refactor when formal navigations are in place
-        #self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
         NavigationTree(self.web_driver).navigate_to_middleware_servers_view()
 
         # 1) Get table as list
@@ -44,8 +42,6 @@ class servers():
 
         ## Validate the Hawkular Server details
 
-        ## Refactor when formal navigations are in place
-        #self.web_session.web_driver.get("{}/middleware_server/show_list?type=list".format(self.web_session.MIQ_URL))
         NavigationTree(self.web_driver).navigate_to_middleware_servers_view()
 
         self.__find_and_click_on_provider__(self.web_session.PROVIDER)
