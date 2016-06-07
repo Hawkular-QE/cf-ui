@@ -15,7 +15,7 @@ class providers():
         self.web_session = web_session
         self.web_driver = web_session.web_driver
 
-    def add_provider(self):
+    def add_provider(self, delete_if_provider_present=True):
         self.providerName = self.web_session.HAWKULAR_PROVIDER_NAME
         self.hostName = self.web_session.HAWKULAR_HOSTNAME
         self.port = self.web_session.HAWKULAR_PORT
@@ -26,7 +26,8 @@ class providers():
 
         if self.does_provider_exist():
             self.web_session.logger.info("Middleware Provider already exist.")
-            self.delete_provider()
+            if delete_if_provider_present:
+                self.delete_provider()
         else:
             self.web_session.logger.info("Adding Middleware Provider to ManageIQ instance")
 

@@ -32,7 +32,7 @@ class session(properties):
 
         ''' Add provider, if the provider has not all ready been added '''
         if (add_provider):
-            providers(self).add_provider_if_not_present()
+            providers(self).add_provider(delete_if_provider_present=False)
 
     def __get_web_driver__(self):
 
