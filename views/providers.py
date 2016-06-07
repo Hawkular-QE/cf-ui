@@ -28,6 +28,8 @@ class providers():
             self.web_session.logger.info("Middleware Provider already exist.")
             if delete_if_provider_present:
                 self.delete_provider()
+            else:
+                return
         else:
             self.web_session.logger.info("Adding Middleware Provider to ManageIQ instance")
 
