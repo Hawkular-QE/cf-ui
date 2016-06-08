@@ -13,4 +13,4 @@ class properties(object):
 
     # Browser that will be used (needs to be installed (requirements.txt) and PATH set properly )
     # Firefox|Chrome
-    USED_BROWSER = "Firefox"
+    BROWSER = "Firefox"
