@@ -18,6 +18,10 @@ def test_add_provider(web_session):
     provs = providers(web_session)
     provs.add_provider()
 
+def test_update_provider(web_session):
+    provs = providers(web_session)
+    provs.update_provider()
+
 def test_delete_provider(web_session):
     provs = providers(web_session)
     provs.delete_provider()
