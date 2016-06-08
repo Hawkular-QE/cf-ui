@@ -39,7 +39,7 @@ def sleep_test_datasources(web_session):
     nav = NavigationTree(driver)
     nav.navigate_to_middleware_datasources_view()
 
-t_all_navegitions_1(web_session):
+def test_all_navegitions_1(web_session):
     nav = NavigationTree(web_session.web_driver)
     nav.navigate_to_middleware_providers_view()
     nav.navigate_to_middleware_servers_view()
