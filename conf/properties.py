@@ -1,16 +1,36 @@
+import ConfigParser
+import StringIO
+import os
+
 class properties(object):
 
-    MIQ_HOSTNAME = ""
-    MIQ_PORT = "80"
-    MIQ_USERNAME = "admin"
-    MIQ_PASSWORD = "smartvm"
+    PROPERTIES_FILE_NAME = "properties.properties"
 
-    HAWKULAR_HOSTNAME = "livingontheedge.hawkular.org"
-    HAWKULAR_PORT = "80"
-    HAWKULAR_USERNAME = "jdoe"
-    HAWKULAR_PASSWORD = "password"
-    HAWKULAR_PROVIDER_NAME = "Hawkular-Provider"
+    # Simple parser for *.properties file
+    # http://stackoverflow.com/questions/2819696/parsing-properties-file-in-python
+    def read_properties_file(self, file_path):
+        # if file does not exists return empty array
+        if not os.path.isfile(file_path):
+            return []
+        # load property file and parse ti to array
+        with open(file_path) as f:
+            config = StringIO.StringIO()
+            config.write('[properties_section]\n')
+            config.write(f.read().replace('%', '%%'))
+            config.seek(0, os.SEEK_SET)
 
-    # Browser that will be used (needs to be installed (requirements.txt) and PATH set properly )
-    # Firefox|Chrome
-    BROWSER = "Firefox"
+            cp = ConfigParser.SafeConfigParser()
+            cp.optionxform = str
+            cp.readfp(config)
+
+            return dict(cp.items('properties_section'))
+
+    def __init__(self):
+        # TODO: parse *.properties file name & path from command line arguments
+        # load properties from same dir as this file is in
+        propertyArray = self.read_properties_file(os.path.dirname(__file__) + '/' + self.PROPERTIES_FILE_NAME)
+        # check if propertyArray is not empty
+        if propertyArray:
+            # set this class's attributes from propertyArray
+            for propertyItemKey, propertyItemValue in propertyArray.iteritems():
+                setattr( properties, propertyItemKey, propertyItemValue )
