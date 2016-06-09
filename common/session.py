@@ -18,7 +18,7 @@ class session(properties):
     logger = None
     logging_level = logging.DEBUG
 
-    def __init__(self, login=True, add_provider=True ):
+    def __init__(self, login=True, add_provider=True):
         # call parent method to load properties from files
         super(session, self).__init__()
 
