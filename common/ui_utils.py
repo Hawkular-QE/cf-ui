@@ -37,3 +37,9 @@ class ui_utils():
 
     def waitForElementOnPage(self, el, waitTime):
         print "To Do"
+
+    def sleep(self, waitTime):
+        time.sleep(waitTime)
+
+    def get_elements_containing_text(self, text):
+        return self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format(text))
