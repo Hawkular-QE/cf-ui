@@ -65,26 +65,27 @@ class UI_Route():
 class NavigationTree():
 
     """ Reflection of CF UI, structure and content """
-    _tree = dict([])
+    _tree = dict([]) # class attribute, common for all instances
+    __is_tree_built = False
     web_driver = None
     _pivot = None
 
     def add_point(self, name, location, action):
         self._tree.update({ name : UI_Action( UI_Point(name, location), UI_Operation(action)) } )
 
-
     def __init__(self, driver):
 
         self._pivot = driver
         self.web_driver = driver
-        self.add_point(   "compute", ".//*[@id='maintab']/li[3]/a/span[2]", "Hover")
-        self.add_point("middleware", "id('#menu-compute')/ul/li[4]/a/span", "Hover")
+        if self.__is_tree_built == False:        ### TODO: looks like doesn't prevent of rebuilding the tree (to investigate) ###
 
-        self.add_point("middleware_providers",   "id('#menu-compute')/ul/li[4]/div/ul/li[1]/a/span", "Click")
-        self.add_point("middleware_servers",     "id('#menu-compute')/ul/li[4]/div/ul/li[2]/a/span", "Click")
-        self.add_point("middleware_deployments", "id('#menu-compute')/ul/li[4]/div/ul/li[3]/a/span", "Click")
-        self.add_point("middleware_datasources", "id('#menu-compute')/ul/li[4]/div/ul/li[4]/a/span", "Click")
-        self.add_point(              "topology", "id('#menu-compute')/ul/li[4]/div/ul/li[5]/a/span", "Click")
+            self.add_point("middleware", "id('maintab')/li[6]/a/span[2]", "Hover")
+            self.add_point("middleware_providers",   "id('#menu-mdl')/ul/li[1]/a/span", "Click")
+            self.add_point("middleware_servers",     "id('#menu-mdl')/ul/li[2]/a/span", "Click")
+            self.add_point("middleware_deployments", "id('#menu-mdl')/ul/li[3]/a/span", "Click")
+            self.add_point("middleware_datasources", "id('#menu-mdl')/ul/li[4]/a/span", "Click")
+            self.add_point(              "topology", "id('#menu-mdl')/ul/li[5]/a/span", "Click")
+            self.__is_tree_built = True
 
     def navigate(self, route):
         driver = self.web_driver
@@ -102,17 +103,17 @@ class NavigationTree():
 
 
     def navigate_to_middleware_providers_view(self):
-        self.navigate(UI_Route("compute").add("middleware").add("middleware_providers"))
+        self.navigate( UI_Route("middleware").add("middleware_providers") )
 
     def navigate_to_middleware_servers_view(self):
-        self.navigate(UI_Route("compute").add("middleware").add("middleware_servers"))
+        self.navigate( UI_Route("middleware").add("middleware_servers") )
 
     def navigate_to_middleware_deployment_view(self):
-        self.navigate(UI_Route("compute").add("middleware").add("middleware_deployments"))
+        self.navigate( UI_Route("middleware").add("middleware_deployments") )
 
     def navigate_to_middleware_datasources_view(self):
-        self.navigate(UI_Route("compute").add("middleware").add("middleware_datasources"))
+        self.navigate( UI_Route("middleware").add("middleware_datasources") )
 
     def navigate_to_topology_view(self):
-        self.navigate(UI_Route("compute").add("middleware").add("topology"))
+        self.navigate( UI_Route("middleware").add("topology") )
 
