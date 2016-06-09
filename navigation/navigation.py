@@ -77,14 +77,14 @@ class NavigationTree():
 
         self._pivot = driver
         self.web_driver = driver
-        if self.__is_tree_built == False:
+        if self.__is_tree_built == False:        ### TODO: looks like doesn't prevent of rebuilding the tree (to investigate) ###
+
             self.add_point("middleware", "id('maintab')/li[6]/a/span[2]", "Hover")
             self.add_point("middleware_providers",   "id('#menu-mdl')/ul/li[1]/a/span", "Click")
             self.add_point("middleware_servers",     "id('#menu-mdl')/ul/li[2]/a/span", "Click")
             self.add_point("middleware_deployments", "id('#menu-mdl')/ul/li[3]/a/span", "Click")
             self.add_point("middleware_datasources", "id('#menu-mdl')/ul/li[4]/a/span", "Click")
             self.add_point(              "topology", "id('#menu-mdl')/ul/li[5]/a/span", "Click")
-            print "\nTree is built."
             self.__is_tree_built = True
 
     def navigate(self, route):
@@ -103,27 +103,17 @@ class NavigationTree():
 
 
     def navigate_to_middleware_providers_view(self):
-        #self.navigate(UI_Route("compute").add("middleware").add("middleware_providers"))
         self.navigate( UI_Route("middleware").add("middleware_providers") )
-        print "\nExecution: navigate_to_middleware_providers_view"
 
     def navigate_to_middleware_servers_view(self):
-        #self.navigate(UI_Route("compute").add("middleware").add("middleware_servers"))
         self.navigate( UI_Route("middleware").add("middleware_servers") )
-        print "\nExecution: navigate_to_middleware_servers_view"
 
     def navigate_to_middleware_deployment_view(self):
-        #self.navigate(UI_Route("compute").add("middleware").add("middleware_deployments"))
         self.navigate( UI_Route("middleware").add("middleware_deployments") )
-        print "\nExecution: navigate_to_middleware_deployment_view"
 
     def navigate_to_middleware_datasources_view(self):
-        #self.navigate(UI_Route("compute").add("middleware").add("middleware_datasources"))
         self.navigate( UI_Route("middleware").add("middleware_datasources") )
-        print "\nExecution: navigate_to_middleware_datasources_view"
 
     def navigate_to_topology_view(self):
-        #self.navigate(UI_Route("compute").add("middleware").add("topology"))
         self.navigate( UI_Route("middleware").add("topology") )
-        print "\nExecution: navigate_to_topology_view"
 
