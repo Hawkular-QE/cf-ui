@@ -14,18 +14,12 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-def test_sucess(web_session):
 
+def test_sucess(web_session):
     print 'Start parsing'
     table = Table(web_session)
+
     print table.get_middleware_datasources_table()
     print table.get_middleware_providers_table()
     print table.get_middleware_servers_table()
     print table.get_middleware_w_deployments_table()
-
-
-def _test_not_sucess(web_session):
-
-    print 'Start parsing'
-    table = Table(web_session)
-    print table.get_middleware_providers_table()
