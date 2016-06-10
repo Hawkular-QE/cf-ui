@@ -124,8 +124,10 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='port']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(8080)
 
+        # Wait till Save button is enabled before click
+
         WebDriverWait(self.web_driver, 30).until(
-            EC.visibility_of_element_located((By.XPATH, "//button[contains(.,'Save')]")))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
         self.web_driver.find_element_by_xpath("//button[contains(.,'Save')]").click()
 
         assert ui_utils(self.web_session).waitForTextOnPage('Middleware Provider "Test_Provider" was saved', 15)
@@ -152,8 +154,10 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='port']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(self.web_session.HAWKULAR_PORT)
 
+        # Wait till Save button is enabled before click
+
         WebDriverWait(self.web_driver, 30).until(
-            EC.visibility_of_element_located((By.XPATH, "//button[contains(.,'Save')]")))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
         self.web_driver.find_element_by_xpath("//button[contains(.,'Save')]").click()
         assert ui_utils(self.web_session).waitForTextOnPage(
             'Middleware Provider "{}" was saved'.format(self.web_session.HAWKULAR_PROVIDER_NAME), 15)
