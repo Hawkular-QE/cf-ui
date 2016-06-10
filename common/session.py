@@ -22,6 +22,8 @@ class session(properties):
         # call parent method to load properties from files
         super(session, self).__init__()
 
+        assert self.MIQ_HOSTNAME, "Property MIQ_HOSTNAME in conf/" + self.PROPERTIES_FILE_NAME + " can not be empty"
+
         self.login = login
 
         self.MIQ_URL = "http://{}:{}/".format(self.MIQ_HOSTNAME, self.MIQ_PORT)
