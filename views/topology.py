@@ -16,7 +16,7 @@ class topology():
 
     def validate_display_names_checkbox(self, select = True):
 
-        # Be default, the MW Provider is always displayed in the Topology
+        # By default, the MW Provider is always displayed in the Topology
         # Thus, use MW Prover Name for checkbock validation
 
         provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
@@ -42,7 +42,6 @@ class topology():
 
         self.web_session.logger.info("Validate that default Topology View displays {}".format(provider_name))
 
-        ## Nav to Top view
         self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
 
         self.__display_names__(select = True)
@@ -57,7 +56,7 @@ class topology():
         # Validate that each Server Name is displayed in Topology:
         # 1) get Servers list (from Servers view)
         # 2) Enable Display Names
-        # 3) Enable Middleware Servers entities (by validating weather 1st Server Name in Servers-List is displayed)
+        # 3) Enable Middleware Servers entities (by validating whether 1st Server Name in Servers-List is displayed)
         # 4) Validate that each Server in Servers-List is displayed
 
         self.web_session.logger.info("Validate that Topology View expcted Servers")
@@ -68,7 +67,7 @@ class topology():
 
         self.__display_names__(select=True)
 
-        ## Select "Middleware Servers"
+        # Select "Middleware Servers"
         self.__select_entities_view__(self.entities.get('servers'), servers_list[0].get('Server Name'))
 
         for server in servers_list:
@@ -84,7 +83,7 @@ class topology():
         # Validate that each Deployment is displayed in Topology:
         # 1) get Deployment list (from Deployments view)
         # 2) Enable Display Names
-        # 3) Enable Middleware Deployment entities (by validating weather 1st Deployment Name in Deployment-List is displayed)
+        # 3) Enable Middleware Deployment entities (by validating whether 1st Deployment Name in Deployment-List is displayed)
         # 4) Validate that each Deployment in Deployments-List is displayed
 
         deployments_list = table(self.web_session).get_middleware_deployments_table()
@@ -93,8 +92,8 @@ class topology():
 
         self.__display_names__(select=True)
 
-        ## Select "Middleware Servers"
-        self.__select_entities_view__(self.entities.get('servers'), deployments_list[0].get('Deployment Name'))
+        # Select "Middleware Deployments"
+        self.__select_entities_view__(self.entities.get('deployments'), deployments_list[0].get('Deployment Name'))
 
         for deployment in deployments_list:
             if not self.__is_name_displayed__(deployment.get('Deployment Name')):
