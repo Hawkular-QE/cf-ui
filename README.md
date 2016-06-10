@@ -1,6 +1,6 @@
 # CF-UI test framework
 
-## Environment setup:
+## Environment setup
 ```shell
 git clone https://github.com/Hawkular-QE/cf-ui.git
 cd cf-ui
@@ -22,3 +22,5 @@ Example:
 ```python
 driver = webdriver.Chrome("/path/to/.cf-ui/")
 ```
+## Configuration
+All configuration on which automation should relied should be stored in conf/properties.properties
