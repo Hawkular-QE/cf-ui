@@ -10,3 +10,7 @@ class properties(object):
     HAWKULAR_USERNAME = "jdoe"
     HAWKULAR_PASSWORD = "password"
     HAWKULAR_PROVIDER_NAME = "Hawkular-Provider"
+
+    # Browser that will be used (needs to be installed (requirements.txt) and PATH set properly )
+    # Firefox|Chrome
+    BROWSER = "Firefox"
