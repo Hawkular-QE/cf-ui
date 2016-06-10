@@ -1,5 +1,5 @@
 
-class Table():
+class table():
 
     paths = {
                 'middleware_servers'     : '/middleware_server/show_list',
@@ -14,7 +14,7 @@ class Table():
         self.driver = web_session.web_driver
 
     def from_url(self, url):
-        self.driver.get(self.web_session.MIQ_HOSTNAME + url)
+        self.driver.get(self.web_session.MIQ_URL + url)
         return self
 
     def elements(self):
