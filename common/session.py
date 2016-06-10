@@ -40,6 +40,7 @@ class session(properties):
 
         self.logger.info("Using Browser: %s", self.BROWSER)
         self.web_driver = getattr(webdriver,self.BROWSER)()
+        self.web_driver.set_window_size(self.BROWSER_WIDTH, self.BROWSER_HEIGHT)
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
         self.web_driver.get(self.MIQ_URL)
 
