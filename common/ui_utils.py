@@ -1,4 +1,5 @@
 import time
+from selenium.common.exceptions import NoSuchElementException
 
 class ui_utils():
 
@@ -20,19 +21,19 @@ class ui_utils():
         ## print "Waiting for text: " + text
         while self.isTextOnPage(text) == False:
             if time.time() - currentTime >= waitTime:
-                self.web_session.logger.error('Timed out waiting for "', text, '"')
+                self.web_session.logger.error("MTimed out waiting for: %s", self.MIQ_URL)
                 return False
             else:
                 time.sleep(1)
 
         return True
 
-    def isElementOnPage(self, el):
-        ## Flesh out - web_driver.isElementPresent(el)
-        if True:
-            return True
-        else:
+    def isElementPresent(self, locatormethod, locatorvalue):
+        try:
+            self.web_driver.find_element(by=locatormethod, value=locatorvalue)
+        except NoSuchElementException:
             return False
+        return True
 
     def waitForElementOnPage(self, el, waitTime):
         print "To Do"
