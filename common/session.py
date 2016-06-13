@@ -65,4 +65,7 @@ class session(properties):
         self.logger.addHandler(ch)
 
     def close_web_driver(self):
+        # close browser window
         self.web_driver.close()
+        # close browser windows & exit webdriver
+        self.web_driver.quit()
