@@ -146,4 +146,7 @@ class topology():
         #  1) Get elements by Name (list of elements)
         #  2) 2nd element can be checked if "name" is Displayed or not
         el = self.ui_utils.get_elements_containing_text(name)
+        if not el:
+            return False
+
         return el[1].is_displayed()
