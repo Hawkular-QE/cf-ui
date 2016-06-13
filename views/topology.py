@@ -136,6 +136,28 @@ class topology():
 
         assert False, "Entity button {} failed to display entity {}.".format(entities_to_view, name)
 
+    def __deselect_entities_view__(self, entities_to_view, name):
+
+        # Currently, not able to determine if Entity button is already deselected:
+        # 1) If "name" is not visible - Entity button already deselected
+        # 2) If "name" is visible - Click entity button
+        # 3) If "name" still visible - assert
+
+        if not self.__is_name_displayed__(name):
+            return
+
+        # Click Entities view (aka: buttons "Middleware Servers" or "Middleware Deployments"):
+        #  1) Get elements by Name (list of elements)
+        #  2) 2nd element contains needed entities element
+
+        el = self.ui_utils.get_elements_containing_text(entities_to_view)
+        el[1].click()
+
+        if not self.__is_name_displayed__(name):
+            return
+
+        assert False, "Entity button {} unexpectedly displaying entity {}.".format(entities_to_view, name)
+
     def __refresh__(self):
         self.web_driver.find_element_by_class_name('btn-default').click()
 
