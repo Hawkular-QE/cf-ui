@@ -20,6 +20,11 @@ class session(properties):
     logging_level = logging.DEBUG
 
     def __init__(self, login=True, add_provider=True):
+        # call parent method to load properties from files
+        super(session, self).__init__()
+
+        assert self.MIQ_HOSTNAME, "Property MIQ_HOSTNAME in conf/" + self.PROPERTIES_FILE_NAME + " can not be empty"
+
         self.login = login
 
         self.MIQ_URL = "http://{}:{}/".format(self.MIQ_HOSTNAME, self.MIQ_PORT)
@@ -38,6 +43,7 @@ class session(properties):
 
         self.logger.info("Using Browser: %s", self.BROWSER)
         self.web_driver = getattr(webdriver,self.BROWSER)()
+        self.web_driver.set_window_size(self.BROWSER_WIDTH, self.BROWSER_HEIGHT)
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
         self.web_driver.get(self.MIQ_URL)
 
