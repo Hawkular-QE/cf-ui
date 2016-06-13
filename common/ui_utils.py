@@ -44,5 +44,5 @@ class ui_utils():
     def get_elements_containing_text(self, text):
         el = self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format(text))
         if not el:
-            self.web_session.logger.WARN("No element found for {}".format(text))
+            self.web_session.logger.warning("No element found for {}".format(text))
         return el
