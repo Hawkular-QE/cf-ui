@@ -155,8 +155,9 @@ class NavigationTree():
 
         current_page = self.web_driver.current_url
         target_page = self.paths.get(target)
+
         if not current_page.endswith(target_page) or force_navigation:
-                self.web_driver.get(self.web_session.MIQ_URL + self.paths.get(target))
+                self.web_driver.get(self.web_session.MIQ_URL + target_page)
 
 
     def jump_to_middleware_providers_view(self, force_navigation=True):
