@@ -111,7 +111,7 @@ class NavigationTree():
 
 
 
-    def navigate(self, target_page):
+    def navigate(self, target_page, force_navigation=True):
         pivot = self.web_driver
         hover = ActionChains(pivot)
 
@@ -148,24 +148,28 @@ class NavigationTree():
 
 # Fast navigation
 
-    def _jump_to(self, target):
+    def _jump_to(self, target, force_navigation=True):
+
         if self.paths.get(target)==None:
             raise ValueError("Fast navigation: no such key in dict 'paths', update it!")
-        print "Jump (", self.web_driver.current_url, " -> ",
-        self.web_driver.get(self.web_session.MIQ_URL + self.paths.get(target))
-        print self.web_driver.current_url, ") "
 
-    def jump_to_middleware_providers_view(self):
-        self._jump_to('middleware_providers')
+        current_page = self.web_driver.current_url
+        target_page = self.paths.get(target)
+        if not current_page.endswith(target_page) or force_navigation:
+                self.web_driver.get(self.web_session.MIQ_URL + self.paths.get(target))
 
-    def jump_to_middleware_servers_view(self):
-        self._jump_to('middleware_servers')
 
-    def jump_to_middleware_deployment_view(self):
-        self._jump_to('middleware_deployments')
+    def jump_to_middleware_providers_view(self, force_navigation=True):
+        self._jump_to('middleware_providers', force_navigation)
 
-    def jump_to_middleware_datasources_view(self):
-        self._jump_to('middleware_datasources')
+    def jump_to_middleware_servers_view(self, force_navigation=True):
+        self._jump_to('middleware_servers', force_navigation)
 
-    def jump_to_topology_view(self):
-        self._jump_to('topology')
+    def jump_to_middleware_deployment_view(self, force_navigation=True):
+        self._jump_to('middleware_deployments', force_navigation)
+
+    def jump_to_middleware_datasources_view(self, force_navigation=True):
+        self._jump_to('middleware_datasources', force_navigation)
+
+    def jump_to_topology_view(self, force_navigation=True):
+        self._jump_to('topology', force_navigation)
