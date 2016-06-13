@@ -7,8 +7,6 @@ from common.session import session
 
 Created on June 6, 2016
 
-
-
 @author: pyadav
 
 '''
