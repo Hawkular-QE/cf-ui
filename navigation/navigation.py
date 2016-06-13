@@ -3,9 +3,7 @@ from time import sleep
 
 
 class UI_Point():
-
     """ Representation of any addressable place in UI, """
-
     _value = None
     _name = None
 
@@ -20,10 +18,10 @@ class UI_Point():
         return self._value
 
 
+
 class UI_Operation():
-
     """ Possible enumeration (radio) options: Click or HoverMouse. """
-
+    # TODO: enumeration
     Click, Hover = range(2)
     _operation = None
 
@@ -34,9 +32,7 @@ class UI_Operation():
             raise ValueError("Value of Operation is out of range!")
 
 class UI_Action():
-
     """ composition of UI_Points and UI_Operations into user actions """
-
     _point = None
     _operation = None
     def __init__(self, point, op):
@@ -45,11 +41,14 @@ class UI_Action():
 
 
 class UI_Route():
-
     """ Set of chains of user actions sucessfully  leading to necessary result (place or page) """
+    target = None
+    steps = []
 
     def __init__(self, point):
-        self.steps = [point]
+        self.target = point
+        self.steps.append(point)
+        pass
 
     def target_point(self, point):
         """ Last point of route, final goal """
@@ -65,55 +64,108 @@ class UI_Route():
 class NavigationTree():
 
     """ Reflection of CF UI, structure and content """
-    _tree = dict([]) # class attribute, common for all instances
-    __is_tree_built = False
+    _tree = dict([])
     web_driver = None
-    _pivot = None
+    web_session = None
+
+    paths = {
+                'middleware_servers'     : '/middleware_server/show_list',
+                'middleware_deployments' : '/middleware_deployment/show_list',
+                'middleware_datasources' : '/middleware_datasource/show_list',
+                'middleware_providers'   : '/ems_middleware/show_list',
+                              'topology' : '/middleware_topology/show',
+            }
+
 
     def add_point(self, name, location, action):
         self._tree.update({ name : UI_Action( UI_Point(name, location), UI_Operation(action)) } )
 
-    def __init__(self, driver):
 
-        self._pivot = driver
-        self.web_driver = driver
-        if self.__is_tree_built == False:        ### TODO: looks like doesn't prevent of rebuilding the tree (to investigate) ###
+    def __init__(self, session):
 
-            self.add_point("middleware", "id('maintab')/li[6]/a/span[2]", "Hover")
-            self.add_point("middleware_providers",   "id('#menu-mdl')/ul/li[1]/a/span", "Click")
-            self.add_point("middleware_servers",     "id('#menu-mdl')/ul/li[2]/a/span", "Click")
-            self.add_point("middleware_deployments", "id('#menu-mdl')/ul/li[3]/a/span", "Click")
-            self.add_point("middleware_datasources", "id('#menu-mdl')/ul/li[4]/a/span", "Click")
-            self.add_point(              "topology", "id('#menu-mdl')/ul/li[5]/a/span", "Click")
-            self.__is_tree_built = True
+        self.web_session = session
+        self.web_driver = self.web_session.web_driver
+        self.add_point("compute", ".//*[@id='maintab']/li[3]/a/span[2]", "Hover")
 
-    def navigate(self, route):
-        driver = self.web_driver
+        """ following points are dependant and should be such used """
 
-        for step in route.steps:
-            hover = ActionChains(driver)
+        self.add_point("middleware", "//span[contains(.,'Middleware')]", "Hover")
+
+        self.add_point("middleware_providers",   "id('#menu-compute')/ul/li[4]/div/ul/li[1]/a/span", "Click")
+
+        self.add_point("middleware_servers",     "//span[contains(.,'Middleware Servers')]",         "Click")
+
+        self.add_point("middleware_deployments", "//span[contains(.,'Middleware Deployments')]",     "Click")
+
+        self.add_point("middleware_datasources", "id('#menu-compute')/ul/li[4]/div/ul/li[4]/a/span", "Click")
+
+        self.add_point(              "topology", "id('#menu-compute')/ul/li[4]/div/ul/li[5]/a/span", "Click")
+
+
+
+    def dump(self):
+        container = self._tree
+        for k in container.keys():
+            v = container.get(k)
+            print " on name '{}' at location '{}' - do '{}!' ".format(k, v._point._value, v._operation._operation)
+
+
+
+    def navigate(self, target_page):
+        pivot = self.web_driver
+        hover = ActionChains(pivot)
+
+        for step in target_page.steps:
             action = self._tree.get(step)
-            target = action._point._value
+            point = action._point._value
             operation = action._operation._operation
-            elem = driver.find_element_by_xpath(target)
-            hover.move_to_element(elem).perform()
-            if operation == "Click":
-                elem.click()
-            sleep(2)
 
+            elem = pivot.find_element_by_xpath(point)
+            hover.move_to_element(elem).perform()
+            sleep(2)
+            if operation=="Click":
+                elem.click()
+            pivot = elem
+
+# Slow and meditative navigation
 
     def navigate_to_middleware_providers_view(self):
-        self.navigate( UI_Route("middleware").add("middleware_providers") )
+        self.navigate(UI_Route("compute").add("middleware").add("middleware_providers"))
 
     def navigate_to_middleware_servers_view(self):
-        self.navigate( UI_Route("middleware").add("middleware_servers") )
+        self.navigate(UI_Route("compute").add("middleware").add("middleware_servers"))
 
     def navigate_to_middleware_deployment_view(self):
-        self.navigate( UI_Route("middleware").add("middleware_deployments") )
+        self.navigate(UI_Route("compute").add("middleware").add("middleware_deployments"))
 
     def navigate_to_middleware_datasources_view(self):
-        self.navigate( UI_Route("middleware").add("middleware_datasources") )
+        self.navigate(UI_Route("compute").add("middleware").add("middleware_datasources"))
 
     def navigate_to_topology_view(self):
-        self.navigate( UI_Route("middleware").add("topology") )
+        self.navigate(UI_Route("compute").add("middleware").add("topology"))
 
+
+
+# Fast navigation
+
+    def _jump_to(self, target):
+        if self.paths.get(target)==None:
+            raise ValueError("Fast navigation: no such key in dict 'paths', update it!")
+        print "Jump (", self.web_driver.current_url, " -> ",
+        self.web_driver.get(self.web_session.MIQ_URL + self.paths.get(target))
+        print self.web_driver.current_url, ") "
+
+    def jump_to_middleware_providers_view(self):
+        self._jump_to('middleware_providers')
+
+    def jump_to_middleware_servers_view(self):
+        self._jump_to('middleware_servers')
+
+    def jump_to_middleware_deployment_view(self):
+        self._jump_to('middleware_deployments')
+
+    def jump_to_middleware_datasources_view(self):
+        self._jump_to('middleware_datasources')
+
+    def jump_to_topology_view(self):
+        self._jump_to('topology')
