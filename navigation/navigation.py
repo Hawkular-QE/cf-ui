@@ -66,14 +66,25 @@ class NavigationTree():
     """ Reflection of CF UI, structure and content """
     _tree = dict([])
     web_driver = None
+    web_session = None
+
+    paths = {
+                'middleware_servers'     : '/middleware_server/show_list',
+                'middleware_deployments' : '/middleware_deployment/show_list',
+                'middleware_datasources' : '/middleware_datasource/show_list',
+                'middleware_providers'   : '/ems_middleware/show_list',
+                              'topology' : '/middleware_topology/show',
+            }
+
 
     def add_point(self, name, location, action):
         self._tree.update({ name : UI_Action( UI_Point(name, location), UI_Operation(action)) } )
 
 
-    def __init__(self, driver):
+    def __init__(self, session):
 
-        self.web_driver = driver
+        self.web_session = session
+        self.web_driver = self.web_session.web_driver
         self.add_point("compute", ".//*[@id='maintab']/li[3]/a/span[2]", "Hover")
 
         """ following points are dependant and should be such used """
@@ -100,7 +111,7 @@ class NavigationTree():
 
 
 
-    def navigate(self, target_page):
+    def navigate(self, target_page, force_navigation=True):
         pivot = self.web_driver
         hover = ActionChains(pivot)
 
@@ -116,6 +127,7 @@ class NavigationTree():
                 elem.click()
             pivot = elem
 
+# Slow and meditative navigation
 
     def navigate_to_middleware_providers_view(self):
         self.navigate(UI_Route("compute").add("middleware").add("middleware_providers"))
@@ -133,3 +145,32 @@ class NavigationTree():
         self.navigate(UI_Route("compute").add("middleware").add("topology"))
 
 
+
+# Fast navigation
+
+    def _jump_to(self, target, force_navigation=True):
+
+        if self.paths.get(target)==None:
+            raise ValueError("Fast navigation: no such key in dict 'paths', update it!")
+
+        current_page = self.web_driver.current_url
+        target_page = self.paths.get(target)
+
+        if not current_page.endswith(target_page) or force_navigation:
+                self.web_driver.get(self.web_session.MIQ_URL + target_page)
+
+
+    def jump_to_middleware_providers_view(self, force_navigation=True):
+        self._jump_to('middleware_providers', force_navigation)
+
+    def jump_to_middleware_servers_view(self, force_navigation=True):
+        self._jump_to('middleware_servers', force_navigation)
+
+    def jump_to_middleware_deployment_view(self, force_navigation=True):
+        self._jump_to('middleware_deployments', force_navigation)
+
+    def jump_to_middleware_datasources_view(self, force_navigation=True):
+        self._jump_to('middleware_datasources', force_navigation)
+
+    def jump_to_topology_view(self, force_navigation=True):
+        self._jump_to('topology', force_navigation)

@@ -11,6 +11,7 @@ class session(properties):
 
     MIQ_URL = None
     HAWKULAR_URL = None
+    PROVIDER = "Hawkular"
 
     web_driver = None
     login = None
@@ -31,11 +32,12 @@ class session(properties):
 
         ''' Add provider, if the provider has not all ready been added '''
         if (add_provider):
-            providers(self).add_provider_if_not_present()
+            providers(self).add_provider(delete_if_provider_present=False)
 
     def __get_web_driver__(self):
 
-        self.web_driver = webdriver.Firefox()
+        self.logger.info("Using Browser: %s", self.BROWSER)
+        self.web_driver = getattr(webdriver,self.BROWSER)()
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
         self.web_driver.get(self.MIQ_URL)
 
@@ -55,9 +57,6 @@ class session(properties):
         ch.setLevel(self.logging_level)
         ch.setFormatter(formatter)
         self.logger.addHandler(ch)
-
-        """ Quite Selenium Logging """
-        LOGGER.setLevel(logging.ERROR)
 
     def close_web_driver(self):
         self.web_driver.close()

@@ -13,36 +13,41 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-# to run 1 test at a time
-# (by removing "sleep_*")
-# due to the fact that Session closes browser (driver)
-# TODO: clarify!
-
-def test_deployments (web_session):
-    driver = web_session.web_driver
-    nav = NavigationTree(driver)
+def sleep_test_deployments (web_session):
+    nav = NavigationTree(web_session)
     nav.navigate_to_middleware_deployment_view()
 
 def sleep_test_providers (web_session):
-    driver = web_session.web_driver
-    nav = NavigationTree(driver)
+    nav = NavigationTree(web_session)
     nav.navigate_to_middleware_providers_view()
 
 def sleep_test_servers (web_session):
-    driver = web_session.web_driver
-    nav = NavigationTree(driver)
+    nav = NavigationTree(web_session)
     nav.navigate_to_middleware_servers_view()
 
 
 def sleep_test_topology(web_session):
-    driver = web_session.web_driver
-    nav = NavigationTree(driver)
+    nav = NavigationTree(web_session)
     nav.navigate_to_topology_view()
 
 
 def sleep_test_datasources(web_session):
-    driver = web_session.web_driver
-    nav = NavigationTree(driver)
+    nav = NavigationTree(web_session)
     nav.navigate_to_middleware_datasources_view()
 
+
+def test_fast_navigation(web_session):
+    nav = NavigationTree(web_session)
+
+    nav.jump_to_middleware_datasources_view()
+    nav.jump_to_middleware_datasources_view(force_navigation=False)
+    nav.jump_to_middleware_datasources_view(force_navigation=True)
+
+    nav.jump_to_middleware_deployment_view()
+    nav.jump_to_middleware_deployment_view(force_navigation=True)
+    nav.jump_to_middleware_deployment_view(force_navigation=False)
+
+    nav.jump_to_middleware_providers_view()
+    nav.jump_to_middleware_servers_view()
+    nav.jump_to_topology_view()
 
