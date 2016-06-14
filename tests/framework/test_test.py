@@ -4,7 +4,7 @@ from common.session import session
 
 @pytest.fixture
 def web_session(request):
-    web_session = session()
+    web_session = session(add_provider=False)
 
     def closeSession():
         web_session.logger.info("Close browser session")

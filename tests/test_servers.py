@@ -22,6 +22,6 @@ def test_servers_view(web_session):
 def test_server_details(web_session):
     web_session.logger.info("Begin Server Details")
     ui_pairs = servers(web_session).validate_server_details()
-    assert ui_pairs["Product"] == web_session.PROVIDER
-    assert ui_pairs["Middleware Provider"] == web_session.HAWKULAR_PROVIDER_NAME
+    assert ui_pairs.get("Product") == web_session.PROVIDER
+    assert ui_pairs.get("Middleware Provider") == web_session.HAWKULAR_PROVIDER_NAME
 

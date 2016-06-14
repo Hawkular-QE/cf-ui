@@ -21,7 +21,7 @@ class ui_utils():
         ## print "Waiting for text: " + text
         while self.isTextOnPage(text) == False:
             if time.time() - currentTime >= waitTime:
-                self.web_session.logger.error("MTimed out waiting for: %s", self.MIQ_URL)
+                self.web_session.logger.error("Timed out waiting for: %s", self.MIQ_URL)
                 return False
             else:
                 time.sleep(1)
@@ -37,3 +37,12 @@ class ui_utils():
 
     def waitForElementOnPage(self, el, waitTime):
         print "To Do"
+
+    def sleep(self, waitTime):
+        time.sleep(waitTime)
+
+    def get_elements_containing_text(self, text):
+        el = self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format(text))
+        if not el:
+            self.web_session.logger.warning("No element found for {}".format(text))
+        return el
