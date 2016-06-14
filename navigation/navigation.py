@@ -122,7 +122,7 @@ class NavigationTree():
 
             elem = pivot.find_element_by_xpath(point)
             hover.move_to_element(elem).perform()
-            sleep(2)
+            sleep(1)
             if operation=="Click":
                 elem.click()
             pivot = elem
