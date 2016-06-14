@@ -145,7 +145,6 @@ class NavigationTree():
         self.navigate(UI_Route("compute").add("middleware").add("topology"))
 
 
-
 # Fast navigation
 
     def _jump_to(self, target, force_navigation=True):
