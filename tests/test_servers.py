@@ -5,7 +5,7 @@ from views.providers import providers
 
 
 @pytest.fixture (scope='session')
-def web_session(request, ):
+def web_session(request):
     web_session = session()
 
     # presume that MIQ has no Middleware Hawkular provider
