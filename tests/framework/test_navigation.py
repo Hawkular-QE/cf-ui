@@ -12,7 +12,7 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-def _test_zero (web_session):
+def test_zero (web_session):
     print "(Zero test)"
 
 def test_deployments (web_session):
