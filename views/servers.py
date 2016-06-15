@@ -33,7 +33,7 @@ class servers():
 
         ## Validate the Hawkular Server details
 
-        NavigationTree(self.web_driver).navigate_to_middleware_servers_view()
+        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
 
         self.__find_and_click_on_provider__(self.web_session.PROVIDER)
 

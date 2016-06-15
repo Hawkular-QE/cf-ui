@@ -87,7 +87,7 @@ class providers():
         if add_provider:
             self.add_provider(delete_if_provider_present=False)
 
-        NavigationTree(self.web_driver).navigate_to_middleware_providers_view()
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         elem_editprovider_link = self.web_driver.find_element_by_xpath(
