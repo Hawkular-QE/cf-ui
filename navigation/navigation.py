@@ -114,8 +114,9 @@ class NavigationTree():
                 elem = driver.find_element_by_xpath(target)
                 hover.move_to_element(elem).perform()
                 if operation == "Click":
+                    sleep(1)
                     elem.click()
-                sleep(2)
+
 
 
     def navigate_to_middleware_providers_view(self):

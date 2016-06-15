@@ -74,7 +74,7 @@ class providers():
             self.web_session.logger.info("Middleware Provider added successfully.")
 
     def delete_provider(self, delete_all_providers=True):
-        NavigationTree(self.web_driver).navigate_to_middleware_providers_view()
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
 
         # Delete the provider
         if delete_all_providers:
