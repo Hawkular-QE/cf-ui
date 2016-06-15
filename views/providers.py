@@ -165,7 +165,7 @@ class providers():
 
         # navigate_to_providers
 
-        NavigationTree(self.web_driver).navigate_to_middleware_providers_view()
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
 
         if ui_utils(self.web_session).isElementPresent(By.XPATH, "//span[contains(.,'(Item 0 of 0)')]"):
             self.web_session.logger.info("Middleware Provider does not exist.")
