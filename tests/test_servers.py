@@ -1,16 +1,11 @@
 import pytest
 from common.session import session
 from views.servers import servers
-from views.providers import providers
 
 
 @pytest.fixture (scope='session')
 def web_session(request):
     web_session = session()
-
-    # presume that MIQ has no Middleware Hawkular provider
-    provider = providers(web_session)
-    provider.add_provider_if_not_present()
 
     def closeSession():
         web_session.logger.info("Close browser session")
