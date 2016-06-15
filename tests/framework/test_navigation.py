@@ -12,28 +12,28 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-def test_zero (web_session):
+def _test_zero (web_session):
     print "(Zero test)"
 
-def test_deployments (web_session):
+def _test_deployments (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_deployment_view()
 
-def test_providers (web_session):
+def _test_providers (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_providers_view()
 
-def test_servers (web_session):
+def _test_servers (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_servers_view()
 
 
-def test_topology(web_session):
+def _test_topology(web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_topology_view()
 
 
-def test_datasources(web_session):
+def _test_datasources(web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_datasources_view()
 
@@ -46,14 +46,14 @@ def _test_all_navigations_1(web_session):
     nav.navigate_to_middleware_datasources_view()
     nav.navigate_to_topology_view()
 
-def _test_all_navigations_2(web_session):
-    NavigationTree(web_session.web_driver).navigate_to_middleware_providers_view()
-    NavigationTree(web_session.web_driver).navigate_to_middleware_servers_view()
-    NavigationTree(web_session.web_driver).navigate_to_middleware_deployment_view()
-    NavigationTree(web_session.web_driver).navigate_to_middleware_datasources_view()
-    NavigationTree(web_session.web_driver).navigate_to_topology_view()
+def test_all_navigations_2(web_session):
+    NavigationTree(web_session).navigate_to_middleware_providers_view()
+    NavigationTree(web_session).navigate_to_middleware_servers_view()
+    NavigationTree(web_session).navigate_to_middleware_deployment_view()
+    NavigationTree(web_session).navigate_to_middleware_datasources_view()
+    NavigationTree(web_session).navigate_to_topology_view()
 
-def test_fast_navigation(web_session):
+def _test_fast_navigation(web_session):
     nav = NavigationTree(web_session)
 
     nav.jump_to_middleware_datasources_view()
