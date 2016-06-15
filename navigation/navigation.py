@@ -95,6 +95,7 @@ class NavigationTree():
         self.add_point(              "topology", "id('#menu-mdl')/ul/li[5]/a/span", "Click")
 
 
+
     def navigate(self, route, force_navigation=True):
         driver = self.web_driver
         goal = route.goal
@@ -104,18 +105,17 @@ class NavigationTree():
         current_page = self.web_driver.current_url
         target_page = self.paths.get(goal)
         if not current_page.endswith(target_page) or force_navigation:
-            self.web_driver.get(self.web_session.MIQ_URL + target_page)
 
-        for step in route.steps:
-            hover = ActionChains(driver)
-            action = self._tree.get(step)
-            target = action._point._value
-            operation = action._operation._operation
-            elem = driver.find_element_by_xpath(target)
-            hover.move_to_element(elem).perform()
-            if operation == "Click":
-                elem.click()
-            sleep(2)
+            for step in route.steps:
+                hover = ActionChains(driver)
+                action = self._tree.get(step)
+                target = action._point._value
+                operation = action._operation._operation
+                elem = driver.find_element_by_xpath(target)
+                hover.move_to_element(elem).perform()
+                if operation == "Click":
+                    elem.click()
+                sleep(2)
 
 
     def navigate_to_middleware_providers_view(self):
