@@ -62,6 +62,7 @@ class topology():
         self.web_session.logger.info("Validate that Topology View expcted Servers")
 
         servers_list = table(self.web_session).get_middleware_servers_table()
+        assert servers_list, "No servers found"
 
         self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
 
@@ -87,6 +88,7 @@ class topology():
         # 4) Validate that each Deployment in Deployments-List is displayed
 
         deployments_list = table(self.web_session).get_middleware_deployments_table()
+        assert deployments_list, "No Deployments found"
 
         self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
 
