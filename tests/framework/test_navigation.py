@@ -1,6 +1,5 @@
 import pytest
 from common.session import session
-from time import sleep
 from navigation.navigation import NavigationTree
 
 @pytest.fixture (scope='session')
@@ -13,25 +12,28 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-def sleep_test_deployments (web_session):
+def _test_zero (web_session):
+    print "(Zero test)"
+
+def test_deployments (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_deployment_view()
 
-def sleep_test_providers (web_session):
+def test_providers (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_providers_view()
 
-def sleep_test_servers (web_session):
+def test_servers (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_servers_view()
 
 
-def sleep_test_topology(web_session):
+def test_topology(web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_topology_view()
 
 
-def sleep_test_datasources(web_session):
+def test_datasources(web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_datasources_view()
 
