@@ -18,6 +18,15 @@ def test_add_provider(web_session):
     provs = providers(web_session)
     provs.add_provider()
 
-def test_delete_provider(web_session):
+def test_update_provider(web_session):
     provs = providers(web_session)
-    provs.delete_provider()
+    provs.update_provider()
+
+def test_delete_all_providers(web_session):
+    provs = providers(web_session)
+    provs.delete_provider(delete_all_providers=True)
+
+def test_delete_single_provider(web_session):
+    provs = providers(web_session)
+    provs.add_provider()
+    provs.delete_hawkular_provider()
