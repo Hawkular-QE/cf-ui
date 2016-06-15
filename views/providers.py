@@ -142,9 +142,12 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage(
             'Middleware Provider "{}" was saved'.format(self.web_session.HAWKULAR_PROVIDER_NAME), 15)
 
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'Hawkular-Provider')]")
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'livingontheedge.hawkular.org')]")
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'80')]")
+        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(
+            self.web_session.HAWKULAR_PROVIDER_NAME))
+        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(
+            self.web_session.HAWKULAR_HOSTNAME))
+        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(
+            self.web_session.HAWKULAR_PORT))
         self.web_session.logger.info("The middleware provider is edited to the original values successfully.")
 
     def add_provider_if_not_present(self):
@@ -189,6 +192,8 @@ class providers():
         assert WebDriverWait(self, 10).until(lambda s: not ui_utils(self.web_session).isElementPresent(By.XPATH,
                                                                                                        "//a[contains(@title,'Name: {}')]".format(
                                                                                                            self.web_session.HAWKULAR_PROVIDER_NAME)))
+        self.web_session.logger.info(
+            "The provider - {} - is deleted successfully".format(self.web_session.HAWKULAR_HOSTNAME))
 
     def clear_all_providers(self):
         self.web_session.logger.info("Deleting all the providers from providers list.")
