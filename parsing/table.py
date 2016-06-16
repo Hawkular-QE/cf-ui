@@ -1,3 +1,5 @@
+from common.ui_utils import ui_utils
+from selenium.webdriver.common.by import By
 
 class table():
 
@@ -15,6 +17,8 @@ class table():
 
     def from_url(self, url):
         self.driver.get(self.web_session.MIQ_URL + url)
+        # wait 60 sec till data appears
+        ui_utils(self.web_session).waitForTextOnPage("No Records Found.",60, exist=False)
         return self
 
     def elements(self):

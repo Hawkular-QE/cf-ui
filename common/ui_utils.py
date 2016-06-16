@@ -11,20 +11,27 @@ class ui_utils():
         self.web_driver = web_session.web_driver
 
     def isTextOnPage(self, text):
-        if self.web_driver.find_elements_by_xpath("//*[contains(text(), '" + text + "')]"):
+        # Just visible text - http://stackoverflow.com/a/651801
+        if self.web_driver.find_elements_by_xpath(".//*[contains(text(), '" + text + "') and not (ancestor::*[contains( @ style,'display:none')]) and not (ancestor::*[contains( @ style, 'display: none')])]"):
             return True
         else:
             return False
 
-    def waitForTextOnPage(self, text, waitTime):
+    # if exist=False then we wait till texts disappears (waitTillTextOnPage[Not]Exists)
+    def waitForTextOnPage(self, text, waitTime, exist=True):
         currentTime = time.time()
         ## print "Waiting for text: " + text
-        while self.isTextOnPage(text) == False:
+        isTextOnPage = self.isTextOnPage(text)
+        while (( not isTextOnPage and exist ) or
+                   ( isTextOnPage and not exist )) :
             if time.time() - currentTime >= waitTime:
                 self.web_session.logger.error("Timed out waiting for: %s", text)
                 return False
             else:
+                if not exist:
+                    self.web_driver.refresh();
                 time.sleep(1)
+            isTextOnPage = self.isTextOnPage(text)
 
         return True
 
