@@ -100,15 +100,6 @@ class servers():
         return self.web_driver.find_elements_by_xpath('.//tr')
 
 
-    def __get_table_list__(self):
-        table = []
-        for tr in self.__getTable_list__():
-            tds = tr.find_elements_by_tag_name('td')
-            if tds:
-                table.append([td.text for td in tds])  # Create the row/list
-
-        return table
-
     def __find_and_click_on_server__(self, product_name):
 
         ## Click on first row that is found to contain Product-name
