@@ -4,4 +4,4 @@
 selenium
 pytest
 # Chrome driver installation
-# chromedriver
+chromedriver
