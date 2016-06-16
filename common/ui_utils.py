@@ -58,7 +58,8 @@ class ui_utils():
 
         if table:
             for pair in table:
-                dict[pair[0]] = pair[1]
+                if len(pair) >= 2:
+                    dict[pair[0]] = pair[1]
         else:
             self.web_session.logger.warning("No element found for table.")
 
