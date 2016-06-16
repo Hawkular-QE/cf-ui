@@ -27,9 +27,9 @@ All configuration on which automation should relied should be stored in conf/pro
 
 ## Navigation:
 Usage of Navigation Tree:
-'''
+```shell
 tree = NavigationTree(<web_session instance>) 
 Not WebDriver instance
 web_session instance as fixture
-'''
+```
 
