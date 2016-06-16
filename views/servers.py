@@ -57,6 +57,8 @@ class servers():
         self.__find_and_click_on_server__(self.web_session.PROVIDER)
 
         server_details = self.ui_utils.get_generic_table_as_dict()
+        assert server_details, "No server details found for {}.".format(self.web_session.PROVIDER)
+
         if not str(server_details.get('My Company Tags')).__contains__("No My Company Tags have been assigned"):
             origValue = int(server_details.get('My Company Tags')[-1:])
 
@@ -117,4 +119,4 @@ class servers():
                             tds[3].click()
                             return;
 
-        assert False, "Did not find {} Provider".format(product_name)
+        assert False, "Did not find {} provider.".format(product_name)
