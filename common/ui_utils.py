@@ -29,7 +29,7 @@ class ui_utils():
                 return False
             else:
                 if not exist:
-                    self.web_driver.refresh();
+                    self.web_driver.refresh()
                 time.sleep(1)
             isTextOnPage = self.isTextOnPage(text)
 
@@ -42,8 +42,24 @@ class ui_utils():
             return False
         return True
 
-    def waitForElementOnPage(self, el, waitTime):
-        print "To Do"
+    # if exist=False then refresh the page and wait till element disappears
+
+    def waitForElementOnPage(self, locatormethod, locatorvalue, waitTime, exist=True):
+        currentTime = time.time()
+
+        isElementPresent = self.isElementPresent(locatormethod, locatorvalue)
+        while ((not isElementPresent and exist) or
+                   (isElementPresent and not exist)):
+            if time.time() - currentTime >= waitTime:
+                self.web_session.logger.error("Timed out waiting for: %s", locatorvalue)
+                return False
+            else:
+                if not exist:
+                    self.web_driver.refresh()
+                time.sleep(1)
+                isElementPresent = self.isElementPresent(locatormethod, locatorvalue)
+
+        return True
 
     def sleep(self, waitTime):
         time.sleep(waitTime)
@@ -71,3 +87,19 @@ class ui_utils():
             self.web_session.logger.warning("No element found for table.")
 
         return dict
+
+    # Refresh the page and wait till expected text appears on the page
+
+    def refresh_until_text_appears(self, text, waitTime):
+        currentTime = time.time()
+        isTextOnPage = self.isTextOnPage(text)
+        while not isTextOnPage:
+            if time.time() - currentTime >= waitTime:
+                self.web_session.logger.error("Timed out waiting for: %s", text)
+                return False
+            else:
+                self.web_driver.refresh()
+                time.sleep(1)
+            isTextOnPage = self.isTextOnPage(text)
+
+        return True

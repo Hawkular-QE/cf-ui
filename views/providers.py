@@ -73,8 +73,17 @@ class providers():
                 self.provider_name)):
             self.web_session.logger.info("Middleware Provider added successfully.")
 
+        # Navigate to the provider details page and check if the last refresh status is - Success.
+
+        self.web_driver.find_element_by_xpath(
+            "//a[@title='{}']".format(self.web_session.HAWKULAR_PROVIDER_NAME)).click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
+
+        assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
+
     def delete_provider(self, delete_all_providers=True):
         NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
 
         # Delete the provider
         if delete_all_providers:
@@ -88,6 +97,7 @@ class providers():
             self.add_provider(delete_if_provider_present=False)
 
         NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         elem_editprovider_link = self.web_driver.find_element_by_xpath(
@@ -175,6 +185,8 @@ class providers():
             return True
 
     def delete_hawkular_provider(self):
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_session.logger.info("Deleting the provider- {}".format(self.web_session.HAWKULAR_HOSTNAME))
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -183,17 +195,13 @@ class providers():
         self.web_driver.switch_to_alert().accept()
         assert ui_utils(self.web_session).waitForTextOnPage("Delete initiated", 15)
 
-        # Verify if the provider is deleted from the provider list by refreshing the page.
+        # Verify if the provider is deleted from the provider list.
 
-        self.web_driver.refresh()
-        while ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
-                self.web_session.HAWKULAR_PROVIDER_NAME)):
-            self.web_driver.refresh()
-        assert WebDriverWait(self, 10).until(lambda s: not ui_utils(self.web_session).isElementPresent(By.XPATH,
-                                                                                                       "//a[contains(@title,'Name: {}')]".format(
-                                                                                                           self.web_session.HAWKULAR_PROVIDER_NAME)))
-        self.web_session.logger.info(
-            "The provider - {} - is deleted successfully".format(self.web_session.HAWKULAR_HOSTNAME))
+        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH, "//a[@title='{}']".format(
+            self.web_session.HAWKULAR_PROVIDER_NAME), 120, exist=False)
+        if not ui_utils(self.web_session).isTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME):
+            self.web_session.logger.info(
+                "The provider - {} - is deleted successfully".format(self.web_session.HAWKULAR_HOSTNAME))
 
     def clear_all_providers(self):
         self.web_session.logger.info("Deleting all the providers from providers list.")
@@ -203,11 +211,25 @@ class providers():
             "//a[@title='Remove selected Middleware Providers from the VMDB']").click()
         self.web_driver.switch_to_alert().accept()
         assert ui_utils(self.web_session).waitForTextOnPage(
-            "Delete initiated for 1 Middleware Provider from the CFME Database", 15)
+            "Delete initiated", 15)
 
-        while not ui_utils(self.web_session).isElementPresent(By.XPATH, "//span[contains(.,'(Item 0 of 0)')]"):
-            self.web_driver.refresh()
-        assert ui_utils(self.web_session).waitForTextOnPage("No Records Found", 15)
+        assert ui_utils(self.web_session).refresh_until_text_appears("No Records Found", 120)
         self.web_session.logger.info("All the middleware providers are deleted successfully.")
 
+    def verify_refresh_status_success(self):
 
+        refresh_value_success = "Success"
+
+        # Refresh the page till till the table value for Last Refresh shows the value - Success
+
+        assert ui_utils(self.web_session).refresh_until_text_appears(refresh_value_success, 120)
+        provider_details = ui_utils(self.web_session).get_generic_table_as_dict()
+
+        # Verify if the 'Last Refresh' value from table contains 'Success:
+        refresh_status = provider_details.get("Last Refresh")
+
+        if str(refresh_status).__contains__(refresh_value_success):
+            self.web_session.logger.info("The Last refresh status is - " + refresh_status)
+            return True
+        else:
+            return False
