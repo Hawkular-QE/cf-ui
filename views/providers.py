@@ -213,7 +213,7 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage(
             "Delete initiated", 15)
 
-        assert ui_utils(self.web_session).refresh_till_text_appears("No Records Found", 120)
+        assert ui_utils(self.web_session).refresh_until_text_appears("No Records Found", 120)
         self.web_session.logger.info("All the middleware providers are deleted successfully.")
 
     def verify_refresh_status_success(self):
@@ -222,7 +222,7 @@ class providers():
 
         # Refresh the page till till the table value for Last Refresh shows the value - Success
 
-        assert ui_utils(self.web_session).refresh_till_text_appears(refresh_value_success, 120)
+        assert ui_utils(self.web_session).refresh_until_text_appears(refresh_value_success, 120)
         provider_details = ui_utils(self.web_session).get_generic_table_as_dict()
 
         # Verify if the 'Last Refresh' value from table contains 'Success:

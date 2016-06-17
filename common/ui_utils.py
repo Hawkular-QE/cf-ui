@@ -90,7 +90,7 @@ class ui_utils():
 
     # Refresh the page and wait till expected text appears on the page
 
-    def refresh_till_text_appears(self, text, waitTime):
+    def refresh_until_text_appears(self, text, waitTime):
         currentTime = time.time()
         isTextOnPage = self.isTextOnPage(text)
         while not isTextOnPage:
