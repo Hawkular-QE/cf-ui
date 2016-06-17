@@ -74,12 +74,16 @@ class servers():
         self.ui_utils.sleep(1)
 
         # Select value - always just select first value in list (list is index):
-        tag = 'data-original-index=0'
-        el = self.web_driver.execute_script("return $('*[{}]')".format(tag))
-        try:
-            el[0].click()
-        except:
-            el[1].click()
+        # By Browser type - for now - to-do, find a better approach
+        if self.web_session.BROWSER == 'Firefox':
+            self.web_driver.find_element_by_xpath('//th[3]/div/div/div/ul/li[1]/a').click()
+        else:
+            tag = 'data-original-index=0'
+            el = self.web_driver.execute_script("return $('*[{}]')".format(tag))
+            try:
+                el[0].click()
+            except:
+                el[1].click()
 
         # To-Do: Need a better polling/wait mechanism
         self.ui_utils.sleep(3)

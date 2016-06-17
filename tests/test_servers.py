@@ -23,7 +23,8 @@ def test_server_details(web_session):
     web_session.logger.info("Begin Server Details")
     ui_pairs = servers(web_session).validate_server_details()
     assert ui_pairs.get("Product") == web_session.PROVIDER
-    assert ui_pairs.get("Middleware Provider") == web_session.HAWKULAR_PROVIDER_NAME
+    assert ui_pairs.get("Middleware Provider") == web_session.HAWKULAR_PROVIDER_NAME,\
+        "Expected: {}    Actual: {}".format(ui_pairs.get("Middleware Provider"), web_session.PROVIDER)
 
 def test_server_policy_edit(web_session):
     assert servers(web_session).server_plocy_edit()
