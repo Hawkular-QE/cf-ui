@@ -25,3 +25,5 @@ def test_server_details(web_session):
     assert ui_pairs.get("Product") == web_session.PROVIDER
     assert ui_pairs.get("Middleware Provider") == web_session.HAWKULAR_PROVIDER_NAME
 
+def test_server_policy_edit(web_session):
+    assert servers(web_session).server_plocy_edit()

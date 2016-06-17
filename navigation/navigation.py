@@ -97,10 +97,10 @@ class NavigationTree():
             operation = action._operation._operation
             elem = driver.find_element_by_xpath(target)
             hover.move_to_element(elem).perform()
+            sleep(2) # wait sec to load menu
             if operation == "Click":
                 elem.click()
-            sleep(2)
-
+            sleep(2)  # wait sec after clicking on menu item
 
     def navigate_to_middleware_providers_view(self):
         self.navigate( UI_Route("middleware").add("middleware_providers") )
