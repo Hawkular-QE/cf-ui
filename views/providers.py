@@ -106,7 +106,7 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage("Confirm Password", 30)
 
         self.web_driver.find_element_by_xpath("//input[@id='name']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys("Test_Provider")
+        self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys(self.web_session.PROVIDER)
 
         self.web_driver.find_element_by_xpath("//input[@id='hostname']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys("Demo.hawkular.org")
@@ -120,11 +120,11 @@ class providers():
             EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
         self.web_driver.find_element_by_xpath("//button[contains(.,'Save')]").click()
 
-        assert ui_utils(self.web_session).waitForTextOnPage('Middleware Provider "Test_Provider" was saved', 15)
+        assert ui_utils(self.web_session).waitForTextOnPage('Middleware Provider "{}" was saved'.format(self.web_session.PROVIDER), 15)
 
         # Verify if the provider name, hostname and port number is successfully updated and shown in UI
 
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'Test_Provider')]")
+        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(self.web_session.PROVIDER))
         assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(text(),'Demo')]")
         assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'8080')]")
         self.web_session.logger.info("The middleware provider is edited successfully.")
