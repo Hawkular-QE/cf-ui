@@ -105,7 +105,7 @@ class ui_utils():
         return True
 
 
-    def click_on_row_containing_value(self, value):
+    def click_on_row_containing_text(self, text):
         ## Click on first row that is found to contain 'value'
 
         table = []
@@ -115,9 +115,9 @@ class ui_utils():
                 table.append([td.text for td in tds])
                 for row in table:
                     for value in row:
-                        if value == value:
-                            self.web_session.logger.info("Click on {} Provider".format(value))
+                        if value == text:
+                            self.web_session.logger.info("Click on {}".format(text))
                             tds[3].click()
                             return;
 
-        assert False, "Did not find {} provider.".format(value)
+        assert False, "Did not find value {}.".format(text)

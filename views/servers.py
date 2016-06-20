@@ -37,7 +37,7 @@ class servers():
 
         NavigationTree(self.web_session).navigate_to_middleware_servers_view()
 
-        self.ui_utils.click_on_row_containing_value(self.web_session.PROVIDER)
+        self.ui_utils.click_on_row_containing_text(self.web_session.PROVIDER)
 
         # 1) Get table as list
         # 2) Convert to Dictionary
