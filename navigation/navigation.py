@@ -95,7 +95,6 @@ class NavigationTree():
         self.add_point(              "topology", "id('#menu-mdl')/ul/li[5]/a/span", "Click")
 
 
-
     def navigate(self, route, force_navigation=True):
         driver = self.web_driver
         goal = route.goal
@@ -132,7 +131,6 @@ class NavigationTree():
 
     def navigate_to_topology_view(self):
         self.navigate(UI_Route("middleware").add("topology"))
-
 
 
     def _jump_to(self, target, force_navigation=True):

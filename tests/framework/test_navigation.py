@@ -37,7 +37,6 @@ def test_datasources(web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_datasources_view()
 
-
 def test_all_navigations_1(web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_providers_view()
