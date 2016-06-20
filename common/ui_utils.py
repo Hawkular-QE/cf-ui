@@ -103,3 +103,21 @@ class ui_utils():
             isTextOnPage = self.isTextOnPage(text)
 
         return True
+
+
+    def click_on_row_containing_value(self, value):
+        ## Click on first row that is found to contain 'value'
+
+        table = []
+        for tr in self.web_driver.find_elements_by_xpath('.//tr'):
+            tds = tr.find_elements_by_tag_name('td')
+            if tds:
+                table.append([td.text for td in tds])
+                for row in table:
+                    for value in row:
+                        if value == value:
+                            self.web_session.logger.info("Click on {} Provider".format(value))
+                            tds[3].click()
+                            return;
+
+        assert False, "Did not find {} provider.".format(value)
