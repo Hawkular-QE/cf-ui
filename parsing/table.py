@@ -101,6 +101,7 @@ class table():
     def get_middleware_datasource_table(self):
         return self.from_path(self.paths.get('middleware_datasources')).elements()
 
+
     def get_leafes_urls(self):
         from lxml import etree
         d = etree.HTML(self.driver.page_source)
@@ -121,14 +122,18 @@ class table():
             all.append( self.get_leaf(url) )
         return all
 
+
     def get_datasource_details(self):
         return self.get_page_details('middleware_datasources')
+
 
     def get_servers_details(self):
         return self.get_page_details('middleware_servers')
 
+
     def get_providers_details(self):
         return self.get_page_details('middleware_providers')
+
 
     def get_deployments_details(self):
         return self.get_page_details('middleware_deployments')
