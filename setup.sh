@@ -16,11 +16,12 @@ cat /etc/os-release | grep -q "Red Hat Enterprise Linux"
 if [ $? -eq "0" ]
 then
     echo -e "\nInstalling RHEL dependencies..."
-    pip uninstall --yes pycurl
-    export PYCURL_SSL_LIBRARY=nss
-    pip install pycurl
     pip install setuptools --upgrade
 fi
+
+pip uninstall --yes pycurl
+export PYCURL_SSL_LIBRARY=nss
+pip install pycurl
 
 pip install mgmtsystem
 

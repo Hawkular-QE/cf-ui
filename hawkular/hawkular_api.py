@@ -13,17 +13,46 @@ class hawkular_api():
     def get_hawkular(self):
         return self.__hawkular__
 
-    def get_hawkular_servers_list(self):
-        list = self.__hawkular__.list_server()
-        return list
+    def get_hawkular_servers(self):
+        servers = []
+        rows = self.__hawkular__.list_server()
 
-    def get_hawkular_datasource_list(self):
-        list = self.__hawkular__.list_server_datasource()
-        return list
+        for server in rows:
+            dict = {}
+            dict['Server Name'] = server.id.strip('~')
+            dict['Product Name'] = server.data['Product Name']
+            dict['Host Name'] = server.data['Hostname']
+            dict['Feed'] = server.path.feed
+            dict['Provider'] = self.web_session.PROVIDER
+            dict['details'] = server.data
+            servers.append(dict)
 
-    def get_hawkular_deployments_list(self):
-        list = self.__hawkular__.list_server_deployment()
-        return list
+        return servers
 
-    def generic_for_testing(self):
+    def get_hawkular_datasources(self):
+        datasources = []
+        rows = self.__hawkular__.list_server_datasource()
+
+        for datasource in rows:
+            dict = {}
+            dict['Nativeid'] = datasource.id
+            dict['Name'] = datasource.name
+            dict['path'] = datasource.path
+            datasources.append(dict)
+
+        return datasources
+
+    def get_hawkular_deployments(self):
+        deployments = []
+        rows = self.__hawkular__.list_server_deployment()
+
+        for deployment in rows:
+            dict = {}
+            dict['Nativeid'] = deployment.id
+            dict['Name'] = deployment.name
+            dict['path'] = deployment.path
+
+        return deployments
+
+    def __generic_for_testing__(self):
         return self.__hawkular__.list_resource()

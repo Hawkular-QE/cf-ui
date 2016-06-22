@@ -15,5 +15,5 @@ def web_session(request):
     return web_session
 
 def test_api(web_session):
-    hawk = hawkular_api(web_session).hawkular_get_servers_list()
+    hawk = hawkular_api(web_session).get_hawkular_servers()
     print hawk

@@ -1,8 +1,7 @@
 from common.ui_utils import ui_utils
 from parsing.table import table
 from navigation.navigation import NavigationTree
-import random
-import selenium
+from hawkular.hawkular_api import hawkular_api
 
 class servers():
     web_session = None
@@ -14,47 +13,12 @@ class servers():
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
 
-    def validate_servers_list(self):
-
-        servers_list = table(self.web_session).get_middleware_servers_table()
-
-        # Search each row to validate whether "Hawkular" provider is present
-        # To-Do: Validate all servers, once there is a way to get the expected servers list
-
-        for server in servers_list:
-             if server.get('Product') == self.web_session.PROVIDER:
-                self.web_session.logger.info("Found {} Provider".format(self.web_session.PROVIDER))
-                return True
-
-        self.web_session.logger.error("No {} Provider found".format(self.web_session.PROVIDER))
-
-        return False
-
-
-    def validate_server_details(self):
-
-        ## Validate the Hawkular Server details
+    def server_plocy_edit(self):
+        origValue = -1
 
         NavigationTree(self.web_session).navigate_to_middleware_servers_view()
 
         self.ui_utils.click_on_row_containing_text(self.web_session.PROVIDER)
-
-        # 1) Get table as list
-        # 2) Convert to Dictionary
-        # 3) Return Dictionary
-
-        pairs = self.ui_utils.get_generic_table_as_dict()
-
-        return pairs
-
-
-    def server_plocy_edit(self):
-        origValue = -1
-        newValue = None
-
-        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
-
-        self.__find_and_click_on_server__(self.web_session.PROVIDER)
 
         server_details = self.ui_utils.get_generic_table_as_dict()
         assert server_details, "No server details found for {}.".format(self.web_session.PROVIDER)
@@ -102,25 +66,51 @@ class servers():
             return False
 
 
-    def __getTable_list__(self):
-        return self.web_driver.find_elements_by_xpath('.//tr')
+    def find_hawkular_server(self, servers_hawk, feed):
+        for serv_hawk in servers_hawk:
+            if feed == serv_hawk.get('Feed'):
+                return serv_hawk
+
+        return None
 
 
-    def __find_and_click_on_server__(self, product_name):
+    def validate_server_details(self):
 
-        ## Click on first row that is found to contain Product-name
-        ## To-Do: how to handle multiple providers with same Product-name
+        servers_ui = table(self.web_session).get_middleware_servers_table()
+        servers_hawk = hawkular_api(self.web_session).get_hawkular_servers()
 
-        table = []
-        for tr in self.__getTable_list__():
-            tds = tr.find_elements_by_tag_name('td')
-            if tds:
-                table.append([td.text for td in tds])
-                for row in table:
-                    for value in row:
-                        if value == product_name:
-                            self.web_session.logger.info("Click on {} Provider".format(product_name))
-                            tds[3].click()
-                            return;
+        for serv_ui in servers_ui:
+            feed = serv_ui.get('Feed')  # Unique Server identifier
+            self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
 
-        assert False, "Did not find {} provider.".format(product_name)
+            self.ui_utils.click_on_row_containing_text(serv_ui.get('Feed'))
+            self.ui_utils.waitForTextOnPage("Properties", 15)
+
+            server_details_ui = self.ui_utils.get_generic_table_as_dict()
+            server_details_hawk = self.find_hawkular_server(servers_hawk, feed)
+
+            assert server_details_hawk, "Feed {} not found in Hawkular Server List".format(feed)
+
+            assert (server_details_ui.get('Product') == server_details_hawk.get("details").get("Product Name")), \
+                    "Product mismatch ui:{}, hawk:{}".format(server_details_ui.get('Product'), server_details_hawk.get("details").get("Product Name"))
+            assert (server_details_ui.get('Version') == server_details_hawk.get("details").get("Version")), \
+                    "Version mismatch ui:{}, hawk:{}".format(server_details_ui.get('Version'), server_details_hawk.get("details").get("Version"))
+
+        return True
+
+    def validate_servers_list(self):
+        servers_ui = table(self.web_session).get_middleware_servers_table()
+        servers_hawk = hawkular_api(self.web_session).get_hawkular_servers()
+
+        assert len(servers_ui) == len(servers_hawk), "Servers lists size mismatch."
+
+        for serv_ui in servers_ui:
+            serv_hawk = self.find_hawkular_server(servers_hawk, serv_ui.get('Feed'))
+
+            assert serv_hawk, "Feed {} not found in Hawkular Server".format(serv_ui.get('Feed'))
+            assert (serv_ui.get('Host Name') == serv_hawk.get("details").get("Hostname")), \
+                "Host Name mismatch ui:{}, hawk:{}".format(serv_ui.get('Feed'), serv_hawk.get("details").get("Hostname"))
+            assert (serv_ui.get('Product') == serv_hawk.get("details").get("Product Name")), \
+                "Product mismatch ui:{}, hawk:{}".format(serv_ui.get('Product'), serv_hawk.get("details").get("Product Name"))
+
+        return True

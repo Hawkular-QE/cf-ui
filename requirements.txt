@@ -3,5 +3,7 @@
 
 selenium
 pytest
+pytz
+
 # Chrome driver installation
 chromedriver
