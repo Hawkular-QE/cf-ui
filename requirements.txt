@@ -3,5 +3,7 @@
 
 selenium
 pytest
+lxml
+#pprint
 # Chrome driver installation
 chromedriver

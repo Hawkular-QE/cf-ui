@@ -13,12 +13,18 @@ class table():
         self.web_session = web_session
         self.driver = web_session.web_driver
 
+    def is_url_different(self, url):
+        return (self.driver.current_url != url)
+
     def from_path(self, path):
-        self.driver.get(self.web_session.MIQ_URL + path)
+        url = self.web_session.MIQ_URL + path
+        if self.is_url_different(url):
+            self.driver.get(self.web_session.MIQ_URL + path)
         return self
 
     def from_url(self, url):
-        self.driver.get(url)
+        if self.is_url_different(url):
+            self.driver.get(url)
         return self
 
     def elements(self):
@@ -67,12 +73,26 @@ class table():
                 self.web_session.logger.warning("No element found for table.")
         return dict
 
+    def get_leaf(self, page, number):
+        leaf = []
+        req_path = self.paths.get(page)
+        leaf_url = req_path.replace("/show_list", "/show/")
+        leaf = self.from_url(leaf_url).details()
+        dict_size = len(leaf)
+        leaf.update({'web_page': leaf_url})
+        leaf.update({'Length': dict_size})
+        if dict_size == 0:
+            leaf.update({'Message': 'Unexpected error encountered'})
+        return leaf
+
     def get_page_details(self, page):
         details = []
         req_path  = self.paths.get(page)
 
         urls = self.from_path(req_path).get_leafes_urls()
         for url in urls:
+            #details.append(self.get_leaf(req_path, n ))
+
             table = self.from_url(url).details()
 
             # additional metadata
@@ -111,7 +131,7 @@ class table():
         urls = [ base_url+value for value in values]
         return urls
 
-
+    """
     def get_leaf(self, url):
         return self.from_url(url).details()
 
@@ -121,11 +141,13 @@ class table():
         for url in self.get_leafes_urls():
             all.append( self.get_leaf(url) )
         return all
-
+    """
 
     def get_datasource_details(self):
         return self.get_page_details('middleware_datasources')
 
+    def get_datasource_details_of(self, offset):
+        return self.get_page_details('middleware_datasources')
 
     def get_servers_details(self):
         return self.get_page_details('middleware_servers')
