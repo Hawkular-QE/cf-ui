@@ -133,3 +133,11 @@ class ui_utils():
             return items
 
         return None
+
+    # Given a list of directories, dictionary key, and value to search - find a specific row
+    def find_row_in_list(self, list, key, value):
+        for row in list:
+            if row.get(key) == value:
+                return row
+
+        return None

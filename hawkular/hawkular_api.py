@@ -55,13 +55,5 @@ class hawkular_api():
 
         return deployments
 
-    # Given a Hawkular list, dictionary key, and value to search - find a specific row
-    def find_row_in_list(self, list, key, value):
-        for row in list:
-            if row.get(key) == value:
-                return row
-
-        return None
-
     def __generic_for_testing__(self):
         return self.__hawkular__.list_resource()

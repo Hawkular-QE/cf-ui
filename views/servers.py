@@ -81,7 +81,7 @@ class servers():
             self.ui_utils.waitForTextOnPage("Properties", 15)
 
             server_details_ui = self.ui_utils.get_generic_table_as_dict()
-            server_details_hawk = self.hawkular_api.find_row_in_list(servers_hawk, 'Feed', feed)
+            server_details_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', feed)
 
             assert server_details_hawk, "Feed {} not found in Hawkular Server List".format(feed)
 
@@ -99,7 +99,7 @@ class servers():
         assert len(servers_ui) == len(servers_hawk), "Servers lists size mismatch."
 
         for serv_ui in servers_ui:
-            serv_hawk = self.hawkular_api.find_row_in_list(servers_hawk, 'Feed', serv_ui.get('Feed'))
+            serv_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', serv_ui.get('Feed'))
 
             assert serv_hawk, "Feed {} not found in Hawkular Server".format(serv_ui.get('Feed'))
             assert (serv_ui.get('Host Name') == serv_hawk.get("details").get("Hostname")), \
