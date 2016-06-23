@@ -8,5 +8,6 @@ pytz
 paramiko
 psycopg2
 
+lxml
 # Chrome driver installation
 chromedriver
