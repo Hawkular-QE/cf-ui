@@ -16,7 +16,7 @@ def web_session(request):
 
 def test_servers_view(web_session):
     web_session.logger.info("Begin Server View")
-    assert (servers(web_session).validate_servers_list())
+    assert servers(web_session).validate_servers_list()
 
 def test_server_details(web_session):
     web_session.logger.info("Begin Server Details")
@@ -24,4 +24,4 @@ def test_server_details(web_session):
 
 def test_server_policy_edit(web_session):
     web_session.logger.info("Begin Server Policy Edit")
-    assert servers(web_session).server_plocy_edit()
+    assert servers(web_session).server_policy_edit()

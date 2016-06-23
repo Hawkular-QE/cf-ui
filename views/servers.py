@@ -13,7 +13,7 @@ class servers():
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
 
-    def server_plocy_edit(self):
+    def server_policy_edit(self):
         origValue = -1
 
         NavigationTree(self.web_session).navigate_to_middleware_servers_view()

@@ -51,6 +51,7 @@ class hawkular_api():
             dict['Nativeid'] = deployment.id
             dict['Name'] = deployment.name
             dict['path'] = deployment.path
+            deployments.append(dict)
 
         return deployments
 
