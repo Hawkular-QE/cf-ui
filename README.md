@@ -4,9 +4,7 @@
 ```shell
 git clone https://github.com/Hawkular-QE/cf-ui.git
 cd cf-ui
-virtualenv .cf-ui
-source .cf-ui/bin/activate
-pip install -r requirements.txt
+setup.sh
 ```
 ### Using Chrome web driver
 Chrome driver is by default installed into .cf-ui directory and it is necessary to set PATH to it so Python Interpreter would know where to find the driver.

@@ -75,6 +75,10 @@ class ui_utils():
         table = []
         dict = {}
 
+        # 1) Get table as list
+        # 2) Convert to Dictionary
+        # 3) Return Dictionary
+
         for tr in self.web_driver.find_elements_by_xpath('.//tr'):
             tds = tr.find_elements_by_tag_name('td')
             if tds: table.append([td.text for td in tds])
