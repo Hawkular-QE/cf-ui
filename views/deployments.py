@@ -30,7 +30,7 @@ class deployments():
             self.ui_utils.click_on_row_containing_text(deployment_name)
             self.ui_utils.waitForTextOnPage("Nativeid", 15)
             dep_details_ui = self.ui_utils.get_generic_table_as_dict()
-            assert dep_details_ui, "UI Deployment Details not found for {}.".format(deployment_name)
+            assert dep_details_ui, "UI Deployment {} not found.".format(deployment_name)
             self.web_session.logger.info("dep_details_ui: {}".format(dep_details_ui))
 
             dep_details_hawk = self.ui_utils.find_row_in_list(deployments_hawk, 'Name', deployment_name)
