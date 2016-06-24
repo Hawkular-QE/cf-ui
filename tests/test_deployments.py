@@ -5,7 +5,7 @@ from views.deployments import deployments
 
 @pytest.fixture (scope='session')
 def web_session(request):
-    web_session = session(add_provider=False)
+    web_session = session(add_provider=True)
 
     def closeSession():
         web_session.logger.info("Close browser session")
