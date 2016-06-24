@@ -48,5 +48,26 @@ def test_details(web_session):
     print "Middleware servers list: "
     t.pretty_print( t.get_servers_details())
 
+def test_single_detail_page(web_session):
 
+    t = table(web_session)
 
+    """
+    Suppose we want to get details of some deployment.
+    Before it is necessary to get list of references from main page of Deployments by method table.get_leaves_refs()
+    Firstly we need to build DOM sub-tree, i.e., navigate to Middleware Deployment page...
+    and then get list of refs
+    """
+    from navigation.navigation import NavigationTree
+
+    NavigationTree(web_session).navigate_to_middleware_deployment_view()
+
+    print "List of refs (unsorted): ",\
+        t.get_leaves_refs()
+
+    """
+    Now we can choose actual values of references, and use it to fetch actual Deployment Details
+    """
+
+    ref = '8'
+    t.pretty_print(t.get_deployments_details_ref(ref), caption="Deployment Details: ")
