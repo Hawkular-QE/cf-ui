@@ -7,11 +7,13 @@ class servers():
     web_session = None
     web_driver = None
     ui_utils = None
+    hawkular_api = None
 
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
+        self.hawkular_api = hawkular_api(self.web_session)
 
     def server_policy_edit(self):
         origValue = -1
@@ -66,18 +68,10 @@ class servers():
             return False
 
 
-    def find_hawkular_server(self, servers_hawk, feed):
-        for serv_hawk in servers_hawk:
-            if feed == serv_hawk.get('Feed'):
-                return serv_hawk
-
-        return None
-
-
     def validate_server_details(self):
 
         servers_ui = table(self.web_session).get_middleware_servers_table()
-        servers_hawk = hawkular_api(self.web_session).get_hawkular_servers()
+        servers_hawk = self.hawkular_api.get_hawkular_servers()
 
         for serv_ui in servers_ui:
             feed = serv_ui.get('Feed')  # Unique Server identifier
@@ -87,7 +81,7 @@ class servers():
             self.ui_utils.waitForTextOnPage("Properties", 15)
 
             server_details_ui = self.ui_utils.get_generic_table_as_dict()
-            server_details_hawk = self.find_hawkular_server(servers_hawk, feed)
+            server_details_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', feed)
 
             assert server_details_hawk, "Feed {} not found in Hawkular Server List".format(feed)
 
@@ -100,12 +94,12 @@ class servers():
 
     def validate_servers_list(self):
         servers_ui = table(self.web_session).get_middleware_servers_table()
-        servers_hawk = hawkular_api(self.web_session).get_hawkular_servers()
+        servers_hawk = self.hawkular_api.get_hawkular_servers()
 
         assert len(servers_ui) == len(servers_hawk), "Servers lists size mismatch."
 
         for serv_ui in servers_ui:
-            serv_hawk = self.find_hawkular_server(servers_hawk, serv_ui.get('Feed'))
+            serv_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', serv_ui.get('Feed'))
 
             assert serv_hawk, "Feed {} not found in Hawkular Server".format(serv_ui.get('Feed'))
             assert (serv_ui.get('Host Name') == serv_hawk.get("details").get("Hostname")), \

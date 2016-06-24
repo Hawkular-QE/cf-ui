@@ -1,5 +1,6 @@
 import time
 from selenium.common.exceptions import NoSuchElementException
+from random import sample
 
 class ui_utils():
 
@@ -108,7 +109,6 @@ class ui_utils():
 
         return True
 
-
     def click_on_row_containing_text(self, text):
         ## Click on first row that is found to contain 'value'
 
@@ -125,3 +125,19 @@ class ui_utils():
                             return;
 
         assert False, "Did not find value {}.".format(text)
+
+    def get_random_list(self, items, limit):
+        if len(items) > limit:
+            return sample(items, limit)
+        else:
+            return items
+
+        return None
+
+    # Given a list of directories, dictionary key, and value to search - find a specific row
+    def find_row_in_list(self, list, key, value):
+        for row in list:
+            if row.get(key) == value:
+                return row
+
+        return None
