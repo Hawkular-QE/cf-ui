@@ -106,15 +106,24 @@ class NavigationTree():
         if not current_page.endswith(target_page) or force_navigation:
 
             for step in route.steps:
-                hover = ActionChains(driver)
-                action = self._tree.get(step)
-                target = action._point._value
-                operation = action._operation._operation
-                elem = driver.find_element_by_xpath(target)
-                hover.move_to_element(elem).perform()
-                if operation == "Click":
-                    elem.click()
-                sleep(2)
+                self.click_turn(driver, step)
+
+
+    def click_turn(self, driver, step):
+        try:
+            hover = ActionChains(driver)
+            action = self._tree.get(step)
+            target = action._point._value
+            operation = action._operation._operation
+            elem = driver.find_element_by_xpath(target)
+            hover.move_to_element(elem).perform()
+            if operation == "Click":
+                elem.click()
+            sleep(2)
+        except:
+            self.web_session.logger.warning(" Clicking goes on next turn. Possibly, recursion...")
+            self.click_turn( driver, step )
+
 
 
     def navigate_to_middleware_providers_view(self):
