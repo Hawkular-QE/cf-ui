@@ -77,6 +77,7 @@ class providers():
 
         self.web_driver.find_element_by_xpath(
             "//a[@title='{}']".format(self.web_session.HAWKULAR_PROVIDER_NAME)).click()
+
         assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
 
         assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
@@ -220,6 +221,8 @@ class providers():
 
         refresh_value_success = "Success"
 
+        self.refresh_provider()
+
         # Refresh the page till till the table value for Last Refresh shows the value - Success
 
         assert ui_utils(self.web_session).refresh_until_text_appears(refresh_value_success, 300)
@@ -233,3 +236,9 @@ class providers():
             return True
         else:
             return False
+
+    def refresh_provider(self):
+        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        self.web_driver.find_element_by_id('ems_middleware_vmdb_choice__ems_middleware_refresh').click()
+        self.web_driver.switch_to_alert().accept()
+        ui_utils(self.web_session).waitForTextOnPage("Refresh Provider initiated", 15)
