@@ -27,7 +27,10 @@ class session(properties):
 
         self.login = login
 
-        self.MIQ_URL = "http://{}:{}/".format(self.MIQ_HOSTNAME, self.MIQ_PORT)
+        self.MIQ_URL = "{}://{}".format(self.MIQ__HTTP, self.MIQ_HOSTNAME)
+        if self.MIQ_PORT:
+            self.MIQ_URL = "{}:{}/".format(self.MIQ_URL, self.MIQ_PORT)
+
         self.HAWKULAR_URL = "http://{}:{}/".format(self.HAWKULAR_HOSTNAME, self.HAWKULAR_PORT)
 
         self.__logger__()
