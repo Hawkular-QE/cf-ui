@@ -1,10 +1,11 @@
 from common.ui_utils import ui_utils
 import time
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from navigation.navigation import NavigationTree
 from selenium.webdriver.support import expected_conditions as EC
+from parsing.table import table
+from hawkular.hawkular_api import hawkular_api
 
 class providers():
     web_session = None
@@ -12,6 +13,7 @@ class providers():
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
+        self.hawkular_api = hawkular_api(self.web_session)
 
     def add_provider(self, delete_if_provider_present=True):
         self.provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
@@ -242,3 +244,50 @@ class providers():
         self.web_driver.find_element_by_id('ems_middleware_vmdb_choice__ems_middleware_refresh').click()
         self.web_driver.switch_to_alert().accept()
         ui_utils(self.web_session).waitForTextOnPage("Refresh Provider initiated", 15)
+
+    def validate_providers_list(self):
+
+        # Test to validate provider list page in UI and validate matching providers hostname, port number
+
+        self.web_session.logger.info("Begin providers list test.")
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        providers_ui = table(self.web_session).get_middleware_providers_table()
+
+        assert len(providers_ui) > 0, "Providers list is empty."
+
+        for prov_ui in providers_ui:
+
+            if prov_ui.get('Name') == self.web_session.HAWKULAR_PROVIDER_NAME:
+                assert (prov_ui.get('Hostname') == self.web_session.HAWKULAR_HOSTNAME), "Hostname mismatch"
+                assert (prov_ui.get('Port') == self.web_session.HAWKULAR_PORT), "Port Number mismatch"
+
+        return True
+
+    def validate_providers_details(self):
+
+        # Test to validate hawkular provider details like name, hostname, port number
+        # and to validate number of middleware servers, deployments and datasources in releationships section.
+
+        self.web_session.logger.info("Begin providers details test.")
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        providers_ui = table(self.web_session).get_middleware_providers_table()
+        servers_hawk = self.hawkular_api.get_hawkular_servers()
+        deployments_hawk = self.hawkular_api.get_hawkular_deployments()
+        datasources_hawk = self.hawkular_api.get_hawkular_datasources()
+
+        for prov_ui in providers_ui:
+            if prov_ui.get('Name') == self.web_session.HAWKULAR_PROVIDER_NAME:
+                ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+
+        assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
+        providers_details_ui = ui_utils(self.web_session).get_generic_table_as_dict()
+
+        assert (providers_details_ui.get('Name') == self.web_session.HAWKULAR_PROVIDER_NAME), "Provider name mismatch"
+        assert (providers_details_ui.get('Host Name') == self.web_session.HAWKULAR_HOSTNAME), "Hostname mismatch"
+        assert (providers_details_ui.get('Port') == self.web_session.HAWKULAR_PORT), "Port Number mismatch"
+
+        assert providers_details_ui.get('Middleware Servers') == str(len(servers_hawk)), "Number of servers mismatch"
+        assert providers_details_ui.get('Middleware Deployments') == str(len(deployments_hawk)), "Number of Deployments mismatch"
+        assert providers_details_ui.get('Middleware Datasources') == str(len(datasources_hawk)), "Number of Datasources mismatch"
+
+        return True
