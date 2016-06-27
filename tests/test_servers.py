@@ -25,3 +25,7 @@ def test_server_details(web_session):
 def test_server_policy_edit(web_session):
     web_session.logger.info("Begin Server Policy Edit")
     assert servers(web_session).server_policy_edit()
+
+def test_stop_eap_server(web_session):
+    web_session.logger.info("Begin Server Stop")
+    assert servers(web_session).stop_eap_server()

@@ -2,6 +2,7 @@ from common.ui_utils import ui_utils
 from parsing.table import table
 from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
+import time
 
 class servers():
     web_session = None
@@ -108,3 +109,61 @@ class servers():
                 "Product mismatch ui:{}, hawk:{}".format(serv_ui.get('Product'), serv_hawk.get("details").get("Product Name"))
 
         return True
+
+    def stop_eap_server(self):
+        start_state = 'running'
+        end_state = 'stopped'    # tbd - need corrext state text
+        feed = None
+
+        # At present, can only get EAP state via Hawkular API.
+        # Find an EAP in 'running' state, which will then be stopped.
+
+        eap_hawk = self.find_eap_in_state(start_state)
+        assert eap_hawk, "No EAP Servers found to be in state {}".format(start_state)
+        feed = eap_hawk.get('Feed')
+        self.web_session.logger.info("About to STOP EAP server {} Feed {}".format(eap_hawk.get('Product'), feed))
+
+        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+
+        self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
+        self.ui_utils.waitForTextOnPage("Properties", 15)
+
+        self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
+        self.web_driver.find_element_by_xpath("//a[contains(.,'Stop Server')]").click()
+        self.web_driver.switch_to_alert().accept()
+        assert self.ui_utils.waitForTextOnPage("Stop initiated for selected server", 15)
+
+        # Validate backend - Hawkular
+        assert self.wait_for_eap_state(feed, end_state, 15)
+
+        return True
+
+    def wait_for_eap_state(self, feed, expected_state, wait_time):
+        currentTime = time.time()
+
+        while True:
+            servers_hawk = self.hawkular_api.get_hawkular_servers()
+            assert servers_hawk, "No Hawkular Servers found."
+
+            eap = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', feed)
+            assert eap, "No EAP found for Feed {}".format(feed)
+            state = eap.get("details").get("Server State")
+
+            if state == expected_state:
+                self.web_session.logger.info("Feed {} found to be in state {}".format(feed, state))
+                break
+            else:
+                if time.time() - currentTime >= wait_time:
+                    self.web_session.logger.error("Timed out waiting for EAP Feed {} to be in state {}, but was in state {}.".format(feed, state, expected_state))
+                    return False
+                else:
+                    time.sleep(2)
+
+        return True
+
+    def find_eap_in_state(self, state):
+        for row in self.hawkular_api.get_hawkular_servers():
+            if row.get("Product Name") != 'Hawkular' and row.get("details").get("Server State") == state:
+                return row
+
+        return None
