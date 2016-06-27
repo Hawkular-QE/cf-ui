@@ -32,3 +32,11 @@ def test_delete_single_provider(web_session):
     provs.add_provider()
     provs.delete_hawkular_provider()
 
+def test_validate_providers_list(web_session):
+    provs = providers(web_session)
+    provs.add_provider()
+    assert provs.validate_providers_list()
+
+def test_validate_providers_details(web_session):
+    assert providers(web_session).validate_providers_details()
+
