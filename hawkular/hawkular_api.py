@@ -13,9 +13,16 @@ class hawkular_api():
     def get_hawkular(self):
         return self.__hawkular__
 
+    def __exception_handler(self):
+        assert False, "Hawkular Server {} failed to connect".format(self.web_session.HAWKULAR_HOSTNAME)
+
     def get_hawkular_servers(self):
         servers = []
-        rows = self.__hawkular__.list_server()
+
+        try:
+            rows = self.__hawkular__.list_server()
+        except:
+            self.__exception_handler()
 
         for server in rows:
             dict = {}
@@ -31,7 +38,11 @@ class hawkular_api():
 
     def get_hawkular_datasources(self):
         datasources = []
-        rows = self.__hawkular__.list_server_datasource()
+
+        try:
+            rows = self.__hawkular__.list_server_datasource()
+        except:
+            self.__exception_handler()
 
         for datasource in rows:
             dict = {}
@@ -44,7 +55,11 @@ class hawkular_api():
 
     def get_hawkular_deployments(self):
         deployments = []
-        rows = self.__hawkular__.list_server_deployment()
+
+        try:
+            rows = self.__hawkular__.list_server_deployment()
+        except:
+            self.__exception_handler()
 
         for deployment in rows:
             dict = {}
