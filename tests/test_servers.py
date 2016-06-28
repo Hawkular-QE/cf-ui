@@ -26,6 +26,10 @@ def test_server_policy_edit(web_session):
     web_session.logger.info("Begin Server Policy Edit")
     assert servers(web_session).server_policy_edit()
 
-def test_stop_eap_server(web_session):
+def test_eap_power_stop(web_session):
     web_session.logger.info("Begin Server Stop")
-    assert servers(web_session).stop_eap_server()
+    assert servers(web_session).eap_power('stop')
+
+def test_eap_power_reload(web_session):
+    web_session.logger.info("Begin Server Reload")
+    assert servers(web_session).eap_power('reload')
