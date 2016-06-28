@@ -10,6 +10,9 @@ class servers():
     ui_utils = None
     hawkular_api = None
 
+    power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':'stopped'}
+    power_reload = {'action': 'Reload Server', 'wait_for': 'Reload initiated for selected server', 'start_state':'running', 'end_state':'running'}
+
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
@@ -110,18 +113,25 @@ class servers():
 
         return True
 
-    def stop_eap_server(self):
-        start_state = 'running'
-        end_state = 'stopped'    # tbd - need corrext state text
+    def eap_power(self, action):
         feed = None
+        power = {}
+
+        if (action == 'stop'):
+            power = self.power_stop
+        elif (action == 'reload'):
+            power = self.power_reload
+        else:
+            self.web_session.logger.error("Power action not recognized: {}".format(action))
+            return False
 
         # At present, can only get EAP state via Hawkular API.
-        # Find an EAP in 'running' state, which will then be stopped.
+        # Find an EAP in 'start' state, which will then have power 'action' applied
 
-        eap_hawk = self.find_eap_in_state(start_state)
-        assert eap_hawk, "No EAP Servers found to be in state {}".format(start_state)
+        eap_hawk = self.find_eap_in_state(power.get('start_state'))
+        assert eap_hawk, "No EAP Servers found to be in state {}".format(power.get('start_state'))
         feed = eap_hawk.get('Feed')
-        self.web_session.logger.info("About to STOP EAP server {} Feed {}".format(eap_hawk.get('Product'), feed))
+        self.web_session.logger.info("About to {} EAP server {} Feed {}".format(action, eap_hawk.get('Product'), feed))
 
         NavigationTree(self.web_session).navigate_to_middleware_servers_view()
 
@@ -129,12 +139,14 @@ class servers():
         self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
-        self.web_driver.find_element_by_xpath("//a[contains(.,'Stop Server')]").click()
+        self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
         self.web_driver.switch_to_alert().accept()
-        assert self.ui_utils.waitForTextOnPage("Stop initiated for selected server", 15)
+        assert self.ui_utils.waitForTextOnPage(format(power.get('wait_for')), 15)
 
         # Validate backend - Hawkular
-        assert self.wait_for_eap_state(feed, end_state, 15)
+        assert self.wait_for_eap_state(feed, power.get('end_state'), 15)
+
+        # TO-DO: Bring EAP back to start-state
 
         return True
 
@@ -147,14 +159,14 @@ class servers():
 
             eap = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', feed)
             assert eap, "No EAP found for Feed {}".format(feed)
-            state = eap.get("details").get("Server State")
+            current_state = eap.get("details").get("Server State")
 
-            if state == expected_state:
+            if current_state == expected_state:
                 self.web_session.logger.info("Feed {} found to be in state {}".format(feed, state))
                 break
             else:
                 if time.time() - currentTime >= wait_time:
-                    self.web_session.logger.error("Timed out waiting for EAP Feed {} to be in state {}, but was in state {}.".format(feed, state, expected_state))
+                    self.web_session.logger.error("Timed out waiting for EAP Feed {} to be in state {}, but is in state {}.".format(feed, expected_state, current_state))
                     return False
                 else:
                     time.sleep(2)
