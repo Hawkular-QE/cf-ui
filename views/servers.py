@@ -141,7 +141,7 @@ class servers():
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
         self.web_driver.switch_to_alert().accept()
-        assert self.ui_utils.waitForTextOnPage(format(power.get('wait_for')), 15)
+        assert self.ui_utils.waitForTextOnPage(power.get('wait_for'), 15)
 
         # Validate backend - Hawkular
         assert self.wait_for_eap_state(feed, power.get('end_state'), 15)
@@ -162,7 +162,7 @@ class servers():
             current_state = eap.get("details").get("Server State")
 
             if current_state == expected_state:
-                self.web_session.logger.info("Feed {} found to be in state {}".format(feed, state))
+                self.web_session.logger.info("Feed {} found to be in state {}".format(feed, expected_state))
                 break
             else:
                 if time.time() - currentTime >= wait_time:
