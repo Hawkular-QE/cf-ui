@@ -14,7 +14,7 @@ def web_session(request):
     return web_session
 
 def test_test(web_session):
-    ip = 'www.myserver.com'
+    ip = 'myserver'
 
     ssh_result = ssh(web_session, ip).execute_command('echo "Hello From Server: `hostname`"')
     assert ssh_result
