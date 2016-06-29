@@ -19,12 +19,15 @@ class servers():
         self.ui_utils = ui_utils(self.web_session)
         self.hawkular_api = hawkular_api(self.web_session)
 
-    def server_policy_edit(self):
+    def server_policy_edit(self, product):
         origValue = -1
 
-        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        servers_ui = table(self.web_session).get_middleware_servers_table()
+        server = self.ui_utils.find_row_in_list(servers_ui, 'Product', product)
+        assert server, "No server {} found.".format(product)
 
-        self.ui_utils.click_on_row_containing_text(self.web_session.PROVIDER)
+        # Feed is unique ID for this server
+        self.ui_utils.click_on_row_containing_text(server.get('Feed'))
 
         server_details = self.ui_utils.get_generic_table_as_dict()
         assert server_details, "No server details found for {}.".format(self.web_session.PROVIDER)

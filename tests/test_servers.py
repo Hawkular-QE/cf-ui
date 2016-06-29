@@ -22,11 +22,16 @@ def test_server_details(web_session):
     web_session.logger.info("Begin Server Details")
     assert servers(web_session).validate_server_details()
 
-def test_server_policy_edit(web_session):
+def test_server_policy_edit_hawkular(web_session):
     web_session.logger.info("Begin Server Policy Edit")
-    assert servers(web_session).server_policy_edit()
+    assert servers(web_session).server_policy_edit(web_session.PROVIDER)
 
-def test_eap_power_stop(web_session):
+def test_server_policy_edit_eap(web_session):
+    web_session.logger.info("Begin Server Policy Edit")
+    # EAP choice "JBoss" or "WildFly"
+    assert servers(web_session).server_policy_edit('JBoss')
+
+def _test_eap_power_stop(web_session):
     web_session.logger.info("Begin Server Stop")
     assert servers(web_session).eap_power('stop')
 

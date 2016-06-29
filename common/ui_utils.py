@@ -137,7 +137,7 @@ class ui_utils():
     # Given a list of directories, dictionary key, and value to search - find a specific row
     def find_row_in_list(self, list, key, value):
         for row in list:
-            if row.get(key) == value:
+            if value in row.get(key):
                 return row
 
         return None
