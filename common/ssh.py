@@ -34,7 +34,6 @@ class ssh():
         except Exception, e:
             raise Exception(e)
 
-        self.web_session.logger.info("Successful SSH connection to server {}.".format(ip))
 
     def execute_command(self, command):
         ssh_result = {}
