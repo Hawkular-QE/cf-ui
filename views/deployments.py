@@ -42,3 +42,24 @@ class deployments():
             assert dep_details_ui.get('Nativeid') == dep_details_hawk.get('Nativeid')
 
         return True
+
+    def validate_deployments_list(self):
+        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        assert deployments_ui, "No UI Deployments found."
+        deployments_hawk = self.hawkular_api.get_hawkular_deployments()
+        assert deployments_hawk, "No Hawkular Deployments found."
+
+        assert len(deployments_ui) == len(deployments_hawk), "Deployments lists size mismatch."
+
+        for dep_ui in deployments_ui:
+            deployment_name = dep_ui.get('Deployment Name')
+            dep_hawk = self.ui_utils.find_row_in_list(deployments_hawk, 'Name', deployment_name)
+
+            assert dep_hawk, "Deployment Name {} not found".format(deployment_name)
+            assert (deployment_name == dep_hawk.get("Name")), \
+                "Deployment Name mismatch ui:{}, hawk:{}".format(deployment_name, dep_hawk.get("Name"))
+            self.web_session.logger.info(
+                "UI Deployment name is: {}, and Hawkular deployment is: {} ".format(deployment_name,
+                                                                                    dep_hawk.get("Name")))
+
+        return True
