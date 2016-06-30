@@ -5,7 +5,7 @@ from hawkular.hawkular_api import hawkular_api
 
 @pytest.fixture
 def web_session(request):
-    web_session = session(add_provider=False)
+    web_session = session(add_provider=False, login=False)
 
     def closeSession():
         web_session.logger.info("Close browser session")
