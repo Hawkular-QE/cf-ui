@@ -4,7 +4,7 @@ from common.ssh import ssh
 
 @pytest.fixture
 def web_session(request):
-    web_session = session(add_provider=False)
+    web_session = session(add_provider=False, login=False)
 
     def closeSession():
         web_session.logger.info("Close browser session")

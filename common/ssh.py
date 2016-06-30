@@ -40,17 +40,23 @@ class ssh():
 
         self.web_session.logger.info('Execute command \"{}\" on IP \"{}\".'.format(command, self.ip))
 
-        stdin, stdout, stderr = self.ssh.exec_command(command)
+        try:
+            stdin, stdout, stderr = self.ssh.exec_command(command)
 
-        while not stdout.channel.exit_status_ready():
-            self.web_session.logger.info('Exit status not ready after command execute: {}'.format(command))
-            ui_utils(self.web_session).sleep(1)
+            while not stdout.channel.exit_status_ready():
+                self.web_session.logger.info('Exit status not ready after command execute: {}'.format(command))
+                ui_utils(self.web_session).sleep(1)
 
-        if stdout.channel.exit_status == 0:
-            ssh_result['output'] = stdout.read()
-        else:
-            ssh_result['output'] = stderr.read()
+            if stdout.channel.exit_status == 0:
+                ssh_result['output'] = stdout.read()
+            else:
+                ssh_result['output'] = stderr.read()
 
-        ssh_result['result'] = stdout.channel.exit_status
+            ssh_result['result'] = stdout.channel.exit_status
+
+        except Exception, e:
+            self.web_session.logger.error('Failed to execute command \"{}\" on IP \"{}\".'.format(command, self.ip))
+            ssh_result['output'] = e
+            ssh_result['result'] = -1
 
         return ssh_result
