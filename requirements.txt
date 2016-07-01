@@ -5,6 +5,7 @@ selenium
 pytest
 pytz
 paramiko
+psycopg2
 
 # Chrome driver installation
 chromedriver
