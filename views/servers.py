@@ -51,7 +51,7 @@ class servers():
         if self.web_session.BROWSER == 'Firefox':
             self.web_driver.find_element_by_xpath('//th[3]/div/div/div/ul/li[1]/a').click()
         else:
-            tag = 'data-original-index=0'
+            tag = 'data-original-index=1'
             el = self.web_driver.execute_script("return $('*[{}]')".format(tag))
             try:
                 el[0].click()
