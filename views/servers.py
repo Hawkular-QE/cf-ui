@@ -3,12 +3,14 @@ from parsing.table import table
 from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 import time
+from common.db import db
 
 class servers():
     web_session = None
     web_driver = None
     ui_utils = None
     hawkular_api = None
+    db = None
 
     power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':'stopped'}
     power_reload = {'action': 'Reload Server', 'wait_for': 'Reload initiated for selected server', 'start_state':'running', 'end_state':'running'}
@@ -18,6 +20,11 @@ class servers():
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
         self.hawkular_api = hawkular_api(self.web_session)
+
+        try:
+            self.db = db(self.web_session)
+        except Exception, e:
+            self.web_session.logger.warning("Unable to connecto to database. {}".format(e))
 
     def server_policy_edit(self, product):
         origValue = -1
@@ -100,10 +107,15 @@ class servers():
         return True
 
     def validate_servers_list(self):
+        servers_db = None
         servers_ui = table(self.web_session).get_middleware_servers_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
 
-        assert len(servers_ui) == len(servers_hawk), "Servers lists size mismatch."
+        if self.db:
+            servers_db = self.db.get_servers()
+            assert len(servers_ui) == len(servers_hawk) == len(servers_db), "Servers lists size mismatch."
+        else:
+            assert len(servers_ui) == len(servers_hawk), "Servers lists size mismatch."
 
         for serv_ui in servers_ui:
             serv_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', serv_ui.get('Feed'))
