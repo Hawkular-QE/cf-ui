@@ -47,7 +47,11 @@ class db():
         return rows
 
     def get_servers(self):
-        return self.execute(self.sql_servers)
+        rows = self.execute(self.sql_servers)
+        for server in rows:
+            server['nativeid'] = server.get('nativeid').strip('~')
+
+        return rows
 
     def get_datasources(self):
         return self.execute(self.sql_datasources)
