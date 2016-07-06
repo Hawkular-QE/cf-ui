@@ -4,6 +4,7 @@ from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 import time
 from common.db import db
+import socket
 
 class servers():
     web_session = None
@@ -190,7 +191,21 @@ class servers():
 
     def find_eap_in_state(self, state):
         for row in self.hawkular_api.get_hawkular_servers():
-            if row.get("Product Name") != 'Hawkular' and row.get("details").get("Server State") == state:
+            if row.get("Product Name") != 'Hawkular' and row.get("details").get("Server State") == state.lower():
                 return row
+
+        return None
+
+    # EAPs that are running in a container will NOTE have a resolvable Hostname (Hostname will be either POD or Container ID)
+    def find_non_container_eap_in_state(self, state):
+        for row in self.hawkular_api.get_hawkular_servers():
+            if row.get("Product Name") != 'Hawkular' and row.get("details").get("Server State") == state.lower():
+                ip = row.get("details").get("Hostname")
+                try:
+                    socket.gethostbyaddr(ip)
+                    self.web_session.logger.info("Found EAP Hostname: {}  state: {}".format(ip, state))
+                    return row
+                except:
+                    self.web_session.logger.info("Note a resolvable Hoatname/IP: {}".format(ip))
 
         return None
