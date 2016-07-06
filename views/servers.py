@@ -196,7 +196,7 @@ class servers():
 
         return None
 
-    # EAPs that are running in a container will NOTE have a resolvable Hostname (Hostname will be either POD or Container ID)
+    # EAPs that are running in a container will NOT have a resolvable Hostname (Hostname will be either POD or Container ID)
     def find_non_container_eap_in_state(self, state):
         for row in self.hawkular_api.get_hawkular_servers():
             if row.get("Product Name") != 'Hawkular' and row.get("details").get("Server State") == state.lower():
