@@ -13,6 +13,7 @@ class servers():
     ui_utils = None
     hawkular_api = None
     db = None
+    EAP_PROCESS = 'standalone.sh'
 
     power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':None}
     power_restart = {'action': 'Restart Server', 'wait_for': 'Restart initiated for selected server', 'start_state': 'running', 'end_state': 'running'}
@@ -135,6 +136,8 @@ class servers():
 
         return True
 
+    # BEGIN - EAP Power
+
     def eap_power_restart(self):
 
         # Find an EAP in 'start state'
@@ -147,18 +150,17 @@ class servers():
         eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
         assert eap_hawk
         eap_host = eap_hawk.get("details").get("Hostname")
-        orig_pid = ssh(self.web_session, eap_host).get_pid('standalone.sh')
+        orig_pid = ssh(self.web_session, eap_host).get_pid(self.EAP_PROCESS)
 
         self.web_session.logger.info("About to Restart EAP server {} Feed {}".format(eap_hawk.get('Product'), eap_hawk.get('Feed')))
         self.eap_power_action(power, eap_hawk)
 
-        new_pid = ssh(self.web_session, eap_host).get_pid('standalone.sh')
+        new_pid = ssh(self.web_session, eap_host).get_pid(self.EAP_PROCESS)
 
         return (orig_pid != new_pid)
 
     def eap_power_stop(self):
         power = self.power_stop
-        eap_proccess = 'standalone.sh'
 
         # Find an EAP in 'start state'
         # Get EAP pid (should be a pid)
@@ -168,10 +170,10 @@ class servers():
         eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
         assert eap_hawk
         eap_hostname = eap_hawk.get("details").get("Hostname")
-        assert ssh(self.web_session, eap_hostname).get_pid(eap_proccess) != None, "No EAP pid found."
+        assert ssh(self.web_session, eap_hostname).get_pid(self.EAP_PROCESS) != None, "No EAP pid found."
 
         self.eap_power_action(power, eap_hawk)
-        assert ssh(self.web_session, eap_hostname).get_pid(eap_proccess) == None, "EAP pid unexpectedly found."
+        assert ssh(self.web_session, eap_hostname).get_pid(self.EAP_PROCESS) == None, "EAP pid unexpectedly found."
 
         # TO-DO Start ESP - until feature is implemented in MIQ
         ssh(self.web_session, eap_hostname).execute_command(
