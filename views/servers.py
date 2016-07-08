@@ -4,6 +4,7 @@ from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 import time
 from common.db import db
+from common.ssh import ssh
 import socket
 
 class servers():
@@ -13,8 +14,13 @@ class servers():
     hawkular_api = None
     db = None
 
-    power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':'stopped'}
+    power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':None}
+    power_restart = {'action': 'Restart Server', 'wait_for': 'Restart initiated for selected server', 'start_state': 'running', 'end_state': 'running'}
+    # TO-DO - Validate Start / End states:
     power_reload = {'action': 'Reload Server', 'wait_for': 'Reload initiated for selected server', 'start_state':'running', 'end_state':'running'}
+    power_graceful_shutdown = {'action': 'Gracefully shutdown Server', 'wait_for': 'Shutdown initiated for selected server', 'start_state':'running', 'end_state':'running'}
+    power_suspend = {'action': 'Suspend Server', 'wait_for': 'Suspend initiated for selected server', 'start_state':'running', 'end_state':'running'}
+    power_resume = {'action': 'Resume Server', 'wait_for': 'Resume initiated for selected server', 'start_state':'stopped', 'end_state':'running'}
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -129,25 +135,120 @@ class servers():
 
         return True
 
-    def eap_power(self, action):
-        feed = None
-        power = {}
+    def eap_power_restart(self):
 
-        if (action == 'stop'):
-            power = self.power_stop
-        elif (action == 'reload'):
-            power = self.power_reload
-        else:
-            self.web_session.logger.error("Power action not recognized: {}".format(action))
-            return False
+        # Find an EAP in 'start state'
+        # Get EAP pid
+        # Restart EAP
+        # Validate that pid changed
 
-        # At present, can only get EAP state via Hawkular API.
-        # Find an EAP in 'start' state, which will then have power 'action' applied
+        power = self.power_restart
 
-        eap_hawk = self.find_eap_in_state(power.get('start_state'))
-        assert eap_hawk, "No EAP Servers found to be in state {}".format(power.get('start_state'))
-        feed = eap_hawk.get('Feed')
-        self.web_session.logger.info("About to {} EAP server {} Feed {}".format(action, eap_hawk.get('Product'), feed))
+        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        assert eap_hawk
+        eap_host = eap_hawk.get("details").get("Hostname")
+        orig_pid = ssh(self.web_session, eap_host).get_pid('standalone.sh')
+
+        self.web_session.logger.info("About to Restart EAP server {} Feed {}".format(eap_hawk.get('Product'), eap_hawk.get('Feed')))
+        self.eap_power_action(power, eap_hawk)
+
+        new_pid = ssh(self.web_session, eap_host).get_pid('standalone.sh')
+
+        return (orig_pid != new_pid)
+
+    def eap_power_stop(self):
+        power = self.power_stop
+        eap_proccess = 'standalone.sh'
+
+        # Find an EAP in 'start state'
+        # Get EAP pid (should be a pid)
+        # Stop EAP
+        # Validate that no pid (EAP has stopped)
+
+        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        assert eap_hawk
+        eap_hostname = eap_hawk.get("details").get("Hostname")
+        assert ssh(self.web_session, eap_hostname).get_pid(eap_proccess) != None, "No EAP pid found."
+
+        self.eap_power_action(power, eap_hawk)
+        assert ssh(self.web_session, eap_hostname).get_pid(eap_proccess) == None, "EAP pid unexpectedly found."
+
+        # TO-DO Start ESP - until feature is implemented in MIQ
+        ssh(self.web_session, eap_hostname).execute_command(
+            'nohup /root/jboss-eap-7.0/bin/standalone.sh -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n')
+
+        return True
+
+    def eap_power_reload(self):
+        power = self.power_reload
+
+        # Find an EAP in 'start state'
+        # Reload EAP
+        # Validate - TO-DO
+
+        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        assert eap_hawk
+
+        self.eap_power_action(power, eap_hawk)
+
+        # TO-DO - Validate
+
+        return True
+
+    def eap_power_suspend(self):
+        power = self.power_suspend
+
+        # Find an EAP in 'start state'
+        # Suspend EAP
+        # Validate - TO-DO
+
+        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        assert eap_hawk
+
+        self.eap_power_action(power, eap_hawk)
+
+        # TO-DO - Validate
+
+        return True
+
+    def eap_power_resume(self):
+        power = self.power_resume
+
+        # Find an EAP in 'start state'
+        # Resume EAP
+        # Validate - TO-DO
+
+        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        assert eap_hawk
+
+        self.eap_power_action(power, eap_hawk)
+
+        # TO-DO - Validate
+
+        return True
+
+    def eap_power_resume(self):
+        power = self.power_graceful_shutdown
+
+        # Find an EAP in 'start state'
+        # Graceful-Shutdown EAP
+        # Validate - TO-DO
+
+        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        assert eap_hawk
+
+        self.eap_power_action(power, eap_hawk)
+
+        # TO-DO - Validate
+
+        return True
+
+    def eap_power_action(self, power, eap_hawk):
+
+        self.web_session.logger.info(
+            "About to {} EAP server {} Feed {}".format(power.get('action'), eap_hawk.get('Product'), eap_hawk.get('Feed')))
+
+        feed = eap_hawk.get('Feed') # Unique server id
 
         NavigationTree(self.web_session).navigate_to_middleware_servers_view()
 
@@ -160,11 +261,8 @@ class servers():
         assert self.ui_utils.waitForTextOnPage(power.get('wait_for'), 15)
 
         # Validate backend - Hawkular
-        assert self.wait_for_eap_state(feed, power.get('end_state'), 15)
-
-        # TO-DO: Bring EAP back to start-state
-
-        return True
+        if power.get('end_state'):
+            assert self.wait_for_eap_state(feed, power.get('end_state'), 15)
 
     def wait_for_eap_state(self, feed, expected_state, wait_time):
         currentTime = time.time()
@@ -206,6 +304,7 @@ class servers():
                     self.web_session.logger.info("Found EAP Hostname: {}  state: {}".format(ip, state))
                     return row
                 except:
-                    self.web_session.logger.info("Note a resolvable Hoatname/IP: {}".format(ip))
+                    self.web_session.logger.info("Note a resolvable Hostname/IP: {}".format(ip))
 
         return None
+
