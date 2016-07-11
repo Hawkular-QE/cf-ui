@@ -34,12 +34,21 @@ class servers():
         except Exception, e:
             self.web_session.logger.warning("Unable to connecto to database. {}".format(e))
 
-    def server_policy_edit(self, product):
+    def server_policy_edit(self, server_type):
         origValue = -1
+        server = None
 
         servers_ui = table(self.web_session).get_middleware_servers_table()
-        server = self.ui_utils.find_row_in_list(servers_ui, 'Product', product)
-        assert server, "No server {} found.".format(product)
+        assert servers_ui, "No servers found."
+
+        if server_type == 'provider':
+            server = self.ui_utils.find_row_in_list(servers_ui, 'Product', self.web_session.PROVIDER)
+        elif server_type == 'eap':
+            for eap in {'WildFly', 'JBoss'}:
+                server = self.ui_utils.find_row_in_list(servers_ui, 'Product', eap)
+                if server: break
+
+        assert server, "No server {} found.".format(server)
 
         # Feed is unique ID for this server
         self.ui_utils.click_on_row_containing_text(server.get('Feed'))
