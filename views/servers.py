@@ -91,6 +91,7 @@ class servers():
         self.ui_utils.waitForTextOnPage("My Company Tags", 5)
 
         server_details = self.ui_utils.get_generic_table_as_dict()
+        self.web_session.logger.debug("Server Details - My Company Tag value: {}", server_details)
         newValue = server_details.get('My Company Tags')[-1:]
 
         if newValue != origValue:
