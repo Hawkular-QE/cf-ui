@@ -1,5 +1,6 @@
 import paramiko
 from common.ui_utils import ui_utils
+import re
 
 class ssh():
     web_session = None
@@ -60,3 +61,18 @@ class ssh():
             ssh_result['result'] = -1
 
         return ssh_result
+
+
+    def get_pid(self, process_name):
+        pid = None
+        cmd = "ps -C {} -o pid=".format(process_name)
+
+        self.web_session.logger.info("Get pid for process: {}  on ip: {}".format(process_name, self.ip))
+
+        ssh_result = self.execute_command(cmd)
+        if ssh_result['result'] == 0:
+            pid = re.sub('[^0-9]+', '', ssh_result["output"])
+        else:
+            self.web_session.logger.info("Unable to get pid for process: {}  on ip: {}".format(process_name, self.ip))
+
+        return pid

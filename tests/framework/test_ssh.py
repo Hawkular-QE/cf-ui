@@ -14,11 +14,17 @@ def web_session(request):
     return web_session
 
 def test_test(web_session):
-    ip = 'myserver'
+    ip = 'eapserver'
 
     ssh_result = ssh(web_session, ip).execute_command('echo "Hello From Server: `hostname`"')
     assert ssh_result
-    print "ssh_result: ", ssh_result
-    print 'result: {}'.format(ssh_result.get('result'))
-    print 'output: {}'.format(ssh_result.get('output'))
+    web_session.logger.info("ssh_result: {}".format(ssh_result))
+    web_session.logger.info("result: {}".format(ssh_result.get('result')))
+    web_session.logger.info("output: {}".format(ssh_result.get('output')))
 
+def test_get_ip(web_session):
+    ip = 'eapserver'
+
+    pid = ssh(web_session, ip).get_pid("standalone.sh")
+    assert pid
+    web_session.logger.info("pid: {}".format(pid))
