@@ -13,16 +13,16 @@ class hawkular_api():
     def get_hawkular(self):
         return self.__hawkular__
 
-    def __exception_handler(self):
-        assert False, "Hawkular Server {} failed to connect".format(self.web_session.HAWKULAR_HOSTNAME)
+    def __exception_handler(self, e):
+        assert False, "Hawkular Server {} failed to connect, Exception: {}".format(self.web_session.HAWKULAR_HOSTNAME, e)
 
     def get_hawkular_servers(self):
         servers = []
 
         try:
             rows = self.__hawkular__.list_server()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         for server in rows:
             dict = {}
