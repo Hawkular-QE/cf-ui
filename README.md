@@ -20,13 +20,7 @@ Example:
 driver = webdriver.Chrome("/path/to/.cf-ui/")
 ```
 ## Configuration
-All configuration on which automation should relied should be stored in conf/properties.properties
+All configuration on which automation is relied upon should be stored in conf/properties.properties
 
-## Navigation:
-Usage of Navigation Tree:
-```shell
-tree = NavigationTree(<web_session instance>) 
-Not WebDriver instance
-web_session instance as fixture
 ```
 
