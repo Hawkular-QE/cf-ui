@@ -1,5 +1,6 @@
 import psycopg2
 import psycopg2.extras
+import string
 
 class db():
     web_session = None
@@ -13,6 +14,7 @@ class db():
     dict_cursor = None
 
     # To-Do: return only needed columns (aka add filters)
+    sql_providers = 'select * from endpoints, ext_management_systems where endpoints.id=ext_management_systems.id;'
     sql_servers = 'select * from middleware_servers'
     sql_datasources = 'select * from middleware_datasources'
     sql_deployments = 'select * from middleware_deployments'
@@ -45,6 +47,16 @@ class db():
             self.web_session.logger.error('Failed to execute SQL \"{}\". Exception: {}".'.format(query, e))
 
         return rows
+
+    def get_providers(self):
+        providers = []
+        rows = self.execute(self.sql_providers)
+
+        for row in rows:
+            if self.web_session.PROVIDER in row.get('type'):
+                providers.append(row)
+
+        return providers
 
     def get_servers(self):
         rows = self.execute(self.sql_servers)
