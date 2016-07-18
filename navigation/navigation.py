@@ -125,7 +125,6 @@ class NavigationTree():
             self.click_turn( driver, step )
 
 
-
     def navigate_to_middleware_providers_view(self):
         self.navigate(UI_Route("middleware").add("middleware_providers"))
 
@@ -146,7 +145,6 @@ class NavigationTree():
         # Fast navigation
         if self.paths.get(target)==None:
             raise ValueError("Fast navigation: no such key in dict 'paths', update it!")
-
         current_page = self.web_driver.current_url
         target_page = self.paths.get(target)
         if not current_page.endswith(target_page) or force_navigation:
@@ -167,3 +165,29 @@ class NavigationTree():
 
     def jump_to_topology_view(self, force_navigation=True):
         self._jump_to('topology', force_navigation)
+
+    def go_to_first_possible_details(self):
+
+        #TODO:
+        """  count all possible urls, and if >0 go to first one  then   """
+
+        driver = self.web_driver
+        driver.find_element_by_xpath("//i[contains(@class,'fa fa-th-list')]").click()
+
+        xpath_urls = ".//*[@id='list_grid']/table/tbody/tr"
+        sub_links = driver.find_elements_by_xpath(xpath_urls)
+        url_num = len(sub_links)
+        print "Number of URLs: ", url_num
+        if url_num>0:
+            sub_links[0].click()
+
+        """
+        xpath = ".//*[@id='records_div']/table/tbody/tr/td/div/table/tbody/tr[2]/td/a"
+        click_point = driver.find_element_by_xpath(xpath)
+        hover = ActionChains(driver)
+        hover.move_to_element(click_point).perform()
+        click_point.click()
+
+        """
+        #sleep(5)
+        return driver
