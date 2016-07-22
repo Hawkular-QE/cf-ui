@@ -6,6 +6,7 @@ from navigation.navigation import NavigationTree
 from selenium.webdriver.support import expected_conditions as EC
 from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
+from common.view import view
 
 class providers():
     web_session = None
@@ -77,8 +78,9 @@ class providers():
 
         # Navigate to the provider details page and check if the last refresh status is - Success.
 
-        self.web_driver.find_element_by_xpath(
-            "//a[@title='{}']".format(self.web_session.HAWKULAR_PROVIDER_NAME)).click()
+        view(self.web_session).list_View()
+        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
 
         assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
 

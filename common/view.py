@@ -1,7 +1,3 @@
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from common.ui_utils import ui_utils
-from common.session import session
 
 '''
 
