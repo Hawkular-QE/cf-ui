@@ -6,14 +6,23 @@ import lxml.html
 # from the junit .xml result file so that it can then be exported
 # to Prolarion via the CI Jenkins Polarion Exporter (V1.3.x).
 
-if len(sys.argv) != 2:
-    print "Usage: {} <results.xml>".format(sys.argv[0])
+OUF_FILE = 'results_export_to_polarion.xml'
+
+if len(sys.argv) < 2:
+    print "Usage: {} results.xml <output.xml>".format(sys.argv[0])
     exit(-1)
 
 in_file = sys.argv[1]
-out_file = 'results_export_to_polarion.xml'
 
-root = lxml.etree.parse(in_file)
+if len(sys.argv) > 2:
+    out_file = sys.argv[2]
+else:
+    out_file = OUF_FILE
+
+try:
+    root = lxml.etree.parse(in_file)
+except Exception, e:
+    raise Exception(e)
 
 # Remove nodes
 system_err = root.findall('testcase/system-err')
@@ -40,4 +49,8 @@ for e in root.iter():
         pass
 
 print "Writing to output file: {}".format(out_file)
-root.write(out_file)
+
+try:
+    root.write(out_file)
+except Exception, e:
+    raise Exception(e)
