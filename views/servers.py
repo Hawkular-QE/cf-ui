@@ -2,6 +2,10 @@ from common.ui_utils import ui_utils
 from parsing.table import table
 from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+import os
 import time
 from common.db import db
 from common.ssh import ssh
@@ -13,6 +17,8 @@ class servers():
     ui_utils = None
     hawkular_api = None
     db = None
+    EAP_JON_HOME = '/root/jboss-eap-7.0'
+    EAP_WILDFLY_HOME = '/root/wildfly-'
     EAP_PROCESS = 'standalone.sh'
 
     power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':None}
@@ -22,6 +28,10 @@ class servers():
     power_graceful_shutdown = {'action': 'Gracefully shutdown Server', 'wait_for': 'Shutdown initiated for selected server', 'start_state':'running', 'end_state':'running'}
     power_suspend = {'action': 'Suspend Server', 'wait_for': 'Suspend initiated for selected server', 'start_state':'running', 'end_state':'running'}
     power_resume = {'action': 'Resume Server', 'wait_for': 'Resume initiated for selected server', 'start_state':'stopped', 'end_state':'running'}
+
+    APPLICATION_WAR = "cfui_test_war.war"
+    APPLICATION_JAR = "{}/data/cfui_test_jar.jar".format(os.getcwd())
+    APPLICATION_EAR = "{}/data/cfui_test_ear.ear".format(os.getcwd())
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -186,8 +196,14 @@ class servers():
         assert ssh(self.web_session, eap_hostname).get_pid(self.EAP_PROCESS) == None, "EAP pid unexpectedly found."
 
         # TO-DO Start ESP - until feature is implemented in MIQ
-        ssh(self.web_session, eap_hostname).execute_command(
-            'nohup /root/jboss-eap-7.0/bin/standalone.sh -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n')
+        if "wildfly" in (eap_hawk.get('Product Name').lower()):
+            eap_home = "{}{}".format(self.EAP_WILDFLY_HOME,eap_hawk.get("details").get("Version"))
+        else:
+            eap_home = self.EAP_JON_HOME
+
+        start_str = 'nohup {}/bin/standalone.sh -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(eap_home)
+        self.web_session.logger.debug("About to start EAP: {}".format(start_str))
+        ssh(self.web_session, eap_hostname).execute_command(start_str)
 
         return True
 
@@ -276,6 +292,56 @@ class servers():
         if power.get('end_state'):
             assert self.wait_for_eap_state(feed, power.get('end_state'), 15)
 
+    def deploy_application_archive(self, app_to_deploy = APPLICATION_WAR):
+
+        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+
+        # Find EAP on which to deploy
+        eap = self.find_non_container_eap_in_state("running")
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.add_server_deployment(self.APPLICATION_WAR)
+
+        # Validate UI
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        assert self.ui_utils.find_row_in_list(deployments_ui, "Deployment Name", self.APPLICATION_WAR), "Deployment {} not found on UI.".format(app_to_deploy)
+        self.ui_utils.click_on_row_containing_text(app_to_deploy)
+        assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
+
+        # Validate DB
+        deployments_db = self.db.get_deployments()
+        assert self.ui_utils.find_row_in_list(deployments_db, "name", self.APPLICATION_WAR), "Deployment {} not found in DB.".format(app_to_deploy)
+
+        # Validate HS API
+        deployments_hawk = hawkular_api(self.web_session).get_hawkular_deployments()
+        assert self.ui_utils.find_row_in_list(deployments_hawk, "Name", self.APPLICATION_WAR), "Deployment {} not found in Hawkular.".format(app_to_deploy)
+
+        return True
+
+    def undeploy_application_archive(self, app_to_undeploy=APPLICATION_WAR):
+        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+
+        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        self.ui_utils.click_on_row_containing_text(app_to_undeploy)
+
+        # Undeploy
+        self.undeploy_server_deployment(app_to_undeploy)
+
+        # Validate that application is "Disabled"
+        assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
+
+        return True
+
+    def redeploy_application_archive(self):
+        # Find EAP with application to redeploy
+        # Redeploy
+        # Validate that application is still in list
+
+        return True
+
     def wait_for_eap_state(self, feed, expected_state, wait_time):
         currentTime = time.time()
 
@@ -319,4 +385,24 @@ class servers():
                     self.web_session.logger.info("Note a resolvable Hostname/IP: {}".format(ip))
 
         return None
+
+    def add_server_deployment(self, app_to_deploy):
+        app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
+
+        self.web_driver.find_element_by_id('middleware_server_deployments_choice').click()
+        self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
+        self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
+
+        el = self.web_driver.find_element_by_id("upload_file")
+        el.send_keys(app)
+
+        self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
+        self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+
+    def undeploy_server_deployment(self, app_to_undeploy = APPLICATION_WAR):
+        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice__middleware_deployment_undeploy').click()
+        self.ui_utils.sleep(2)
+        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
 
