@@ -27,7 +27,7 @@ class hawkular_api():
         for server in rows:
             dict = {}
             dict['Server Name'] = server.id.strip('~')
-            dict['Product Name'] = server.data['Product Name']
+            dict['Product Name'] = server.data['Name']
             dict['Host Name'] = server.data['Hostname']
             dict['Feed'] = server.path.feed
             dict['Provider'] = self.web_session.PROVIDER
@@ -70,5 +70,5 @@ class hawkular_api():
 
         return deployments
 
-    def __generic_for_testing__(self):
-        return self.__hawkular__.list_resource()
+    def generic_for_testing(self):
+        return self.__hawkular__.list_server_deployment()
