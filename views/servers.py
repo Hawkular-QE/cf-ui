@@ -142,7 +142,7 @@ class servers():
             assert (serv_ui.get('Host Name') == serv_hawk.get("details").get("Hostname")), \
                 "Host Name mismatch ui:{}, hawk:{}".format(serv_ui.get('Feed'), serv_hawk.get("details").get("Hostname"))
             assert (serv_ui.get('Product') == serv_hawk.get("details").get("Product Name")), \
-                "Product mismatch ui:{}, hawk:{}".format(serv_ui.get('Product'), serv_hawk.get("details").get("Product Name"))
+                "Product mismatch ui:{}, hawk:{}".format(serv_ui.get('Product'), serv_hawk.get("Product Name"))
 
         return True
 

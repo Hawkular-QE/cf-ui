@@ -29,7 +29,7 @@ class hawkular_api():
             dict['Server Name'] = server.id.strip('~')
             dict['Product Name'] = server.data['Name']
             dict['Host Name'] = server.data['Hostname']
-            dict['Feed'] = server.path.feed
+            dict['Feed'] = server.data['UUID']
             dict['Provider'] = self.web_session.PROVIDER
             dict['details'] = server.data
             servers.append(dict)
