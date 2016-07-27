@@ -149,6 +149,7 @@ class NavigationTree():
         target_page = self.paths.get(target)
         if not current_page.endswith(target_page) or force_navigation:
                 self.web_driver.get(self.web_session.MIQ_URL + target_page)
+        return self
 
 
     def jump_to_middleware_providers_view(self, force_navigation=True):
@@ -169,13 +170,13 @@ class NavigationTree():
     def to_first_details(self):
         driver = self.web_driver
         list_view_click = "//i[contains(@class,'fa fa-th-list')]"
+        first_item = ".//*[@id='list_grid']/table/tbody/tr"
 
         driver.find_element_by_xpath(list_view_click).click()
-        xpath_urls = ".//*[@id='list_grid']/table/tbody/tr"
-        sub_links = driver.find_elements_by_xpath(xpath_urls)
-        url_num = len(sub_links)
-        #print "Number of URLs: ", url_num
-        if url_num>0:
+        #xpath_urls = first_item
+        sub_links = driver.find_elements_by_xpath(first_item)
+        #url_num = len(sub_links)
+        if len(sub_links)>0:
             sub_links[0].click()
         else:
             raise ValueError("Not enough items for searching!")

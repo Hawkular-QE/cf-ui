@@ -71,4 +71,18 @@ def test_provider_details(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_providers_view()
     nav.to_first_details()
-    pass
+
+def _test_deployment_details(web_session):
+    nav = NavigationTree(web_session)
+    nav.jump_to_middleware_deployment_view()
+    nav.to_first_details()
+
+def _test_server_details(web_session):
+    nav = NavigationTree(web_session)
+    nav.jump_to_middleware_servers_view()
+    nav.to_first_details()
+
+def _test_datasource_details(web_session):
+    nav = NavigationTree(web_session)
+    nav.jump_to_middleware_datasources_view()
+    nav.to_first_details()
