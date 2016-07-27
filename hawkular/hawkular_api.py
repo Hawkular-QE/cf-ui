@@ -27,7 +27,7 @@ class hawkular_api():
         for server in rows:
             dict = {}
             dict['Server Name'] = server.id.strip('~')
-            dict['Product Name'] = server.data['Name']
+            dict['Product Name'] = server.data['Product Name']
             dict['Host Name'] = server.data['Hostname']
             dict['Feed'] = server.data['UUID']
             dict['Provider'] = self.web_session.PROVIDER

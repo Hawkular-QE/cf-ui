@@ -65,14 +65,17 @@ class ssh():
 
     def get_pid(self, process_name):
         pid = None
-        cmd = "ps -C {} -o pid=".format(process_name)
+        cmd = "ps -ef | grep {} | grep -v grep  | awk {}".format(process_name, "'{ print $2 }'")
 
         self.web_session.logger.info("Get pid for process: {}  on ip: {}".format(process_name, self.ip))
 
         ssh_result = self.execute_command(cmd)
         if ssh_result['result'] == 0:
-            pid = re.sub('[^0-9]+', '', ssh_result["output"])
+            pid = re.sub('[^0-9]+', "", ssh_result["output"])
+            if len(pid) == 0: pid = None
         else:
             self.web_session.logger.info("Unable to get pid for process: {}  on ip: {}".format(process_name, self.ip))
+
+        self.web_session.logger.info("Returning pid: {} for process: {}  on ip: {}".format(pid, process_name, self.ip))
 
         return pid
