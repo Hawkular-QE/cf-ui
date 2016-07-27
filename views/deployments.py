@@ -38,7 +38,7 @@ class deployments():
             self.web_session.logger.info("dep_details_hawk: {}".format(dep_details_hawk))
 
             assert dep_details_ui.get('Middleware Provider') == self.web_session.HAWKULAR_PROVIDER_NAME
-            assert dep_details_ui.get('Name') == dep_details_hawk.get('Name')
+            assert dep_details_ui.get('Name') in dep_details_hawk.get('Name')
             assert dep_details_ui.get('Nativeid') == dep_details_hawk.get('Nativeid')
 
         return True
@@ -56,7 +56,7 @@ class deployments():
             dep_hawk = self.ui_utils.find_row_in_list(deployments_hawk, 'Name', deployment_name)
 
             assert dep_hawk, "Deployment Name {} not found".format(deployment_name)
-            assert (deployment_name == dep_hawk.get("Name")), \
+            assert (deployment_name in dep_hawk.get("Name")), \
                 "Deployment Name mismatch ui:{}, hawk:{}".format(deployment_name, dep_hawk.get("Name"))
             self.web_session.logger.info(
                 "UI Deployment name is: {}, and Hawkular deployment is: {} ".format(deployment_name,
