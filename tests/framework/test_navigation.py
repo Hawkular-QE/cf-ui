@@ -12,7 +12,6 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-"""
 def test_deployments (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_deployment_view()
@@ -64,8 +63,6 @@ def test_fast_navigation(web_session):
     nav.jump_to_middleware_providers_view()
     nav.jump_to_middleware_servers_view()
     nav.jump_to_topology_view()
-
-"""
 
 def test_provider_details(web_session):
     nav = NavigationTree(web_session)
