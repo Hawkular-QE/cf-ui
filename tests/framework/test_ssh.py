@@ -13,7 +13,7 @@ def web_session(request):
 
     return web_session
 
-def test_test(web_session):
+def test_cfui_test(web_session):
     ip = 'eapserver'
 
     ssh_result = ssh(web_session, ip).execute_command('echo "Hello From Server: `hostname`"')
@@ -22,7 +22,7 @@ def test_test(web_session):
     web_session.logger.info("result: {}".format(ssh_result.get('result')))
     web_session.logger.info("output: {}".format(ssh_result.get('output')))
 
-def test_get_ip(web_session):
+def test_cfui_get_ip(web_session):
     ip = 'eapserver'
 
     pid = ssh(web_session, ip).get_pid("standalone.sh")

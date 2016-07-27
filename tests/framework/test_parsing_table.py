@@ -15,7 +15,7 @@ def web_session(request):
     return web_session
 
 
-def test_1_instance(web_session):
+def test_cfui_1_instance(web_session):
 
     t = table(web_session)
 
@@ -35,7 +35,7 @@ def test_1_instance(web_session):
     """
 
 
-def test_multi_instances(web_session):
+def test_cfui_multi_instances(web_session):
 
     print "List of middleware datasources: ", table(web_session).get_middleware_datasources_table(), "\n"
     print "List of middleware providers: ",   table(web_session).get_middleware_providers_table(), "\n"

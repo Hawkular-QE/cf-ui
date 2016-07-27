@@ -13,19 +13,19 @@ def web_session(request):
 
     return web_session
 
-def test_db_datasources(web_session):
+def test_cfui_db_datasources(web_session):
     rows = db(web_session).get_datasources()
     assert rows
     for row in rows:
         print "name: ", row.get('name')
 
-def test_db_servers(web_session):
+def test_cfui_db_servers(web_session):
     rows = db(web_session).get_servers()
     assert rows
     for row in rows:
         print "product: ", row.get('product')
 
-def test_db_deployments(web_session):
+def test_cfui_db_deployments(web_session):
     rows = db(web_session).get_deployments()
     assert rows
     for row in rows:
