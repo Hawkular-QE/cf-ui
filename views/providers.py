@@ -69,9 +69,7 @@ class providers():
 
         assert ui_utils(self.web_session).waitForTextOnPage(
             'Middleware Providers "{}" was saved'.format(self.provider_name), 15)
-        elem_provider = self.web_driver.find_element_by_xpath(
-            "//a[contains(@title,'Name: {}')]".format(self.provider_name))
-
+        
         if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
                 self.provider_name)):
             self.web_session.logger.info("Middleware Provider added successfully.")
