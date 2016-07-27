@@ -12,9 +12,6 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
-def test_zero (web_session):
-    print "(Zero test)"
-
 """
 def test_deployments (web_session):
     nav = NavigationTree(web_session)
@@ -73,5 +70,5 @@ def test_fast_navigation(web_session):
 def test_provider_details(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_providers_view()
-    nav.go_to_first_possible_details()
+    nav.to_first_details()
     pass

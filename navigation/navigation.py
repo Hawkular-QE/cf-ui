@@ -166,28 +166,16 @@ class NavigationTree():
     def jump_to_topology_view(self, force_navigation=True):
         self._jump_to('topology', force_navigation)
 
-    def go_to_first_possible_details(self):
-
-        #TODO:
-        """  count all possible urls, and if >0 go to first one  then   """
-
+    def to_first_details(self):
         driver = self.web_driver
-        driver.find_element_by_xpath("//i[contains(@class,'fa fa-th-list')]").click()
+        list_view_click = "//i[contains(@class,'fa fa-th-list')]"
 
+        driver.find_element_by_xpath(list_view_click).click()
         xpath_urls = ".//*[@id='list_grid']/table/tbody/tr"
         sub_links = driver.find_elements_by_xpath(xpath_urls)
         url_num = len(sub_links)
-        print "Number of URLs: ", url_num
+        #print "Number of URLs: ", url_num
         if url_num>0:
             sub_links[0].click()
-
-        """
-        xpath = ".//*[@id='records_div']/table/tbody/tr/td/div/table/tbody/tr[2]/td/a"
-        click_point = driver.find_element_by_xpath(xpath)
-        hover = ActionChains(driver)
-        hover.move_to_element(click_point).perform()
-        click_point.click()
-
-        """
-        #sleep(5)
-        return driver
+        else:
+            raise ValueError("Not enough items for searching!")
