@@ -13,7 +13,7 @@ def web_session(request):
 
     return web_session
 
-def test_failing(web_session):
+def test_cfui_failing(web_session):
     web_session.logger.info("Begin Test")
     time.sleep(5)
     raise Exception('A very specific bad thing happened')

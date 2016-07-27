@@ -13,7 +13,7 @@ def web_session(request):
 
     return web_session
 
-def test_test(web_session):
+def test_cfui_test(web_session):
     web_session.logger.info("Begin Test")
     assert True, "Sanity Login Test"
 

@@ -14,14 +14,14 @@ def web_session(request):
 
     return web_session
 
-def test_validate_display_names_checkbox(web_session):
+def test_cfui_validate_display_names_checkbox(web_session):
     assert topology(web_session).validate_display_names_checkbox()
 
-def test_default_topology_view(web_session):
+def test_cfui_default_topology_view(web_session):
     assert topology(web_session).validate_default_topology_view()
 
-def test_servers_entities(web_session):
+def test_cfui_servers_entities(web_session):
     assert topology(web_session).validate_middleware_servers_entities()
 
-def test_deployments_entities(web_session):
+def test_cfui_deployments_entities(web_session):
     assert topology(web_session).validate_middleware_deployments_entities()
