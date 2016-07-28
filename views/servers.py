@@ -189,9 +189,9 @@ class servers():
 
         new_pid = ssh_.get_pid(eap_app)
 
-        self.web_session.logger.info("Orig Pid: {}  New Pid: {}".format(orig_pid, new_pid))
+        assert orig_pid != new_pid, "Orig Pid: {}  New Pid: {}".format(orig_pid, new_pid)
 
-        return (orig_pid != new_pid)
+        return True
 
     def eap_power_stop(self):
         pid = None
@@ -314,6 +314,7 @@ class servers():
 
         # Find EAP on which to deploy
         eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         self.ui_utils.waitForTextOnPage('Version', 15)
@@ -322,8 +323,9 @@ class servers():
 
         # Validate UI
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
-        assert self.ui_utils.find_row_in_list(deployments_ui, "Deployment Name", self.APPLICATION_WAR), "Deployment {} not found on UI.".format(app_to_deploy)
+        # deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        #assert self.ui_utils.find_row_in_list(deployments_ui, "Deployment Name", self.APPLICATION_WAR), "Deployment {} not found on UI.".format(app_to_deploy)
+        self.ui_utils.refresh_until_text_appears(self.APPLICATION_WAR, 300)
         self.ui_utils.click_on_row_containing_text(app_to_deploy)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
 
@@ -405,6 +407,8 @@ class servers():
     def add_server_deployment(self, app_to_deploy):
         app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
 
+        self.web_session.logger.info("Deploying App: {}".format(app))
+
         self.web_driver.find_element_by_id('middleware_server_deployments_choice').click()
         self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
         self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
@@ -416,9 +420,36 @@ class servers():
         self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
 
     def undeploy_server_deployment(self, app_to_undeploy = APPLICATION_WAR):
+        self.web_session.logger.info("Undeploying App: {}".format(app_to_undeploy))
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice__middleware_deployment_undeploy').click()
         self.ui_utils.sleep(2)
         self.web_driver.switch_to_alert().accept()
         self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
 
+    def wait_for_deployment_state(self, deployment_name, state, wait_time):
+        currentTime = time.time()
+        deployment = None
+
+        self.web_session.logger.info("Wait for Deployment: {} to be in state: ".format(deployment_name, state))
+
+        while True:
+            deployments = self.db.get_deployments()
+            for row in deployments:
+                if deployment_name in row['name']:
+                    deployment = row
+                    break
+
+            assert deployment, "Deployment: {} not found in DB".format(deployment_name)
+
+            if state.lower() == deployment['status'].lower():
+                break
+            else:
+                if time.time() - currentTime >= wait_time:
+                    self.web_session.logger.error(
+                        "Timed out waiting for Deployment {} to be in state {}.".format(deployment_name, state))
+                    return False
+                else:
+                    time.sleep(2)
+
+        return True
