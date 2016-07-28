@@ -6,7 +6,7 @@ import lxml.html
 # from the junit .xml result file so that it can then be exported
 # to Prolarion via the CI Jenkins Polarion Exporter (V1.3.x).
 
-OUF_FILE = 'results_export_to_polarion.xml'
+OUT_FILE = 'results_export_to_polarion.xml'
 
 if len(sys.argv) < 2:
     print "Usage: {} results.xml <output.xml>".format(sys.argv[0])
@@ -17,7 +17,7 @@ in_file = sys.argv[1]
 if len(sys.argv) > 2:
     out_file = sys.argv[2]
 else:
-    out_file = OUF_FILE
+    out_file = OUT_FILE
 
 try:
     root = lxml.etree.parse(in_file)
