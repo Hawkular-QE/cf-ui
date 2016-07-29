@@ -17,3 +17,7 @@ def web_session(request):
 def test_cfui_datasource_list(web_session):
     web_session.logger.info("Begin datasource list test")
     assert datasources(web_session).validate_datasource_list()
+
+def test_cfui_datasource_detail(web_session):
+    web_session.logger.info("Begin datasource detail page test")
+    assert datasources(web_session).validate_datasource_detail()
