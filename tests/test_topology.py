@@ -25,3 +25,6 @@ def test_cfui_servers_entities(web_session):
 
 def test_cfui_deployments_entities(web_session):
     assert topology(web_session).validate_middleware_deployments_entities()
+
+def test_cfui_datasources_entities(web_session):
+    assert topology(web_session).validate_middleware_datasources_entities()
