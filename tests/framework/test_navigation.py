@@ -12,6 +12,8 @@ def web_session(request):
     request.addfinalizer(closeSession)
     return web_session
 
+"""
+
 def test_deployments (web_session):
     nav = NavigationTree(web_session)
     nav.navigate_to_middleware_deployment_view()
@@ -63,23 +65,28 @@ def test_fast_navigation(web_session):
     nav.jump_to_middleware_providers_view()
     nav.jump_to_middleware_servers_view()
     nav.jump_to_topology_view()
+"""
 
-def test_provider_details(web_session):
+def test_cfui_provider_details(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_providers_view()
     nav.to_first_details()
+    pass
 
-def _test_deployment_details(web_session):
+def test_cfui_deployment_details(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_deployment_view()
     nav.to_first_details()
+    pass
 
-def _test_server_details(web_session):
+def test_cfui_server_details(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_servers_view()
     nav.to_first_details()
+    pass
 
-def _test_datasource_details(web_session):
+def test_cfui_datasource_details(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_datasources_view()
     nav.to_first_details()
+    pass

@@ -64,6 +64,7 @@ class table():
         row_number = 0
         for table_row in table_rows:
             row_number += 1
+            table_row_list = [] ## ??
             table_row_point = table_row.find_elements_by_tag_name('td')
             if table_row_point:
 
@@ -80,6 +81,37 @@ class table():
             dictionary.append( table_row_list)
         return dictionary
 
+    def page_elements(self):
+
+        print "Page URL: ", self.driver.current_url
+
+        dictionary = {}
+        table_locator = ".//table//tbody//tr[not(ancestor::tr)]"
+        table_rows = self.driver.find_elements_by_xpath(table_locator)
+
+        for table_row in table_rows:
+            print "\n > table row: ", table_row.text
+            tds = table_row.find_elements_by_tag_name("td")
+            property_name = "'{}'".format(tds[0].text)
+            print "tds's size: ", len(tds), " -- property_name: ", property_name
+            property_value = None
+
+            if len(tds) == 1:
+                property_value = "is empty"
+
+            if len(tds) == 2:
+                property_value = "'{}'".format(tds[1].text)
+            inner_rows = table_row.find_elements_by_xpath(".//table//tbody//tr")
+
+            if inner_rows:
+                inner_elem = " '{}' ".format( "".join([inner.text for inner in inner_rows]))
+                property_value = inner_elem
+
+            if property_name != None and property_name != "":
+                dictionary.update( { property_name : property_value })
+        return dictionary
+
+
 
     def details(self):
         table = []
@@ -90,13 +122,14 @@ class table():
             if tds:
                 table.append([td.text for td in tds])
                 for pair in table:
-                    dict[pair[0]] = pair[1]
+                    #dict[pair[0]] = pair[1]
+                    print " pair > ", pair
             else:
                 self.web_session.logger.warning("No element found for table.")
         return dict
 
-    def get_leaf(self, number):
 
+    def get_leaf(self, number):
         leaf = self.details()
         dict_size = len(leaf)
         leaf.update({'web_page': self.driver.current_url})
@@ -108,7 +141,6 @@ class table():
     def get_page_details(self, page):
         details = []
         req_path  = self.paths.get(page)
-
         urls = self.from_path(req_path).get_leaves_urls()
         for url in urls:
             self.from_url(url)
@@ -181,8 +213,6 @@ class table():
         return self.get_page_details_ref('middleware_deployments', ref)
 
     ## TODO: next - to use python's magics with method's names substitution for eliminate this spagetti! -^^
-
-
 
     def pretty_print(self, complex_data, caption="DUMP: "):
         import pprint as pp

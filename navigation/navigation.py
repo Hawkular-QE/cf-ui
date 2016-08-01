@@ -1,6 +1,11 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from time import sleep
 
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 class UI_Point():
 
@@ -172,12 +177,36 @@ class NavigationTree():
         driver = self.web_driver
         list_view_click = "//i[contains(@class,'fa fa-th-list')]"
         first_item = ".//*[@id='list_grid']/table/tbody/tr"
-
         driver.find_element_by_xpath(list_view_click).click()
-        #xpath_urls = first_item
         sub_links = driver.find_elements_by_xpath(first_item)
-        #url_num = len(sub_links)
         if len(sub_links)>0:
             sub_links[0].click()
         else:
             raise ValueError("Not enough items for searching!")
+
+
+    def is_ok(self, point):
+        if point.is_displayed() and point.is_enabled():
+            return True
+
+    def go_up_till_clickable(self, click_point):
+        xpath_up = ".."
+        parent = click_point.find_element_by_xpath(xpath_up)
+        if self.is_ok(parent):
+            parent.click()
+        else:
+            self.go_up_till_clickable(parent)
+
+
+    def found_by_pattern(self, pattern):
+        driver = self.web_driver
+        driver.find_element_by_name("view_list").click()
+        xpath = "//*[contains(text(), '{}')]".format(pattern)
+        click_points = driver.find_elements_by_xpath(xpath)
+        if len(click_points) > 1:
+            click_point = click_points[0]
+            if self.is_ok(click_point):
+                click_point.click()
+            else:
+                self.go_up_till_clickable(click_point)
+        return True
