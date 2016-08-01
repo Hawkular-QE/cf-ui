@@ -161,9 +161,9 @@ class servers():
     def __get_eap_app_path(self,eap_hawk):
 
         if "wildfly" in (eap_hawk.get('Product Name').lower()):
-            return "{}{}/bin/standalone.sh".format(self.EAP_WILDFLY_HOME,eap_hawk.get("details").get("Version"))
+            return "{}{}/".format(self.EAP_WILDFLY_HOME,eap_hawk.get("details").get("Version"))
         else:
-            return "{}/bin/standalone.sh".format(self.EAP_JON_HOME)
+            return "{}/".format(self.EAP_JON_HOME)
 
     def eap_power_restart(self):
 
@@ -177,7 +177,8 @@ class servers():
         eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
-        eap_app = self.__get_eap_app_path(eap_hawk)
+        # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
+        eap_app = "{}{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk), "standalone")
 
         eap_host = eap_hawk.get("details").get("Hostname")
         ssh_ = ssh(self.web_session, eap_host)
@@ -186,7 +187,7 @@ class servers():
         self.web_session.logger.info("About to Restart EAP server {} Feed {}".format(eap_hawk.get('Product'), eap_hawk.get('Feed')))
         self.eap_power_action(power, eap_hawk)
         self.ui_utils.sleep(5)  # need a timer here
-
+        print "eap_app: ", eap_app
         new_pid = ssh_.get_pid(eap_app)
 
         assert orig_pid != new_pid, "Orig Pid: {}  New Pid: {}".format(orig_pid, new_pid)
@@ -206,7 +207,8 @@ class servers():
         eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
-        eap_app = self.__get_eap_app_path(eap_hawk)
+        # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
+        eap_app = "{}{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk), "standalone")
 
         eap_hostname = eap_hawk.get("details").get("Hostname")
         ssh_ = ssh(self.web_session, eap_hostname)
@@ -216,7 +218,7 @@ class servers():
         self.ui_utils.sleep(3)
         assert ssh_.get_pid(eap_app) == None, "EAP pid unexpectedly found."
 
-        start_str = 'nohup {} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(eap_app)
+        start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "bin/standalone.sh")
         self.web_session.logger.debug("About to start EAP: {}".format(start_str))
         ssh_.execute_command(start_str)
         assert ssh_.get_pid(eap_app) != None, "EAP pid not found."
