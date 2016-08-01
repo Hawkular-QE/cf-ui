@@ -14,7 +14,7 @@ def web_session(request):
     return web_session
 
 
-def _test_instance(web_session):
+def _test_cfui_instance(web_session):
     t = table(web_session)
     print "List of middleware datasources: ", t.get_middleware_datasource_table(), "\n"
     print "List of middleware providers: ", t.get_middleware_providers_table(), "\n"
@@ -23,7 +23,7 @@ def _test_instance(web_session):
     print "Full servers list: ", servers_list, "\n"
 
 
-def _test_details(web_session):
+def _test_cfui_details(web_session):
     t = table(web_session)
     datasources_table = t.get_middleware_datasource_table()
     ds_num = len(datasources_table)
@@ -41,14 +41,14 @@ def _test_details(web_session):
 from navigation.navigation import NavigationTree
 from time import sleep
 
-def _test_single_detail_page(web_session):
+def _test_cfui_single_detail_page(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_providers_view()
     nav.to_first_details()
     t = table(web_session)
     t.pretty_print(t.page_elements())
 
-def test_details_by_text(web_session):
+def test_cfui_details_by_text(web_session):
 
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_servers_view()
