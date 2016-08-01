@@ -14,7 +14,7 @@ echo $TEST_FILE
 if [ "$RUN_TESTS" = true ] ; then
 
 # all tests should be independent so order of testing does not matter
-python -m pytest -s $TEST_FILE --ignore=tests/framework # | tee -a ${WORKSPACE}/pytest.log
+python -m pytest -s $TEST_FILE --junitxml=polarion-output.xml --ignore=tests/framework # | tee -a ${WORKSPACE}/pytest.log
 
 # stop recording
 pkill -SIGINT -f flvrec.py
