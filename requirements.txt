@@ -3,11 +3,7 @@
 
 selenium
 pytest
-pytz
-# cryptography
-paramiko
-psycopg2
-
 lxml
+#pprint
 # Chrome driver installation
 chromedriver
