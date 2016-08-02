@@ -160,7 +160,7 @@ class table():
         return self.from_path(self.paths.get('middleware_deployments')).elements()
 
 
-    def get_middleware_datasource_table(self):
+    def get_middleware_datasources_table(self):
         return self.from_path(self.paths.get('middleware_datasources')).elements()
 
 
