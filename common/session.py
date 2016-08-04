@@ -31,6 +31,7 @@ class session(properties):
         self.fixture_request = request
 
         assert self.MIQ_HOSTNAME, "Property MIQ_HOSTNAME in conf/" + self.PROPERTIES_FILE_NAME + " can not be empty"
+        assert self.HAWKULAR_URL, "Property HAWKULAR_URL in conf/" + self.PROPERTIES_FILE_NAME + " can not be empty"
 
         self.login = login
 
