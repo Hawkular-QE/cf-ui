@@ -272,7 +272,7 @@ class servers():
 
         return True
 
-    def eap_power_resume(self):
+    def eap_power_graceful_shutdown(self):
         power = self.power_graceful_shutdown
 
         # Find an EAP in 'start state'
