@@ -70,3 +70,6 @@ def test_cfui_redeploy_application_archive(web_session):
 
 def test_cfui_stop_application_archive(web_session):
     assert servers(web_session).stop_application_archive()
+
+def test_cfui_start_application_archive(web_session):
+    assert servers(web_session).start_application_archive()
