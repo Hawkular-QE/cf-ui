@@ -300,12 +300,11 @@ class providers():
 
         self.web_session.logger.info("Begin test for Authentication->Recheck Authentication.")
         NavigationTree(self.web_session).navigate_to_middleware_providers_view()
-        #providers_ui = table(self.web_session).get_middleware_providers_table()
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
 
         self.web_driver.find_element_by_id('ems_middleware_authentication_choice').click()
         self.web_driver.find_element_by_id('ems_middleware_authentication_choice__ems_middleware_recheck_auth_status').click()
 
         ui_utils(self.web_session).sleep(2)
-        ui_utils(self.web_session).waitForTextOnPage("Authentication status will be saved and workers will be restarted for this Middleware Provider", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Authentication status will be saved and workers will be restarted for this Middleware Provider", 15)
         return True
