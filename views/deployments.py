@@ -26,7 +26,7 @@ class deployments():
         deployments_db = self.db.get_deployments()
         assert deployments_db, "No DB Deployments found."
 
-        # Test only a random sameple of the entire Deployments list
+        # Test only a random sample of the entire Deployments list
         for dep in self.ui_utils.get_random_list(deployments_ui, 3):
             deployment_name = dep.get('Deployment Name')
             self.web_session.logger.info("Validate Deployment {}.".format(deployment_name))
