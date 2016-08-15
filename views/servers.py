@@ -354,11 +354,58 @@ class servers():
 
         return True
 
-    def redeploy_application_archive(self):
-        # Find EAP with application to redeploy
-        # Redeploy
-        # Validate that application is still in list
+    def redeploy_application_archive(self, app_to_redeploy=APPLICATION_WAR):
 
+        # Find EAP with application to redeploy
+        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+
+        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        self.ui_utils.click_on_row_containing_text(app_to_redeploy)
+
+        # Redeploy
+
+        self.redeploy_server_deployment(app_to_redeploy)
+
+        # Validate that application status is enabled:
+        # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/9876, Issue#10138 )
+
+        assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
+        return True
+
+    def stop_application_archive(self, app_to_stop=APPLICATION_WAR):
+
+        # Find EAP with application to stop
+        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+
+        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        self.ui_utils.click_on_row_containing_text(app_to_stop)
+
+        # Stop the application archive
+
+        self.stop_server_deployment(app_to_stop)
+
+        # Validate that application status is Disabled:
+        # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
+
+        assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
+        return True
+
+    def start_application_archive(self, app_to_start=APPLICATION_WAR):
+
+        # Find EAP with application to start
+        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+
+        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        self.ui_utils.click_on_row_containing_text(app_to_start)
+
+        # Start the application archive
+
+        self.start_server_deployment(app_to_start)
+
+        # Validate that application status is Enabled:
+        # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
+
+        assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         return True
 
     def wait_for_eap_state(self, feed, expected_state, wait_time):
@@ -427,6 +474,33 @@ class servers():
         self.ui_utils.sleep(2)
         self.web_driver.switch_to_alert().accept()
         self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
+
+    def redeploy_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
+        self.web_session.logger.info("Redeploying App: {}".format(app_to_redeploy))
+        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_id(
+            'middleware_deployment_deploy_choice__middleware_deployment_redeploy').click()
+        self.ui_utils.sleep(2)
+        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.waitForTextOnPage('Redeployment initiated for selected deployment(s)', 15)
+
+    def stop_server_deployment(self, app_to_stop=APPLICATION_WAR):
+        self.web_session.logger.info("Stopping App: {}".format(app_to_stop))
+        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_id(
+            'middleware_deployment_deploy_choice__middleware_deployment_stop').click()
+        self.ui_utils.sleep(2)
+        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.waitForTextOnPage('Stop initiated for selected deployment(s)', 15)
+
+    def start_server_deployment(self, app_to_start=APPLICATION_WAR):
+        self.web_session.logger.info("Starting App: {}".format(app_to_start))
+        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_id(
+            'middleware_deployment_deploy_choice__middleware_deployment_start').click()
+        self.ui_utils.sleep(2)
+        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.waitForTextOnPage('Start initiated for selected deployment(s)', 15)
 
     def wait_for_deployment_state(self, deployment_name, state, wait_time):
         currentTime = time.time()
