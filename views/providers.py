@@ -194,7 +194,7 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.web_driver.find_element_by_xpath(
-            "//a[@title='Remove selected Middleware Providers from the VMDB']").click()
+            "//a[@title='Remove selected Middleware Providers']").click()
         self.web_driver.switch_to_alert().accept()
         assert ui_utils(self.web_session).waitForTextOnPage("Delete initiated", 15)
 
@@ -211,7 +211,7 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.web_driver.find_element_by_xpath(
-            "//a[@title='Remove selected Middleware Providers from the VMDB']").click()
+            "//a[@title='Remove selected Middleware Providers']").click()
         self.web_driver.switch_to_alert().accept()
         assert ui_utils(self.web_session).waitForTextOnPage(
             "Delete initiated", 15)
@@ -292,4 +292,19 @@ class providers():
         # assert providers_details_ui.get('Middleware Deployments') == str(len(deployments_hawk)), "Number of Deployments mismatch"
         assert providers_details_ui.get('Middleware Datasources') == str(len(datasources_hawk)), "Number of Datasources mismatch"
 
+        return True
+
+    def recheck_authentication(self):
+
+        # Test for Authentication->Recheck Authentication' on hawkular provider
+
+        self.web_session.logger.info("Begin test for Authentication->Recheck Authentication.")
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+
+        self.web_driver.find_element_by_id('ems_middleware_authentication_choice').click()
+        self.web_driver.find_element_by_id('ems_middleware_authentication_choice__ems_middleware_recheck_auth_status').click()
+
+        ui_utils(self.web_session).sleep(2)
+        assert ui_utils(self.web_session).waitForTextOnPage("Authentication status will be saved and workers will be restarted for this Middleware Provider", 15)
         return True
