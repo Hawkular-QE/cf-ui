@@ -7,6 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
 from common.view import view
+from common.db import db
 
 class providers():
     web_session = None
@@ -33,6 +34,8 @@ class providers():
                 return
         else:
             self.web_session.logger.info("Adding Middleware Provider to ManageIQ instance")
+
+        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
 
         elem_config = self.web_driver.find_element_by_xpath("//button[@title='Configuration']")
         elem_config.click()
@@ -176,16 +179,13 @@ class providers():
     def does_provider_exist(self):
         self.web_session.logger.info("Checking if provider exists")
 
-        # navigate_to_providers
-
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
-
-        if ui_utils(self.web_session).isElementPresent(By.XPATH, "//span[contains(.,'(Item 0 of 0)')]"):
-            self.web_session.logger.info("Middleware Provider does not exist.")
-            return False
-        else:
-            self.web_session.logger.info("Middleware Provider already exist.")
+        # For performance reasons, check if the provider is present via DB
+        providers = db(self.web_session).get_providers()
+        provider = ui_utils(self.web_session).find_row_in_list(providers, 'name', self.web_session.HAWKULAR_PROVIDER_NAME)
+        if provider:
             return True
+        else:
+            return False
 
     def delete_hawkular_provider(self):
         NavigationTree(self.web_session).navigate_to_middleware_providers_view()
