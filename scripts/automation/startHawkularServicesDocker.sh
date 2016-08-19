@@ -3,7 +3,7 @@
 HS_IMAGE="docker.io/hawkularqe/hawkular-services"
 CASSANDRA_IMAGE="cassandra:3.7"
 
-HS_START_CMD="docker run -d  -e TEST_MODE=true -e CASSANDRA_NODES=myCassandra -p 8080:8080 -p 8443:8443 --link myCassandra:myCassandra ${HS_IMAGE}"
+HS_START_CMD="docker run -d  -e TEST_MODE=true -e CASSANDRA_NODES=myCassandra -e DB_TIMEOUT=300 -p 8080:8080 -p 8443:8443 --link myCassandra:myCassandra ${HS_IMAGE}"
 CASSANDRA_START_CMD="docker run -d --name myCassandra -e CASSANDRA_START_RPC=true ${CASSANDRA_IMAGE}"
 
 # Stop HS if running
@@ -41,7 +41,7 @@ fi
 echo "Starting ${CASSANDRA_IMAGE}"
 ${CASSANDRA_START_CMD}
 
-sleep 20
+sleep 5
 
 # Start HS
 echo "Starting ${HS_IMAGE}"
