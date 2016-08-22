@@ -7,7 +7,7 @@ sed -i "/DISPLAY_PORT /c\DISPLAY_PORT = $DISPLAY_PORT" conf/properties.propertie
 
 if [[ -z $RECORD_TESTS ]]
 then
-    RECORD_TESTS="true"
+    RECORD_TESTS=true
 fi
 
 echo "Setting RECORD_TESTS to: $RECORD_TESTS"
