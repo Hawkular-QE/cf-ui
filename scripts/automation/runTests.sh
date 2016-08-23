@@ -17,7 +17,7 @@ if [ "$RUN_TESTS" = true ] ; then
 python -m pytest -s $TEST_FILE --junitxml=polarion-output.xml --ignore=tests/framework # | tee -a ${WORKSPACE}/pytest.log
 
 # stop recording
-if ["$RECORD_TESTS" = true] ; then
+if ["$RECORD_TESTS" = "True"] ; then
     pkill -SIGINT -f flvrec.py
 fi
 
