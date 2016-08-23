@@ -19,6 +19,7 @@ class db():
     sql_datasources = 'select * from middleware_datasources'
     sql_deployments = 'select * from middleware_deployments'
     sql_domains = 'select * from middleware_domains'
+    sql_server_groups = 'select * from  middleware_server_groups'
 
     def __init__(self, web_session, miq_ip = None, username = None, password = None, db_port = None):
 
@@ -74,3 +75,6 @@ class db():
 
     def get_domains(self):
         return self.execute(self.sql_domains)
+
+    def get_server_groups(self):
+        return self.execute(self.sql_server_groups)
