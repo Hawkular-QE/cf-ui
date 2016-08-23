@@ -17,7 +17,9 @@ if [ "$RUN_TESTS" = true ] ; then
 python -m pytest -s $TEST_FILE --junitxml=polarion-output.xml --ignore=tests/framework # | tee -a ${WORKSPACE}/pytest.log
 
 # stop recording
-pkill -SIGINT -f flvrec.py
+if ["$RECORD_TESTS" = true] ; then
+    pkill -SIGINT -f flvrec.py
+fi
 
 else
 echo "Skipping tests because of build parameter RUN_TESTS=False"
