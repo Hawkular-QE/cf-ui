@@ -6,6 +6,7 @@ class table():
                 'middleware_deployments' : '/middleware_deployment/show_list',
                 'middleware_datasources' : '/middleware_datasource/show_list',
                 'middleware_providers'   : '/ems_middleware/show_list',
+                'middleware_domains'     : '/middleware_domain/show_list',
                 'middleware_datasources_details': '/middleware_datasource/show/{}',
     }
 
@@ -163,6 +164,8 @@ class table():
     def get_middleware_datasources_table(self):
         return self.from_path(self.paths.get('middleware_datasources')).elements()
 
+    def get_middleware_domains_table(self):
+        return self.from_path(self.paths.get('middleware_domains')).elements()
 
     def get_leaves_refs(self):
         from lxml import etree

@@ -30,3 +30,9 @@ def test_cfui_db_deployments(web_session):
     assert rows
     for row in rows:
         print "name: ", row.get('name')
+
+def test_cfui_db_domains(web_session):
+    rows = db(web_session).get_domains()
+    assert rows
+    for row in rows:
+        print "name: ", row.get('name')
