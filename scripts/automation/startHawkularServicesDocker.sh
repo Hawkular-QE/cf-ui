@@ -13,8 +13,8 @@ if [ ${#HS_CONTAINER_ID} -gt 0 ] ; then
     echo "Stopping HS Container ${HS_CONTAINER_ID}"
     docker stop ${HS_CONTAINER_ID}
     docker rm ${HS_CONTAINER_ID}
-    IMAGE_ID=`docker images | grep ${HS_IMAGE} | awk '{ print $3}'`
-    echo "Removing Image ${HS_IMAGE}}"
+    IMAGE_ID=`docker images | grep "hawkular-services" | awk '{ print $3}'`
+    echo "Removing Image ${HS_IMAGE}   ID: ${IMAGE_ID}"
     docker rmi -f ${IMAGE_ID}
 else
     echo "No ${HS_IMAGE} container found to be running."
@@ -28,8 +28,8 @@ if [ ${#CASSANDRA_CONTAINER_ID} -gt 0 ] ; then
     echo "Stopping HS Container ${CASSANDRA_CONTAINER_ID}"
     docker stop ${CASSANDRA_CONTAINER_ID}
     docker rm ${CASSANDRA_CONTAINER_ID}
-    IMAGE_ID=`docker images | grep ${CASSANDRA_IMAGE} | awk '{print $3}'`
-    echo "Removing Image ${CASSANDRA_IMAGE}}"
+    IMAGE_ID=`docker images | grep "cassandra" | awk '{print $3}'`
+    echo "Removing Image ${CASSANDRA_IMAGE}   ID: ${IMAGE_ID}"
     docker rmi -f ${IMAGE_ID}
 else
     echo "No ${CASSANDRA_IMAGE} container found to be running."
