@@ -74,6 +74,10 @@ sleep 5s
 
 WAIT_FOR_APPLIANCE_STATUS="True"
 
+# 30min / 10s
+MAX_WAITING_CYCLES=180
+
+
 while [[ $WAIT_FOR_APPLIANCE_STATUS = "True" ]] ; do
 sleep 10s
 rm -rf sprout_appliance_pool_status.json
@@ -83,11 +87,20 @@ curl -s -H "Content-Type: application/json" -X POST -d \
 '{"method":"request_check","args":["'${REQUEST_APPLIANCES_POOL_ID}'"],"kwargs":{},"auth":["'${SPROUT_USER}'","'${SPROUT_PASSWORD}'"]}' \
 http://10.16.4.94/appliances/api > sprout_appliance_pool_status.json
 REQUEST_APPLIANCES_RESULT=$(cat sprout_appliance_pool_status.json | python -c 'import json,sys;obj=json.load(sys.stdin);print(obj["result"]);')
-echo "Waiting for pool to load.."
+REQUEST_APPLIANCES_FINISHED=$(cat sprout_appliance_pool_status.json | python -c 'import json,sys;obj=json.load(sys.stdin);print(obj["result"]["finished"]);')
+
+echo "Waiting for pool to load.. Finished: $REQUEST_APPLIANCES_FINISHED"
 echo "$REQUEST_APPLIANCES_RESULT"
-if ! [[ -z $REQUEST_APPLIANCES_RESULT ]] ; then
+if [[ $REQUEST_APPLIANCES_FINISHED == "True" ]] ; then
 WAIT_FOR_APPLIANCE_STATUS="False"
 fi
+
+MAX_WAITING_CYCLES=$((MAX_WAITING_CYCLES-1))
+if [ $MAX_WAITING_CYCLES -eq 0 ]; then
+   echo "Unable to get Sprout appliance.. exiting with 1.";
+   exit 1
+fi
+
 done
 
 # delete file with old MIQ IP
