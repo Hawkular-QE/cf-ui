@@ -39,7 +39,8 @@ class providers():
 
         elem_config = self.web_driver.find_element_by_xpath("//button[@title='Configuration']")
         elem_config.click()
-        assert ui_utils(self.web_session).waitForTextOnPage("Add a New Middleware Provider", 15)
+        # assert ui_utils(self.web_session).waitForTextOnPage("Add a New Middleware Provider", 15)
+        ui_utils(self.web_session).sleep(2)
         elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a New Middleware Provider']")
         elem_add_new_provider.click()
         self.web_driver.implicitly_wait(15)
