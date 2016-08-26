@@ -83,7 +83,7 @@ class ui_utils():
         for tr in self.web_driver.find_elements_by_xpath('.//tr'):
             tds = tr.find_elements_by_tag_name('td')
             if tds: table.append([td.text for td in tds])
-        
+
         if table:
             for pair in table:
                 if len(pair) >= 2:
@@ -144,7 +144,6 @@ class ui_utils():
                 table.append([td.text for td in tds])
                 for row in table:
                     for value in row:
-                        print "Value: ", value
                         if value == text:
                             self.web_session.logger.info("Click on {}".format(text))
                             tds[3].click()
