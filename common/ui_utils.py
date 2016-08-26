@@ -83,7 +83,7 @@ class ui_utils():
         for tr in self.web_driver.find_elements_by_xpath('.//tr'):
             tds = tr.find_elements_by_tag_name('td')
             if tds: table.append([td.text for td in tds])
-        print "Table: ", table
+        
         if table:
             for pair in table:
                 if len(pair) >= 2:
