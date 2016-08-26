@@ -79,12 +79,22 @@ class NavigationTree():
     web_session = None
 
     paths = {
-                'middleware_servers'     : '/middleware_server/show_list',
-                'middleware_deployments' : '/middleware_deployment/show_list',
-                'middleware_datasources' : '/middleware_datasource/show_list',
-                'middleware_providers'   : '/ems_middleware/show_list',
-                              'topology' : '/middleware_topology/show',
-            }
+        'middleware_providers'   : '/ems_middleware/show_list',
+        'middleware_domains'     : '/middleware_domain/show_list',
+        'middleware_servers'     : '/middleware_server/show_list',
+        'middleware_deployments' : '/middleware_deployment/show_list',
+        'middleware_datasources' : '/middleware_datasource/show_list',
+                      'topology' : '/middleware_topology/show',
+        }
+
+    page_marks = {
+        'middleware_providers'   : '/ems_middleware/show_list',
+        'middleware_domains'     : '/middleware_domain/show_list',
+        'middleware_servers'     : '/middleware_server/show_list',
+        'middleware_deployments' : '/middleware_deployment/show_list',
+        'middleware_datasources' : '/middleware_datasource/show_list',
+                      'topology' : '/middleware_topology/show',
+        }
 
     def add_point(self, name, location, action):
         self._tree.update( { name : UI_Action( UI_Point(name, location), UI_Operation(action)) } )
@@ -92,12 +102,14 @@ class NavigationTree():
     def __init__(self, session):
         self.web_session = session
         self.web_driver = self.web_session.web_driver
-        self.add_point("middleware", "id('maintab')/li[6]/a/span[2]", "Hover")
-        self.add_point("middleware_providers",   "id('#menu-mdl')/ul/li[1]/a/span", "Click")
-        self.add_point("middleware_servers",     "id('#menu-mdl')/ul/li[2]/a/span", "Click")
-        self.add_point("middleware_deployments", "id('#menu-mdl')/ul/li[3]/a/span", "Click")
-        self.add_point("middleware_datasources", "id('#menu-mdl')/ul/li[4]/a/span", "Click")
-        self.add_point(              "topology", "id('#menu-mdl')/ul/li[5]/a/span", "Click")
+
+        self.add_point("middleware", ".//*[@id='maintab']/li[6]/a/span[contains(.,'Middleware')]", "Hover")
+        self.add_point("middleware_providers",   "id('#menu-mdl')//span[contains(.,'Middleware Providers')]", "Click")
+        self.add_point("middleware_domains",     "id('#menu-mdl')//span[contains(.,'Middleware Domains')]/..", "Click")
+        self.add_point("middleware_servers",     "id('#menu-mdl')//span[contains(.,'Middleware Servers')]", "Click")
+        self.add_point("middleware_deployments", "id('#menu-mdl')//span[contains(.,'Middleware Deployments')]", "Click")
+        self.add_point("middleware_datasources", "id('#menu-mdl')//span[contains(.,'Middleware Datasources')]", "Click")
+        self.add_point("topology",               "id('#menu-mdl')//span[contains(.,'Topology')]", "Click")
 
 
     def navigate(self, route, force_navigation=True):
@@ -160,29 +172,104 @@ class NavigationTree():
 
     def jump_to_middleware_providers_view(self, force_navigation=True):
         self._jump_to('middleware_providers', force_navigation)
+        return self
 
     def jump_to_middleware_servers_view(self, force_navigation=True):
         self._jump_to('middleware_servers', force_navigation)
+        return self
 
     def jump_to_middleware_deployment_view(self, force_navigation=True):
         self._jump_to('middleware_deployments', force_navigation)
+        return self
 
     def jump_to_middleware_datasources_view(self, force_navigation=True):
         self._jump_to('middleware_datasources', force_navigation)
+        return self
 
     def jump_to_topology_view(self, force_navigation=True):
         self._jump_to('topology', force_navigation)
+        return self
 
-    def to_first_details(self):
+    def jump_to_middleware_domain_view(self, force_navigation=True):
+        self._jump_to('middleware_domains', force_navigation)
+        return self
+
+
+    def to_exact_details(self, param='first'):
+
         driver = self.web_driver
         list_view_click = "//i[contains(@class,'fa fa-th-list')]"
         first_item = ".//*[@id='list_grid']/table/tbody/tr"
+
         driver.find_element_by_xpath(list_view_click).click()
         sub_links = driver.find_elements_by_xpath(first_item)
+        num_link = len(sub_links)
+        ind = None
+        use_numeric_param = False
+        try:
+            ind = int(param) - 1 ## Visual numeration from 1 !!
+            use_numeric_param = True
+        except: pass
+
+        assert (ind <= num_link and ind >= 0), "-- Definitely wrong value of param: '{}'".format(param)
+        assert (use_numeric_param == True or param == 'first' or param == 'last'), "-- Possible wrong value of param '{}'?".format(param)
+
+        if len(sub_links) > 0:
+
+            if param == 'first':
+                sub_links[0].click()
+
+            elif param=='last':
+                sub_links[num_link - 1].click()
+
+            elif use_numeric_param:
+                sub_links[ind].click()
+
+        else:
+            # raise ValueError("Not enough items for searching!") # ??
+            print "Not enough items for selection!"
+        return self
+
+    def to_first_details(self):
+        self.to_exact_details('first')
+
+    def to_last_details(self):
+        self.to_exact_details('last')
+
+    def _to_first_details(self):
+        driver = self.web_driver
+        list_view_click = "//i[contains(@class,'fa fa-th-list')]"
+        first_item = ".//*[@id='list_grid']/table/tbody/tr"
+
+        driver.find_element_by_xpath(list_view_click).click()
+        sub_links = driver.find_elements_by_xpath(first_item)
+        #print "Number of details items: ", len(sub_links)
+
         if len(sub_links)>0:
             sub_links[0].click()
         else:
-            raise ValueError("Not enough items for searching!")
+            #raise ValueError("Not enough items for searching!")
+            print "Not enough items for selection!"
+        return self
+
+
+    def _to_last_details(self):
+        driver = self.web_driver
+        list_view_click = "//i[contains(@class,'fa fa-th-list')]"
+        first_item = ".//*[@id='list_grid']/table/tbody/tr"
+
+        driver.find_element_by_xpath(list_view_click).click()
+        sub_links = driver.find_elements_by_xpath(first_item)
+        last = len(sub_links)
+        if last > 0:
+            sub_links[last-1].click()
+        else:
+            # raise ValueError("Not enough items for searching!")
+            print "Not enough items for searching!"
+        return self
+
+    def to_any_details(self):
+        return self
 
 
     def is_ok(self, point):
