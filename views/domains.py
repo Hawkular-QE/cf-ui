@@ -1,7 +1,6 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
-from parsing.table import table
 
 
 class domains():
@@ -26,7 +25,7 @@ class domains():
         self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
-        domains_ui = table(self.web_session).get_middleware_domains_table()
+        domains_ui = self.ui_utils.get_list_table()
         domains_db = self.db.get_domains()
         # TBD domains_hawk = ...
 
@@ -45,7 +44,7 @@ class domains():
         self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
-        domains_ui = table(self.web_session).get_middleware_domains_table()
+        domains_ui = self.ui_utils.get_list_table()
         domains_db = self.db.get_domains()
 
         for domain_ui in domains_ui:
@@ -74,7 +73,7 @@ class domains():
         self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
-        domains_ui = table(self.web_session).get_middleware_domains_table()
+        domains_ui = self.ui_utils.get_list_table()
         server_groups_db = self.db.get_server_groups()
 
         for domain in domains_ui:
