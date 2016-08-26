@@ -66,19 +66,19 @@ def _test_fast_navigation(web_session):
     nav.jump_to_topology_view()
 
 
-def _test_cfui_provider_details(web_session):
+def test_cfui_provider_details(web_session):
     NavigationTree(web_session).jump_to_middleware_providers_view().to_exact_details(1) ## Visual numeration from 1 !!
 
 
-def _test_cfui_deployment_details(web_session):
+def test_cfui_deployment_details(web_session):
     NavigationTree(web_session).jump_to_middleware_deployment_view().to_exact_details(5)
 
 
-def _test_cfui_server_details(web_session):
+def test_cfui_server_details(web_session):
     NavigationTree(web_session).jump_to_middleware_servers_view().to_exact_details(2)
 
 
-def _test_cfui_datasource_details(web_session):
+def test_cfui_datasource_details(web_session):
     NavigationTree(web_session).jump_to_middleware_datasources_view().to_exact_details(2)
 
 

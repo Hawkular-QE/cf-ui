@@ -1,12 +1,6 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from time import sleep
 
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-
-
 class UI_Point():
 
     """ Representation of any addressable place in UI, """
@@ -235,41 +229,6 @@ class NavigationTree():
 
     def to_last_details(self):
         self.to_exact_details('last')
-
-    def _to_first_details(self):
-        driver = self.web_driver
-        list_view_click = "//i[contains(@class,'fa fa-th-list')]"
-        first_item = ".//*[@id='list_grid']/table/tbody/tr"
-
-        driver.find_element_by_xpath(list_view_click).click()
-        sub_links = driver.find_elements_by_xpath(first_item)
-        #print "Number of details items: ", len(sub_links)
-
-        if len(sub_links)>0:
-            sub_links[0].click()
-        else:
-            #raise ValueError("Not enough items for searching!")
-            print "Not enough items for selection!"
-        return self
-
-
-    def _to_last_details(self):
-        driver = self.web_driver
-        list_view_click = "//i[contains(@class,'fa fa-th-list')]"
-        first_item = ".//*[@id='list_grid']/table/tbody/tr"
-
-        driver.find_element_by_xpath(list_view_click).click()
-        sub_links = driver.find_elements_by_xpath(first_item)
-        last = len(sub_links)
-        if last > 0:
-            sub_links[last-1].click()
-        else:
-            # raise ValueError("Not enough items for searching!")
-            print "Not enough items for searching!"
-        return self
-
-    def to_any_details(self):
-        return self
 
 
     def is_ok(self, point):
