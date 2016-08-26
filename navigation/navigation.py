@@ -198,7 +198,7 @@ class NavigationTree():
         driver.find_element_by_xpath(list_view_click).click()
         sub_links = driver.find_elements_by_xpath(first_item)
         num_link = len(sub_links)
-        ind = None
+        ind = 0
         use_numeric_param = False
         try:
             ind = int(param) - 1 ## Visual numeration from 1 !!

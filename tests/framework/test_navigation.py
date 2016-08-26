@@ -72,6 +72,8 @@ def test_cfui_provider_details(web_session):
 
 def test_cfui_deployment_details(web_session):
     NavigationTree(web_session).jump_to_middleware_deployment_view().to_exact_details(5)
+    NavigationTree(web_session).jump_to_middleware_deployment_view().to_first_details()
+    NavigationTree(web_session).jump_to_middleware_deployment_view().to_last_details()
 
 
 def test_cfui_server_details(web_session):
@@ -83,7 +85,15 @@ def test_cfui_datasource_details(web_session):
 
 
 def test_cfui_domain_details(web_session):
+    # +
     NavigationTree(web_session).jump_to_middleware_domain_view().to_exact_details(1)
+
+    # -
+    try:
+        NavigationTree(web_session).jump_to_middleware_domain_view().to_exact_details(17)
+        raise ValueError("Uncaught Exception!!")
+    except(AssertionError):
+        print "OK - negative test for number of domain"
 
 
 def test_cfui_negative_domain_details(web_session):
@@ -92,6 +102,6 @@ def test_cfui_negative_domain_details(web_session):
         nav.to_exact_details('nonexistent')
         raise ValueError("Uncaught Exception!!")
     except(AssertionError):
-        print "OK"
+        print "OK - negative test for key words"
 
 
