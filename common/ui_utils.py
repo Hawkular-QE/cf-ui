@@ -83,13 +83,38 @@ class ui_utils():
         for tr in self.web_driver.find_elements_by_xpath('.//tr'):
             tds = tr.find_elements_by_tag_name('td')
             if tds: table.append([td.text for td in tds])
-
+        print "Table: ", table
         if table:
             for pair in table:
                 if len(pair) >= 2:
                     dict[pair[0]] = pair[1]
         else:
             self.web_session.logger.warning("No element found for table.")
+
+        return dict
+
+    def get_list_table(self):
+        header = []
+        table = []
+        dict = []
+
+        # Get table headers
+        for tr in self.web_driver.find_elements_by_xpath('.//tr'):
+            tds = tr.find_elements_by_tag_name('th')
+            if tds: header.append([td.text for td in tds])
+
+        # Get table values
+        for tr in self.web_driver.find_elements_by_xpath('.//tr'):
+            tds = tr.find_elements_by_tag_name('td')
+            if tds: table.append([td.text for td in tds])
+
+        # Build the Dictionary
+        for row in table:
+            d = {}
+            for index, value in enumerate(row, start=0):
+                d[header[0][index]] = value
+
+            dict.append(d)
 
         return dict
 
@@ -119,6 +144,7 @@ class ui_utils():
                 table.append([td.text for td in tds])
                 for row in table:
                     for value in row:
+                        print "Value: ", value
                         if value == text:
                             self.web_session.logger.info("Click on {}".format(text))
                             tds[3].click()

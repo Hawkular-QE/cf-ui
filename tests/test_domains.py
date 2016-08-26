@@ -21,3 +21,7 @@ def test_cfui_domains_view(web_session):
 def test_cfui_domain_details(web_session):
     web_session.logger.info("Begin Domain Details")
     assert domains(web_session).validate_domain_details()
+
+def test_cfui_server_groups_list(web_session):
+    web_session.logger.info("Begin Server Groups")
+    assert domains(web_session).validate_server_groups_list()
