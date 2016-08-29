@@ -1,6 +1,7 @@
 from common.ui_utils import ui_utils
 import re
 from hawkular.hawkular_api import hawkular_api
+from common.db import db
 
 class topology():
     web_session = None
@@ -11,13 +12,14 @@ class topology():
     LEGENDS = '//kubernetes-topology-icon'
 
     entities = {'servers':'Middleware Servers','deployments':'Middleware Deployments',
-                'datasources':'Middleware Datasources'}
+                'datasources':'Middleware Datasources','server_groups':'Middleware Server Groups'}
 
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
         self.hawkular_api = hawkular_api(self.web_session)
+        self.db = db(self.web_session)
 
     def validate_display_names_checkbox(self, select = True):
 
@@ -92,7 +94,7 @@ class topology():
         # 3) Enable Middleware Deployment entities (by validating whether 1st Deployment Name in Deployment-List is displayed)
         # 4) Validate that each Deployment in Deployments-List is displayed
 
-        deployments_list = servers_list = self.hawkular_api.get_hawkular_deployments()
+        deployments_list = self.hawkular_api.get_hawkular_deployments()
         assert deployments_list, "No Deployments found"
 
         self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
@@ -119,7 +121,7 @@ class topology():
         # 3) Enable Middleware Datasource entities (by validating whether 1st Datasource Name in Datasource-List is displayed)
         # 4) Validate that each Datasource in Datasource-List is displayed
 
-        deployments_list = servers_list = self.hawkular_api.get_hawkular_datasources()
+        deployments_list = self.hawkular_api.get_hawkular_datasources()
         assert deployments_list, "No Datasources found"
 
         self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
@@ -137,6 +139,32 @@ class topology():
 
         return True
 
+    def validate_middleware_server_groups_entities(self):
+        self.web_session.logger.info("Validate that Topology View expected Server Groups")
+
+        # Validate that each Server Groups is displayed in Topology:
+        # 1) Get Server Groups list (from DB)
+        # 2) Enable Display Names
+        # 3) Enable Middleware Server Groups entities
+        # 4) Validate that each Server Groups in Server Groups-List is displayed
+
+        server_groups_list = self.db.get_server_groups()
+        assert server_groups_list, "No Server Groups found"
+
+        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+
+        self.__display_names__(select=True)
+
+        # Select "Middleware Deployments"
+        self.__select_entities_view__(self.entities.get('server_groups'), server_groups_list[0].get('name'))
+
+        for server_group in server_groups_list:
+            if not self.__is_name_displayed__(server_group.get('name')):
+                self.web_session.logger.failure(
+                    "Display Names - {} Not Displayed.".format(server_group.get("name")))
+                return False
+
+        return True
 
     def __get_deployment_name__(self, text):
         # Filter all but the actual Name. Ex: 'Deployment [hawkular-command-gateway-war.war]'
