@@ -89,7 +89,7 @@ class domains():
 
             self.ui_utils.waitForTextOnPage("All Middleware Server Groups", 15)
 
-            # To Do: get Table UI table
+            # To Do: get Table hawkular_api table
             server_groups_ui = self.ui_utils.get_list_table()
 
             for server_group in server_groups_ui:
@@ -99,5 +99,43 @@ class domains():
 
                 assert server_group.get('Feed') == server_group_db.get('feed')
                 assert server_group.get('Profile') == server_group_db.get('profile')
+
+        return True
+
+    def validate_server_group_details(self):
+        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
+
+        domains_ui = self.ui_utils.get_list_table()
+        server_groups_db = self.db.get_server_groups()
+
+        for domain in domains_ui:
+            self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+            assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
+
+            self.ui_utils.click_on_row_containing_text(domain.get('Domain Name'))
+
+            try:
+                self.ui_utils.get_elements_containing_text('Middleware Server Groups')[0].click()
+            except Exception, e:
+                raise Exception(e)
+
+            self.ui_utils.waitForTextOnPage("All Middleware Server Groups", 15)
+
+            server_groups_ui = self.ui_utils.get_list_table()
+            server_groups_hawk = self.hawkular_api.get_hawkular_server_groups(domain.get('Feed'))
+            for server_group in server_groups_ui:
+                name_ui = server_group.get('Server Group Name')
+                self.ui_utils.click_on_row_containing_text(name_ui)
+
+                group_details_ui = self.ui_utils.get_generic_table_as_dict()
+                group_details_db = self.ui_utils.find_row_in_list(server_groups_db, 'name', name_ui)
+                group_details_hawk = self.ui_utils.find_row_in_list(server_groups_hawk, 'name', name_ui)
+
+                assert group_details_ui.get('Name') in group_details_hawk.get('name'), "UI: {}   Hawk: {}".format(group_details_ui.get('Name'), group_details_hawk.get('name'))
+                assert group_details_ui.get('Name') == group_details_db.get('name')
+                assert group_details_ui.get("Profile") == group_details_hawk.get('data').get('Profile') == group_details_db.get('profile')
+
+                self.web_driver.back()
 
         return True
