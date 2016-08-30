@@ -35,7 +35,8 @@ class providers():
         else:
             self.web_session.logger.info("Adding Middleware Provider to ManageIQ instance")
 
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
 
         elem_config = self.web_driver.find_element_by_xpath("//button[@title='Configuration']")
         elem_config.click()
@@ -89,7 +90,8 @@ class providers():
         assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
 
     def delete_provider(self, delete_all_providers=True):
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
 
         # Delete the provider
@@ -103,7 +105,7 @@ class providers():
         if add_provider:
             self.add_provider(delete_if_provider_present=False)
 
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -189,7 +191,8 @@ class providers():
             return False
 
     def delete_hawkular_provider(self):
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_session.logger.info("Deleting the provider- {}".format(self.web_session.HAWKULAR_HOSTNAME))
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
@@ -251,7 +254,7 @@ class providers():
         # Test to validate provider list page in UI and validate matching providers hostname, port number
 
         self.web_session.logger.info("Begin providers list test.")
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         providers_ui = table(self.web_session).get_middleware_providers_table()
 
         assert len(providers_ui) > 0, "Providers list is empty."
@@ -270,7 +273,7 @@ class providers():
         # and to validate number of middleware servers, deployments and datasources in releationships section.
 
         self.web_session.logger.info("Begin providers details test.")
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         providers_ui = table(self.web_session).get_middleware_providers_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
         deployments_hawk = self.hawkular_api.get_hawkular_deployments()
@@ -300,12 +303,15 @@ class providers():
         # Test for Authentication->Recheck Authentication' on hawkular provider
 
         self.web_session.logger.info("Begin test for Authentication->Recheck Authentication.")
-        NavigationTree(self.web_session).navigate_to_middleware_providers_view()
-        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+        self.web_session.web_driver.get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
 
-        self.web_driver.find_element_by_id('ems_middleware_authentication_choice').click()
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+        self.web_driver.find_element_by_xpath("//h1[contains(.,'Hawkular-Provider (Summary)')]")
+
+        self.web_driver.find_element_by_xpath("//button[@title='Authentication']").click()
         self.web_driver.find_element_by_id('ems_middleware_authentication_choice__ems_middleware_recheck_auth_status').click()
 
         ui_utils(self.web_session).sleep(2)
-        assert ui_utils(self.web_session).waitForTextOnPage("Authentication status will be saved and workers will be restarted for this Middleware Provider", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Authentication status will be saved and workers will be restarted for the selected Middleware Provider", 15)
+
         return True
