@@ -33,7 +33,7 @@ class topology():
         self.__display_names__()
 
         if not self.__is_name_displayed__(provider_name):
-            self.web_session.logger.failure("Display Names - {} Not Displayed.".format(provider_name))
+            self.web_session.logger.error("Display Names - {} Not Displayed.".format(provider_name))
             return False
 
         self.__display_names__(select = False)
@@ -80,8 +80,8 @@ class topology():
 
         for server in servers_list:
             if not self.__is_name_displayed__(server.get('Server Name')):
-                self.web_session.logger.failure("Display Names - {} Not Displayed.".format(server.get("Server Name")))
-                return False
+                self.web_session.logger.error("Display Names - {} Not Displayed.".format(server.get("Server Name")))
+                #return False
 
         return True
 
@@ -107,7 +107,7 @@ class topology():
         for deployment in deployments_list:
             name = self.__get_deployment_name__(deployment.get('Name'))
             if not self.__is_name_displayed__(name):
-                self.web_session.logger.failure("Display Names - {} Not Displayed.".format(name))
+                self.web_session.logger.error("Display Names - {} Not Displayed.".format(name))
                 return False
 
         return True
@@ -133,7 +133,7 @@ class topology():
 
         for deployment in deployments_list:
             if not self.__is_name_displayed__(deployment.get('Name')):
-                self.web_session.logger.failure(
+                self.web_session.logger.error(
                     "Display Names - {} Not Displayed.".format(deployment.get("Name")))
                 return False
 
@@ -160,7 +160,7 @@ class topology():
 
         for server_group in server_groups_list:
             if not self.__is_name_displayed__(server_group.get('name')):
-                self.web_session.logger.failure(
+                self.web_session.logger.error(
                     "Display Names - {} Not Displayed.".format(server_group.get("name")))
                 return False
 

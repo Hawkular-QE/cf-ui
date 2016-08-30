@@ -295,14 +295,15 @@ class servers():
 
         feed = eap_hawk.get('Feed') # Unique server id
 
-        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        #NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        self.web_session.web_driver.get("{}//middleware_servers/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
         self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
-        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.accept_alert(10)
         assert self.ui_utils.waitForTextOnPage(power.get('wait_for'), 15)
 
         # Validate backend - Hawkular
@@ -311,7 +312,8 @@ class servers():
 
     def deploy_application_archive(self, app_to_deploy = APPLICATION_WAR):
 
-        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        # NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find EAP on which to deploy
         eap = self.find_non_container_eap_in_state("running")
@@ -341,7 +343,8 @@ class servers():
         return True
 
     def undeploy_application_archive(self, app_to_undeploy=APPLICATION_WAR):
-        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
 
         deployments_ui = table(self.web_session).get_middleware_deployments_table()
         self.ui_utils.click_on_row_containing_text(app_to_undeploy)
@@ -357,7 +360,8 @@ class servers():
     def redeploy_application_archive(self, app_to_redeploy=APPLICATION_WAR):
 
         # Find EAP with application to redeploy
-        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
 
         deployments_ui = table(self.web_session).get_middleware_deployments_table()
         self.ui_utils.click_on_row_containing_text(app_to_redeploy)
@@ -375,7 +379,8 @@ class servers():
     def stop_application_archive(self, app_to_stop=APPLICATION_WAR):
 
         # Find EAP with application to stop
-        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
 
         deployments_ui = table(self.web_session).get_middleware_deployments_table()
         self.ui_utils.click_on_row_containing_text(app_to_stop)
@@ -393,7 +398,8 @@ class servers():
     def start_application_archive(self, app_to_start=APPLICATION_WAR):
 
         # Find EAP with application to start
-        NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
+        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
 
         deployments_ui = table(self.web_session).get_middleware_deployments_table()
         self.ui_utils.click_on_row_containing_text(app_to_start)
@@ -472,7 +478,7 @@ class servers():
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice__middleware_deployment_undeploy').click()
         self.ui_utils.sleep(2)
-        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
 
     def redeploy_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
@@ -481,7 +487,7 @@ class servers():
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_redeploy').click()
         self.ui_utils.sleep(2)
-        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Redeployment initiated for selected deployment(s)', 15)
 
     def stop_server_deployment(self, app_to_stop=APPLICATION_WAR):
@@ -490,7 +496,7 @@ class servers():
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_stop').click()
         self.ui_utils.sleep(2)
-        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Stop initiated for selected deployment(s)', 15)
 
     def start_server_deployment(self, app_to_start=APPLICATION_WAR):
@@ -499,7 +505,7 @@ class servers():
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_start').click()
         self.ui_utils.sleep(2)
-        self.web_driver.switch_to_alert().accept()
+        self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Start initiated for selected deployment(s)', 15)
 
     def wait_for_deployment_state(self, deployment_name, state, wait_time):
