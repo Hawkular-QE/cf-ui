@@ -27,9 +27,10 @@ class hawkular_api():
         for server in rows:
             dict = {}
             dict['Server Name'] = server.id.strip('~')
-            dict['Product Name'] = server.data['Product Name']
-            dict['Host Name'] = server.data['Hostname']
-            dict['Feed'] = server.data['UUID']
+            dict['Product Name'] = server.data.get('Product Name')
+            dict['Host Name'] = server.data.get('Hostname')
+            dict['UUID'] = server.data.get('UUID')
+            dict['Feed'] = server.path.feed_id
             dict['Provider'] = self.web_session.PROVIDER
             dict['details'] = server.data
             servers.append(dict)
@@ -107,4 +108,4 @@ class hawkular_api():
         return server_groups
 
     def generic_for_testing(self):
-        return self.__hawkular__.list_server_deployment()
+        return self.__hawkular__.list_server()

@@ -199,7 +199,7 @@ class providers():
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.web_driver.find_element_by_xpath(
             "//a[@title='Remove selected Middleware Providers']").click()
-        self.web_driver.switch_to_alert().accept()
+        ui_utils(self.web_session).accept_alert(10)
         assert ui_utils(self.web_session).waitForTextOnPage("Delete initiated", 15)
 
         # Verify if the provider is deleted from the provider list.
@@ -216,7 +216,7 @@ class providers():
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.web_driver.find_element_by_xpath(
             "//a[@title='Remove selected Middleware Providers']").click()
-        self.web_driver.switch_to_alert().accept()
+        ui_utils(self.web_session).accept_alert(10)
         assert ui_utils(self.web_session).waitForTextOnPage(
             "Delete initiated", 15)
 
@@ -246,7 +246,7 @@ class providers():
     def refresh_provider(self):
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.web_driver.find_element_by_id('ems_middleware_vmdb_choice__ems_middleware_refresh').click()
-        self.web_driver.switch_to_alert().accept()
+        ui_utils(self.web_session).accept_alert(10)
         ui_utils(self.web_session).waitForTextOnPage("Refresh Provider initiated", 15)
 
     def validate_providers_list(self):

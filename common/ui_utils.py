@@ -166,3 +166,18 @@ class ui_utils():
                 return row
 
         return None
+
+    def accept_alert(self, waitTime):
+        currentTime = time.time()
+
+        print time.time() - currentTime
+        while (time.time() - currentTime < waitTime):
+            try:
+                self.web_driver.switch_to_alert().accept()
+                return True
+            except:
+                self.web_session.logger.info('Alert not present.')
+                self.sleep(1)
+
+        assert False, "Timed out waiting for Alert dialog."
+
