@@ -1,6 +1,10 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from time import sleep
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 class UI_Point():
 
     """ Representation of any addressable place in UI, """
@@ -71,6 +75,7 @@ class NavigationTree():
     _tree = dict([])
     web_driver = None
     web_session = None
+    wait = None
 
     paths = {
         'middleware_providers'   : '/ems_middleware/show_list',
@@ -96,9 +101,11 @@ class NavigationTree():
     def __init__(self, session):
         self.web_session = session
         self.web_driver = self.web_session.web_driver
+        time_delay = 7
+        self.wait = WebDriverWait(self.web_driver, time_delay)
 
         self.add_point("middleware", ".//*[@id='maintab']/li[6]/a/span[contains(.,'Middleware')]", "Hover")
-        self.add_point("middleware_providers",   "id('#menu-mdl')//span[contains(.,'Middleware Providers')]", "Click")
+        self.add_point("middleware_providers",   "id('#menu-mdl')//span[contains(.,'Providers')]", "Click")
         self.add_point("middleware_domains",     "id('#menu-mdl')//span[contains(.,'Middleware Domains')]/..", "Click")
         self.add_point("middleware_servers",     "id('#menu-mdl')//span[contains(.,'Middleware Servers')]", "Click")
         self.add_point("middleware_deployments", "id('#menu-mdl')//span[contains(.,'Middleware Deployments')]", "Click")
@@ -115,7 +122,6 @@ class NavigationTree():
         current_page = self.web_driver.current_url
         target_page = self.paths.get(goal)
         if not current_page.endswith(target_page) or force_navigation:
-
             for step in route.steps:
                 self.click_turn(driver, step)
 
@@ -126,15 +132,18 @@ class NavigationTree():
             action = self._tree.get(step)
             target = action._point._value
             operation = action._operation._operation
+            self.wait.until(EC.visibility_of_element_located((By.XPATH, target)))
             elem = driver.find_element_by_xpath(target)
             hover.move_to_element(elem).perform()
-            sleep(2) # wait sec to load menu
+            self.wait.until(EC.visibility_of(elem))
             if operation == "Click":
+                self.wait.until(EC.element_to_be_clickable((By.XPATH, target)))
                 elem.click()
-            sleep(2)
+
         except:
             self.web_session.logger.warning(" Clicking goes on next turn. Possibly, recursion...")
             self.click_turn( driver, step )
+
 
 
     def navigate_to_middleware_providers_view(self):
@@ -142,6 +151,9 @@ class NavigationTree():
 
     def navigate_to_middleware_servers_view(self):
         self.navigate(UI_Route("middleware").add("middleware_servers"))
+
+    def navigate_to_middleware_domains_view(self):
+        self.navigate(UI_Route("middleware").add("middleware_domains"))
 
     def navigate_to_middleware_deployment_view(self):
         self.navigate(UI_Route("middleware").add("middleware_deployments"))
