@@ -71,7 +71,7 @@ class servers():
 
         self.web_session.logger.info("Current Company Tags: {}".format(origValue))
 
-        self.web_driver.find_element_by_id('middleware_server_policy_choice').click()
+        self.web_driver.find_element_by_xpath("//button[@title='Policy']").click()
         self.web_driver.find_element_by_id('middleware_server_policy_choice__middleware_server_tag').click()
         self.ui_utils.waitForTextOnPage('Tag Assignment', 5)
 
@@ -463,7 +463,7 @@ class servers():
 
         self.web_session.logger.info("Deploying App: {}".format(app))
 
-        self.web_driver.find_element_by_id('middleware_server_deployments_choice').click()
+        self.web_driver.find_element_by_xpath("//button[@title='Deployments']").click()
         self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
         self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
 
@@ -475,7 +475,7 @@ class servers():
 
     def undeploy_server_deployment(self, app_to_undeploy = APPLICATION_WAR):
         self.web_session.logger.info("Undeploying App: {}".format(app_to_undeploy))
-        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice__middleware_deployment_undeploy').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
@@ -483,7 +483,7 @@ class servers():
 
     def redeploy_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
         self.web_session.logger.info("Redeploying App: {}".format(app_to_redeploy))
-        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_redeploy').click()
         self.ui_utils.sleep(2)
@@ -492,7 +492,7 @@ class servers():
 
     def stop_server_deployment(self, app_to_stop=APPLICATION_WAR):
         self.web_session.logger.info("Stopping App: {}".format(app_to_stop))
-        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_stop').click()
         self.ui_utils.sleep(2)
@@ -501,7 +501,7 @@ class servers():
 
     def start_server_deployment(self, app_to_start=APPLICATION_WAR):
         self.web_session.logger.info("Starting App: {}".format(app_to_start))
-        self.web_driver.find_element_by_id('middleware_deployment_deploy_choice').click()
+        self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_start').click()
         self.ui_utils.sleep(2)
