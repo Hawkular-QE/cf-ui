@@ -17,8 +17,6 @@ class servers():
     ui_utils = None
     hawkular_api = None
     db = None
-    EAP_JON_HOME = '/root/jboss-eap-7.0'
-    EAP_WILDFLY_HOME = '/root/wildfly-'
     EAP_PROCESS = 'standalone.sh'
 
     power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':None}
@@ -159,10 +157,10 @@ class servers():
 
     def __get_eap_app_path(self,eap_hawk):
 
-        if "wildfly" in (eap_hawk.get('Product Name').lower()):
-            return "{}{}/".format(self.EAP_WILDFLY_HOME,eap_hawk.get("details").get("Version"))
-        else:
-            return "{}/".format(self.EAP_JON_HOME)
+        home_dir = eap_hawk.get('details').get('Home Directory')
+        self.web_session.logger.info("EAP Home Directory: {}".format(home_dir))
+
+        return home_dir
 
     def eap_power_restart(self):
 
@@ -177,7 +175,7 @@ class servers():
         assert eap_hawk
 
         # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
-        eap_app = "{}{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk), "standalone")
+        eap_app = "{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk))
 
         eap_host = eap_hawk.get("details").get("Hostname")
         ssh_ = ssh(self.web_session, eap_host)
@@ -186,7 +184,7 @@ class servers():
         self.web_session.logger.info("About to Restart EAP server {} Feed {}".format(eap_hawk.get('Product'), eap_hawk.get('Feed')))
         self.eap_power_action(power, eap_hawk)
         self.ui_utils.sleep(5)  # need a timer here
-        print "eap_app: ", eap_app
+
         new_pid = ssh_.get_pid(eap_app)
 
         assert orig_pid != new_pid, "Orig Pid: {}  New Pid: {}".format(orig_pid, new_pid)
@@ -207,7 +205,7 @@ class servers():
         assert eap_hawk
 
         # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
-        eap_app = "{}{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk), "standalone")
+        eap_app = "{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk))
 
         eap_hostname = eap_hawk.get("details").get("Hostname")
         ssh_ = ssh(self.web_session, eap_hostname)
@@ -296,7 +294,7 @@ class servers():
         feed = eap_hawk.get('Feed') # Unique server id
 
         #NavigationTree(self.web_session).navigate_to_middleware_servers_view()
-        self.web_session.web_driver.get("{}//middleware_servers/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
         self.ui_utils.waitForTextOnPage("Properties", 15)
