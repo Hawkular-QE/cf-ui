@@ -149,7 +149,9 @@ class topology():
         # 4) Validate that each Server Groups in Server Groups-List is displayed
 
         server_groups_list = self.db.get_server_groups()
-        assert server_groups_list, "No Server Groups found"
+        if not  server_groups_list:
+            self.web_session.logger.warning("No Server Groups found")
+            return True
 
         self.__navigate_to_topology__()
 
