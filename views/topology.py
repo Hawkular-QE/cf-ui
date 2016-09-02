@@ -28,7 +28,7 @@ class topology():
 
         provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
 
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.__navigate_to_topology__()
 
         self.__display_names__()
 
@@ -49,7 +49,7 @@ class topology():
 
         self.web_session.logger.info("Validate that default Topology View displays {}".format(provider_name))
 
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.__navigate_to_topology__()
 
         self.__display_names__(select = True)
 
@@ -68,20 +68,20 @@ class topology():
 
         self.web_session.logger.info("Validate that Topology View expected Servers")
 
-        servers_list = self.hawkular_api.get_hawkular_servers()
+        servers_list = db(self.web_session).get_servers()
         assert servers_list, "No servers found"
 
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.__navigate_to_topology__()
 
         self.__display_names__(select=True)
 
         # Select "Middleware Servers"
-        self.__select_entities_view__(self.entities.get('servers'), servers_list[0].get('Server Name'))
+        self.__select_entities_view__(self.entities.get('servers'), servers_list[0].get('name'))
 
         for server in servers_list:
-            if not self.__is_name_displayed__(server.get('Server Name')):
+            if not self.__is_name_displayed__(server.get('name')):
                 self.web_session.logger.error("Display Names - {} Not Displayed.".format(server.get("Server Name")))
-                #return False
+                return False
 
         return True
 
@@ -97,7 +97,7 @@ class topology():
         deployments_list = self.hawkular_api.get_hawkular_deployments()
         assert deployments_list, "No Deployments found"
 
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.__navigate_to_topology__()
 
         self.__display_names__(select=True)
 
@@ -124,7 +124,7 @@ class topology():
         deployments_list = self.hawkular_api.get_hawkular_datasources()
         assert deployments_list, "No Datasources found"
 
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.__navigate_to_topology__()
 
         self.__display_names__(select=True)
 
@@ -151,7 +151,7 @@ class topology():
         server_groups_list = self.db.get_server_groups()
         assert server_groups_list, "No Server Groups found"
 
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.__navigate_to_topology__()
 
         self.__display_names__(select=True)
 
@@ -251,3 +251,6 @@ class topology():
 
         return el[1].is_displayed()
 
+    def __navigate_to_topology__(self):
+        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.ui_utils.waitForTextOnPage('Middleware Server Groups', 10)

@@ -293,8 +293,8 @@ class servers():
 
         feed = eap_hawk.get('Feed') # Unique server id
 
-        #NavigationTree(self.web_session).navigate_to_middleware_servers_view()
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        #self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
         self.ui_utils.waitForTextOnPage("Properties", 15)
@@ -310,8 +310,8 @@ class servers():
 
     def deploy_application_archive(self, app_to_deploy = APPLICATION_WAR):
 
-        # NavigationTree(self.web_session).navigate_to_middleware_servers_view()
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
+        #self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find EAP on which to deploy
         eap = self.find_non_container_eap_in_state("running")
