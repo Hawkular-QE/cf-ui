@@ -17,7 +17,8 @@ class deployments():
         self.db = db(self.web_session)
 
     def validate_deployment_details(self):
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        deployments_ui = self.ui_utils.get_list_table()
         assert deployments_ui, "No UI Deployments found."
 
         deployments_hawk = self.hawkular_api.get_hawkular_deployments()
@@ -59,22 +60,19 @@ class deployments():
         return True
 
     def validate_deployments_list(self):
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        deployments_ui = self.ui_utils.get_list_table()
         assert deployments_ui, "No UI Deployments found."
         deployments_hawk = self.hawkular_api.get_hawkular_deployments()
         assert deployments_hawk, "No Hawkular Deployments found."
-
-        self.web_session.logger.debug(
-            "UI Deployments: {}  HW Deployments: {}".format(deployments_ui.get('Middleware Deployments'), str(len(deployments_hawk))))
-        #assert len(deployments_ui) == len(deployments_hawk), "Deployments lists size mismatch."
 
         for dep_ui in deployments_ui:
             deployment_name = dep_ui.get('Deployment Name')
             dep_hawk = self.ui_utils.find_row_in_list(deployments_hawk, 'Name', deployment_name)
 
-            #assert dep_hawk, "Deployment Name {} not found".format(deployment_name)
-            #assert (deployment_name in dep_hawk.get("Name")), \
-            #    "Deployment Name mismatch ui:{}, hawk:{}".format(deployment_name, dep_hawk.get("Name"))
+            assert dep_hawk, "Deployment Name {} not found".format(deployment_name)
+            assert (deployment_name in dep_hawk.get("Name")), \
+                "Deployment Name mismatch ui:{}, hawk:{}".format(deployment_name, dep_hawk.get("Name"))
             self.web_session.logger.info(
                 "UI Deployment name is: {}, and Hawkular deployment is: {} ".format(deployment_name,
                                                                                     dep_hawk.get("Name")))

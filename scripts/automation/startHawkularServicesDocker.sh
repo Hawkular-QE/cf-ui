@@ -2,9 +2,10 @@
 
 HS_IMAGE="docker.io/hawkularqe/hawkular-services"
 CASSANDRA_IMAGE="cassandra:3.7"
+CASSANDRA_CONTAINER_NAME="myCassandra"
 
-HS_START_CMD="docker run -d  -e TEST_MODE=true -e CASSANDRA_NODES=myCassandra -e DB_TIMEOUT=300 -p 8080:8080 -p 8443:8443 --link myCassandra:myCassandra ${HS_IMAGE}"
-CASSANDRA_START_CMD="docker run -d --name myCassandra -e CASSANDRA_START_RPC=true ${CASSANDRA_IMAGE}"
+HS_START_CMD="docker run -d  -e TEST_MODE=true -e CASSANDRA_NODES=${CASSANDRA_CONTAINER_NAME} -e DB_TIMEOUT=300 -p 8080:8080 -p 8443:8443 --link ${CASSANDRA_CONTAINER_NAME}:myCassandra ${HS_IMAGE}"
+CASSANDRA_START_CMD="docker run -d --name ${CASSANDRA_CONTAINER_NAME} -e CASSANDRA_START_RPC=true ${CASSANDRA_IMAGE}"
 
 # Stop HS if running
 HS_CONTAINER_ID=`docker ps | grep $HS_IMAGE | awk '{ print $1}'`
@@ -35,6 +36,11 @@ else
     echo "No ${CASSANDRA_IMAGE} container found to be running."
 fi
 
+# Remove named cassandra container if it still exists
+if [[ "$(docker ps -aq --filter name=${CASSANDRA_CONTAINER_NAME} 2> /dev/null)" != "" ]]; then
+    echo "Removing previous cassandra container: ${CASSANDRA_CONTAINER_NAME}"
+    docker rm ${CASSANDRA_CONTAINER_NAME}
+fi
 
 
 # Start Cassandra
