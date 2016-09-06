@@ -58,3 +58,6 @@ class datasources():
             assert dat_details_ui.get('Name') == dat_details_api.get('Name')
 
         return True
+
+    def count_datasources(self):
+        return len(self.web_session.web_driver.find_elements_by_xpath("//tbody/tr"))

@@ -1,5 +1,8 @@
 from selenium.webdriver.common.action_chains import ActionChains
 from time import sleep
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -200,6 +203,48 @@ class NavigationTree():
         self._jump_to('middleware_domains', force_navigation)
         return self
 
+    def waiting_ability(self, xpath, seconds):
+        try:
+            WebDriverWait(self.web_driver, seconds).until(
+                EC.visibility_of_element_located((By.XPATH, xpath)))
+        except:
+            self.web_session.logger.info(" Given object is not clickable. (waiting_clickability)")
+            self.waiting_ability(xpath, seconds - 1)
+
+    def power_click(self, clickable):
+        driver = self.web_driver
+        hover = ActionChains(driver)
+        if clickable:
+            hover.move_to_element(clickable).perform()
+
+            clickable.click()
+
+    def select_and_click(self, click_point, select_option):
+        #print "Start select_and_click..."
+        driver = self.web_driver
+        xpath_top = ".//div[contains(@class, 'dropdown')]/button[contains(.,'{}')]".format(click_point)
+        xpath_select = "{}/../ul[contains(@class, 'dropdown-menu')]/li/a[contains(.,'{}')]".format(xpath_top, select_option)
+
+        WebDriverWait(self.web_driver, 7).until(
+            EC.visibility_of_element_located((By.XPATH, xpath_top))
+            )
+
+        found_top = driver.find_elements_by_xpath(xpath_top)
+        found_select = driver.find_elements_by_xpath(xpath_select)
+        if len(found_top)==0 or len(found_select)==0:
+            raise Exception("Page does not contain such pattern(s) {}, {}: ".format(click_point, select_option))
+
+        self.waiting_ability(xpath_top, 7)
+        self.power_click(driver.find_element_by_xpath(xpath_top))
+
+        self.waiting_ability(xpath_select, 7)
+        self.power_click(driver.find_element_by_xpath(xpath_select))
+
+        #print "select_and_click - completed."
+        #sleep(5)
+        #print "Current page URL (3): ", driver.current_url
+
+        return self
 
     def to_exact_details(self, param='first'):
 
@@ -217,7 +262,6 @@ class NavigationTree():
             use_numeric_param = True
         except: pass
 
-        assert (ind <= num_link and ind >= 0), "-- Definitely wrong value of param: '{}'".format(param)
         assert (use_numeric_param == True or param == 'first' or param == 'last'), "-- Possible wrong value of param '{}'?".format(param)
 
         if len(sub_links) > 0:
@@ -229,6 +273,7 @@ class NavigationTree():
                 sub_links[num_link - 1].click()
 
             elif use_numeric_param:
+                assert (ind <= num_link and ind >= 0), "-- Definitely wrong value of param: '{}'".format(param)
                 sub_links[ind].click()
 
         else:
@@ -238,9 +283,11 @@ class NavigationTree():
 
     def to_first_details(self):
         self.to_exact_details('first')
+        return self
 
     def to_last_details(self):
         self.to_exact_details('last')
+        return self
 
 
     def is_ok(self, point):
