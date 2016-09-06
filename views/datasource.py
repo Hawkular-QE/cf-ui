@@ -15,10 +15,15 @@ class datasources():
 
 
     def validate_datasource_list(self):
-        NavigationTree(self.web_session).navigate_to_middleware_datasources_view()
+        nav= NavigationTree(self.web_session)
+        nav.navigate_to_middleware_datasources_view()
+
+        haw= hawkular_api(self.web_session)
+        tab = table(self.web_session)
+        dataDb = db(self.web_session)
 
         datasource_api = self.hawkular_api.get_hawkular_datasources()
-        datasource_ui = self.ui_utils.get_list_table();
+        datasource_ui = table(self.web_session).get_middleware_datasources_table()
         datasource_db = db(self.web_session).get_datasources()
         assert len(datasource_db) == len(datasource_ui) == len(datasource_api), "Datasource length match"
 
@@ -36,9 +41,7 @@ class datasources():
         return True
 
     def validate_datasource_detail(self):
-        NavigationTree(self.web_session).navigate_to_middleware_datasources_view()
-
-        datasource_ui = self.ui_utils.get_list_table();
+        datasource_ui = table(self.web_session).get_middleware_datasources_table()
         datasource_api = self.hawkular_api.get_hawkular_datasources()
 
         for dat in self.ui_utils.get_random_list(datasource_ui, 3):
@@ -56,5 +59,6 @@ class datasources():
             self.web_session.logger.info("dat_details_api: {}".format(dat_details_api))
 
             assert dat_details_ui.get('Name') == dat_details_api.get('Name')
+            assert dat_details_ui.get('Nativeid') == dat_details_api.get('Nativeid')
 
         return True

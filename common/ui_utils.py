@@ -93,31 +93,6 @@ class ui_utils():
 
         return dict
 
-    def get_list_table(self):
-        header = []
-        table = []
-        dict = []
-
-        # Get table headers
-        for tr in self.web_driver.find_elements_by_xpath('.//tr'):
-            tds = tr.find_elements_by_tag_name('th')
-            if tds: header.append([td.text for td in tds])
-
-        # Get table values
-        for tr in self.web_driver.find_elements_by_xpath('.//tr'):
-            tds = tr.find_elements_by_tag_name('td')
-            if tds: table.append([td.text for td in tds])
-
-        # Build the Dictionary
-        for row in table:
-            d = {}
-            for index, value in enumerate(row, start=0):
-                d[header[0][index]] = value
-
-            dict.append(d)
-
-        return dict
-
     # Refresh the page and wait till expected text appears on the page
 
     def refresh_until_text_appears(self, text, waitTime):
@@ -166,18 +141,3 @@ class ui_utils():
                 return row
 
         return None
-
-    def accept_alert(self, waitTime):
-        currentTime = time.time()
-
-        print time.time() - currentTime
-        while (time.time() - currentTime < waitTime):
-            try:
-                self.web_driver.switch_to_alert().accept()
-                return True
-            except:
-                self.web_session.logger.info('Alert not present.')
-                self.sleep(1)
-
-        assert False, "Timed out waiting for Alert dialog."
-

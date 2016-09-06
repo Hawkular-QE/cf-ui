@@ -18,4 +18,3 @@ def test_cfui_api(web_session):
     assert hawkular_api(web_session).get_hawkular_servers(), "Hawkular Servers List Empty"
     assert hawkular_api(web_session).get_hawkular_deployments(), "Hawkular Deployments List Empty"
     assert hawkular_api(web_session).get_hawkular_datasources(), "Hawkular Datasources List Empty"
-    assert hawkular_api(web_session).get_hawkular_domains(), "Hawkular Domains List Empty"
