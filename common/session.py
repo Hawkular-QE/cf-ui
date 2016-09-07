@@ -8,6 +8,7 @@ from views.providers import providers
 import logging
 import logging.config
 from selenium.webdriver.remote.remote_connection import LOGGER
+from selenium.webdriver.chrome.options import Options
 
 class session(properties):
 
@@ -57,8 +58,40 @@ class session(properties):
 
     def __get_web_driver__(self):
 
-        self.logger.info("Using Browser: %s", self.BROWSER)
-        self.web_driver = getattr(webdriver,self.BROWSER)()
+        if self.BROWSER == "Firefox":
+            self.logger.info("Using Browser: %s", self.BROWSER)
+            profile = webdriver.FirefoxProfile()
+            # enable auto download
+            # http://stackoverflow.com/questions/24852709/how-do-i-automatically-download-files-from-a-pop-up-dialog-using-selenium-python
+            profile.set_preference("browser.download.folderList", 2)
+            profile.set_preference("browser.download.manager.showWhenStarting", False)
+            profile.set_preference("browser.download.dir", '~/Downloads/')
+            profile.set_preference("browser.download.panel.shown", False)
+            profile.set_preference("browser.helperApps.neverAsk.openFile","text/csv,application/vnd.ms-excel,text/plain")
+            profile.set_preference("browser.helperApps.neverAsk.saveToDisk", "text/csv,application/vnd.ms-excel,text/plain")
+
+            self.web_driver = getattr(webdriver,self.BROWSER)(firefox_profile=profile)
+        elif self.BROWSER == "Chrome":
+            self.logger.info("Using Browser: %s", self.BROWSER)
+            chrome_options = Options()
+            # enable auto download
+            # http://stackoverflow.com/questions/21082499/selenium-chromedriver-download-profile
+            #prefs = {'download.prompt_for_download': "False", 'download.default_directory' : '~/Downloads/'}
+            prefs = {"prefs": {
+                            "download.default_directory": '~/Downloads/',
+                            "download.prompt_for_download": False
+                        },
+                "switches": ["-silent", "--disable-logging"],
+                "chromeOptions": {
+                            "args": ["-silent", "--disable-logging"]
+                        }
+                }
+            chrome_options.add_experimental_option("prefs", prefs)
+            self.web_driver = getattr(webdriver,self.BROWSER)(chrome_options=chrome_options)
+        else:
+            self.logger.info("Using Browser (no options): %s", self.BROWSER)
+            self.web_driver = getattr(webdriver,self.BROWSER)()
+
         self.web_driver.set_window_size(self.BROWSER_WIDTH, self.BROWSER_HEIGHT)
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
         self.web_driver.get(self.MIQ_URL)
