@@ -4,6 +4,7 @@ from common.download_report import download_report
 from navigation.navigation import NavigationTree
 import os
 import glob
+import fnmatch
 
 
 
@@ -33,13 +34,13 @@ def test_cfui_providers_download_txt(web_session):
     assert download_report(web_session,"ems_middleware").csv_format()
 
     web_session.logger.info("Begin provider file assert")
+
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Provider*')
     r = glob.glob(file)
 
-    assert len(r)==2
+    assert fnmatch.filter(r,'*.txt')
+    assert fnmatch.filter(r,'*.csv')
 
-    for i in r:
-        assert os.path.exists(i)
 
 def test_cfui_domain_download_txt(web_session):
     nav= NavigationTree(web_session).navigate_to_middleware_domains_view()
@@ -53,10 +54,8 @@ def test_cfui_domain_download_txt(web_session):
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Domain*')
     r = glob.glob(file)
 
-    assert len(r)==2
-
-    for i in r:
-        assert os.path.exists(i)
+    assert fnmatch.filter(r, '*.txt')
+    assert fnmatch.filter(r, '*.csv')
 
 def test_cfui_server_download_txt(web_session):
     nav = NavigationTree(web_session).navigate_to_middleware_servers_view()
@@ -69,9 +68,8 @@ def test_cfui_server_download_txt(web_session):
     web_session.logger.info("Begin server file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Servers*')
     r = glob.glob(file)
-    assert len(r) == 2
-    for i in r:
-        assert os.path.exists(i)
+    assert fnmatch.filter(r, '*.txt')
+    assert fnmatch.filter(r, '*.csv')
 
 
 def test_cfui_datasource_download_txt(web_session):
@@ -85,9 +83,8 @@ def test_cfui_datasource_download_txt(web_session):
     web_session.logger.info("Begin datasource file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Datasources*')
     r = glob.glob(file)
-    assert len(r) == 2
-    for i in r:
-        assert os.path.exists(i)
+    assert fnmatch.filter(r, '*.txt')
+    assert fnmatch.filter(r, '*.csv')
 
 
 def test_cfui_deployment_download_txt(web_session):
@@ -101,6 +98,5 @@ def test_cfui_deployment_download_txt(web_session):
     web_session.logger.info("Begin deployment file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Deployments*')
     r = glob.glob(file)
-    assert len(r) == 2
-    for i in r:
-        assert os.path.exists(i)
+    assert fnmatch.filter(r, '*.txt')
+    assert fnmatch.filter(r, '*.csv')

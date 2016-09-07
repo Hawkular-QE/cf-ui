@@ -18,18 +18,18 @@ class download_report():
         self.web_session = web_session
         self.web_driver = web_session.web_driver
         #self.web_session.web_driver.get("{}/{}/show_list".format(self.web_session.MIQ_URL, view_name))
-        self.download = self.web_driver.find_element_by_id("download_choice")
+        self.download = self.web_driver.find_element_by_xpath('.//*[@title="Download"]')
 
 
     def text_format(self):
-        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH, ".//*[@id='download_choice']", 15)
+        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH, ".//*[@title='Download']", 15)
         self.download.click()
         text= self.web_driver.find_element_by_id("download_choice__download_text")
         text.click()
         return True
 
     def csv_format(self):
-        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH, ".//*[@id='download_choice']", 15)
+        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH, ".//*[@title='Download']", 15)
         self.download.click()
         csv= self.web_driver.find_element_by_id("download_choice__download_csv")
         csv.click()
