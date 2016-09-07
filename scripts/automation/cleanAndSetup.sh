@@ -14,7 +14,7 @@ rm -rf ${WORKSPACE}/pytest.log
 touch ${WORKSPACE}/pytest.log
 
 # rm recrods older thank 7 days
-find /var/www/html/records/* -mtime +7 -exec rm -Rf {} \;
+find /var/www/html/records/* -mtime +3 -exec rm -Rf {} \;
 
 echo "pwd:"
 pwd
