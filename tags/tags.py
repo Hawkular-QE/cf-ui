@@ -18,42 +18,33 @@ class tags():
 
     def button_click(self, xpath, seconds):
         driver = self.web_driver
-        self.web_session.logger.info(" Exact XPath: {}".format(xpath))
-        wait = WebDriverWait(self.web_driver, seconds)
-
-        wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
+        #self.web_session.logger.info(" Exact XPath: {}".format(xpath))
         click = driver.find_element_by_xpath(xpath)
-        wait.until(EC.visibility_of(click))
-        wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
         click.click()
 
 
     def click_option(self, option_name, xpath):
-        wait = WebDriverWait(self.web_driver, 5)
-        print "OPTION NAME: ", option_name
-
         for option in self.web_driver.find_elements_by_xpath( xpath ):
-            print "OPTION - ", option.text
             option_text = "{}".format(option.text)
             if option_name in option.text:
                 print "Click on -> ", option_text
-                print " '{}' <in> '{}'  (type = {}) (type = {})".format(option_name, option_text, type(option_text), type(option_name))
-                #print " option '{}' (type = {})".format(option_name, type(option_name))
-                #wait.until(EC.visibility_of_element_located((By.XPATH, xpath)))
                 option.click()
                 break
 
 
     def get_tag_value_group(self):
-        xpath =  ".//*[@id='cat_tags_div']/div/div"
-        inner_html = self.web_session.web_driver.find_element_by_xpath(xpath).get_attribute('innerHTML')
-        return inner_html
+        driver = self.web_session.web_driver
+        tag_value_group_xpath = ".//*[@id='cat_tags_div']/div/select"
+        tag_value_group_value = driver.find_element_by_xpath(tag_value_group_xpath).get_attribute('innerHTML')
+        trace = tag_value_group_value
+        return trace
 
 
-    def values_group_is_updated(self,state_before):
-        xpath = '//*[@id="cat_tags_div"]/select[@id="tag_add"]'
+    def values_group_is_updated(self, state_before):
+        #print "State before: ", state_before
         state_now = self.get_tag_value_group()
-        return (state_now != state_before) and EC.element_to_be_clickable((By.XPATH, xpath))
+        #print "State now:    ", state_now
+        return state_now != state_before
 
 
     def set_tag(self, tag_name, tag_value):
@@ -62,85 +53,60 @@ class tags():
         wait = WebDriverWait(self.web_driver, 5)
 
         existent_tags = self.ui_tags()
-        print "Exactly tags: ", existent_tags
         if tag_value in existent_tags[tag_name]:
             print "Already added (set_tag: ", tag_name, "::", tag_value, ")"
             return self
 
         column_xpath = "//button[@data-toggle='dropdown'][@data-id='{}']"
+        tag_name_button = column_xpath.format("tag_cat")
+        tag_value_button = "//button[@data-toggle='dropdown'][@data-id='tag_add']/span/span[@class='caret']"
+
+        tag_name_options = ".//*[@id='tab_div']/table/thead/tr/th[2]/div/div/ul/li/a/span[@class='text']"
+        tag_value_options = ".//*[@id='cat_tags_div']/div/div/ul/li" # NNN matches
+
         xpath_save = "//button[contains(@title,'Save Changes')]"
-        print "Tag value: '{}', type: {} ".format(tag_value, type(tag_value))
+        flash_caption = "id('flash_text_div')/div/strong[contains(.,'Tag edits were successfully saved')]"
 
-        original_tag_values = self.get_tag_value_group()
-        print "original_tag_values: ", original_tag_values
+        state_before = self.get_tag_value_group()
 
-        tag_button = column_xpath.format("tag_cat")
-        self.button_click(tag_button, 7)
+        self.button_click(tag_name_button, 7)
+        self.click_option(tag_name, tag_name_options)
 
-        option_button = ".//*[@id='tab_div']/table/thead/tr/th[2]/div/div/ul/li/a/span[@class='text']"
-        self.click_option(tag_name, option_button)
-
-        wait.until(
-            lambda lamb:
-            self.values_group_is_updated(original_tag_values)
-        )
-
-        value_button = column_xpath.format("tag_add")
-        self.button_click(value_button, 7)
-
-        value_button = ".//*[@id='cat_tags_div']/div/div/ul/li"
-        tag_value = "{}".format(tag_value)
-        self.click_option(tag_value, value_button)
+        wait.until(lambda lamb: self.values_group_is_updated(state_before))
+        self.button_click(tag_value_button, 7)
+        self.click_option(tag_value, tag_value_options)
 
         save_click = driver.find_element_by_xpath(xpath_save)
         wait.until(EC.visibility_of_element_located((By.XPATH, xpath_save)))
         save_click.click()
 
-        flash_caption = "id('flash_text_div')/div/strong[contains(.,'Tag edits were successfully saved')]"
         wait.until(EC.visibility_of_element_located((By.XPATH, flash_caption)))
-
         if not driver.find_element_by_xpath("//strong[contains(.,'Tag edits were successfully saved')]"):
             raise ValueError("Flasher not found!")
-
         return self
 
 
     def count_tags_on_page(self):
         driver = self.web_driver
-        # first_xpath = "(//td[@title='Click to remove this assignment'])[1]"
-        #
         wait = WebDriverWait(self.web_driver, 5)
         xpath = './/table/tbody/tr[contains(@id, "_tr")]'
-
         xpath_0 = ".//*[@id='assignments_div']/table/tbody/tr/td[2]"
         wait.until(EC.visibility_of_element_located((By.XPATH, xpath_0)))
         determinator = driver.find_element_by_xpath(xpath_0).get_attribute('innerHTML')
-        #print "determinator = ", determinator
 
         if 'No My Company Tags are assigned' in determinator:
-            #print "   -->  Number of tags (count_tags_on_page) == 0 "
             return 0
-
-
-        #WebDriverWait(self.web_driver, 5).until(EC.visibility_of_element_located((By.XPATH, xpath)))
         num_tags = len( driver.find_elements_by_xpath(xpath) )
-        #print "Number of tags (count_tags_on_page): ", num_tags
         return num_tags
 
     def ui_tags(self):
         wait = WebDriverWait(self.web_driver, 5)
         xpath = "//table/tbody/tr[contains(@id,'_tr')]/td[not(contains(@title,'Click'))]"
-        #xpath = "//table/tbody/tr[contains(@id,'_tr')]/td/button/i"
         driver = self.web_driver
 
         xpath_0 = ".//*[@id='assignments_div']/table/tbody/tr"
-
-        WebDriverWait(self.web_driver, 5).until(EC.visibility_of_element_located((By.XPATH, xpath_0)))
-        WebDriverWait(self.web_driver, 5).until(EC.element_to_be_clickable((By.XPATH, xpath_0)))
-
-        stick = driver.find_element_by_xpath(xpath_0)
-
-        #WebDriverWait(self.web_driver, 5).until(EC.staleness_of(stick))
+        wait.until(EC.visibility_of_element_located((By.XPATH, xpath_0)))
+        wait.until(EC.element_to_be_clickable((By.XPATH, xpath_0)))
 
         collected_tags = driver.find_elements_by_xpath(xpath)
         tags = [ tag.text for tag in collected_tags ]
@@ -190,18 +156,11 @@ class tags():
         self.web_session.logger.info(" --| drop first tag")
         magic_xpath = "(//td[@title='Click to remove this assignment'])[1]"
 
-        """
-        if self.count_tags_on_page() == 0:
-            print "Nothing to delete."
-            return self
-        """
-
         WebDriverWait(self.web_driver, 5).until(
             EC.visibility_of_element_located((By.XPATH, magic_xpath))
         )
         tag_list = driver.find_elements_by_xpath(magic_xpath)
 
-        #for x in tag_list:
         x_button = driver.find_element_by_xpath(magic_xpath)
         WebDriverWait(self.web_driver, 7).until(EC.element_to_be_clickable((By.XPATH, magic_xpath)))
         x_button.click()
@@ -240,12 +199,10 @@ class tags():
             return self
 
         for i in range(0, num_tags):
-            #print "(tag = {})".format(i)
             x_button = driver.find_element_by_xpath(first_xpath)
             wait.until(EC.element_to_be_clickable((By.XPATH, first_xpath)))
             x_button.click()
             wait.until(EC.staleness_of(driver.find_element_by_xpath(first_xpath)))
-            #continue
 
         save_button = driver.find_element_by_xpath(xpath_save)
         wait.until(EC.presence_of_all_elements_located((By.XPATH, xpath_save)))
