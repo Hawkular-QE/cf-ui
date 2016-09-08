@@ -342,16 +342,23 @@ class servers():
 
     def undeploy_application_archive(self, app_to_undeploy=APPLICATION_WAR):
         #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
-        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
-        self.ui_utils.click_on_row_containing_text(app_to_undeploy)
+        if self.ui_utils.get_elements_containing_text(app_to_undeploy):
+            self.ui_utils.click_on_row_containing_text(app_to_undeploy)
+        else:
+            self.web_session.logger.info("The archive to undeploy does not exist.")
 
         # Undeploy
         self.undeploy_server_deployment(app_to_undeploy)
 
-        # Validate that application is "Disabled"
-        assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
+        # Validate that application is "Removed from the deployments list"
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH,
+                                                               "//td[contains(.,'{}')]".format(app_to_undeploy), 120,
+                                                               exist=False)
+        if not self.ui_utils.get_elements_containing_text(app_to_undeploy):
+            self.web_session.logger.info("The archive is removed successfully.")
 
         return True
 
@@ -359,10 +366,12 @@ class servers():
 
         # Find EAP with application to redeploy
         #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
-        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
-        self.ui_utils.click_on_row_containing_text(app_to_redeploy)
+        if self.ui_utils.get_elements_containing_text(app_to_redeploy):
+            self.ui_utils.click_on_row_containing_text(app_to_redeploy)
+        else:
+            self.deploy_application_archive()
 
         # Redeploy
 
@@ -378,9 +387,8 @@ class servers():
 
         # Find EAP with application to stop
         #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
-        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
         self.ui_utils.click_on_row_containing_text(app_to_stop)
 
         # Stop the application archive
@@ -397,9 +405,8 @@ class servers():
 
         # Find EAP with application to start
         #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
-        self.web_session.web_driver.get("{}//middleware_deployments/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
-        deployments_ui = table(self.web_session).get_middleware_deployments_table()
         self.ui_utils.click_on_row_containing_text(app_to_start)
 
         # Start the application archive
@@ -445,7 +452,9 @@ class servers():
     # EAPs that are running in a container will NOT have a resolvable Hostname (Hostname will be either POD or Container ID)
     def find_non_container_eap_in_state(self, state):
         for row in self.hawkular_api.get_hawkular_servers():
-            if row.get("Product Name") != 'Hawkular' and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
+            #if row.get("Product Name") != 'Hawkular' and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
+            if row.get("Product Name") == 'JBoss EAP' and row.get("Node Name") != 'master:server-*' and (
+                    state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
                     ip = row.get("details").get("Hostname")
                     try:
                         socket.gethostbyaddr(ip)
