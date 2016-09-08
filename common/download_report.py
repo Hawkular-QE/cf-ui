@@ -1,6 +1,7 @@
 from common.ui_utils import ui_utils
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from time import sleep
 '''
 
 Created on August 4, 2016
@@ -26,6 +27,7 @@ class download_report():
         self.download.click()
         text= self.web_driver.find_element_by_id("download_choice__download_text")
         text.click()
+        sleep(5)
         return True
 
     def csv_format(self):
@@ -33,4 +35,5 @@ class download_report():
         self.download.click()
         csv= self.web_driver.find_element_by_id("download_choice__download_csv")
         csv.click()
+        sleep(5)
         return True
