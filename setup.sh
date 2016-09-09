@@ -23,7 +23,7 @@ pip uninstall --yes pycurl
 export PYCURL_SSL_LIBRARY=nss
 pip install pycurl
 
-pip install mgmtsystem
+pip install mgmtsystem==1.3.10
 
 # setup test recorder
 pip install http://pypi.python.org/packages/source/v/vnc2flv/vnc2flv-20100207.tar.gz
