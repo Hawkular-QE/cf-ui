@@ -14,11 +14,11 @@ class tags():
         self.web_session = _web_session
         self.web_driver = _web_session.web_driver
         self.nav = NavigationTree(self.web_session)
+        self.logger = _web_session.logger
 
 
     def button_click(self, xpath, seconds):
         driver = self.web_driver
-        #self.web_session.logger.info(" Exact XPath: {}".format(xpath))
         click = driver.find_element_by_xpath(xpath)
         click.click()
 
@@ -41,10 +41,7 @@ class tags():
 
 
     def values_group_is_updated(self, state_before):
-        #print "State before: ", state_before
-        state_now = self.get_tag_value_group()
-        #print "State now:    ", state_now
-        return state_now != state_before
+        return self.get_tag_value_group() != state_before
 
 
     def set_tag(self, tag_name, tag_value):
@@ -115,7 +112,6 @@ class tags():
         tag_dict = defaultdict(list)
 
         for zz in zip(*[iter(tags)] * 2):
-            #print zz[0], " -> ", zz[1]
             key = zz[0].encode('ascii', 'ignore')
             val = zz[1].encode('ascii', 'ignore')
             tag_dict[key].append( val )
@@ -131,8 +127,8 @@ class tags():
         print "Current page: ", driver.current_url
 
         if self.count_tags_on_page() == 0 or tag_value not in self.ui_tags()[tag_name]:
-            print "Nothing to delete."
-            return self
+            return "Nothing to delete."
+            #return self
 
         magic_xpath = "//td[contains(., '{}')]/../td[contains(., '{}')]/../td[contains(@title, 'to remove this assignment')]".format(tag_name, tag_value)
         magic_button = None
@@ -190,7 +186,6 @@ class tags():
 
         first_xpath = "(//td[@title='Click to remove this assignment'])[1]"
         xpath_save = "//button[contains(@title,'Save Changes')]"
-        #wait.until(EC.visibility_of_element_located((By.XPATH, first_xpath)))
 
         num_tags = self.count_tags_on_page()
         print "Number of tags: ", num_tags
@@ -218,6 +213,76 @@ class tags():
         text_to_search = r'Tag edits were successfully saved'
         text_found = re.search(text_to_search, src)
         assert(text_found != None), "Not Found."
-
         return self
 
+
+    def set_multi_tags_a(self):
+        logger = self.logger
+        logger.info("Begin set_few_tags test")
+
+        tags_2 = {'Department': ['Engineering', 'Marketing']}
+        tags_5 = {
+            'Department': ['Engineering'],
+            'LifeCycle *': ['Fully retire VM and remove from Provider'],
+            'Quota - Max Storage *': ['1TB'],
+            'Auto Approve - Max VM *': ['5'],
+            'Auto Approve - Max Memory *': ['8GB']
+        }
+
+        tag_dict = tags_5
+        t = tags(self.web_session)
+        nav = NavigationTree(self.web_session).jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+
+        logger.info("collect existent tags")
+        stored_tags = t.ui_tags()
+        print "SAVED TAGS == ", stored_tags
+
+        logger.info("Starting to set given tags")
+        for tag_key in tag_dict.keys():
+            for tag_value in tag_dict[tag_key]:
+                logger.info( " - Set tag: ({} -> {})".format(tag_key, tag_value))
+                nav.jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+                t.set_tag(tag_key, tag_value)
+
+        logger.info(" == drop all tags == ")
+        nav.jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+        t.drop_all_tags()
+
+        logger.info("restoring saved tags")
+        nav.jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+
+        print "TAGS TO BE RESTORED: ", stored_tags
+        for tag_key in stored_tags.keys():
+            for tag_value in stored_tags[tag_key]:
+                print "Restore (", tag_key, " - ", tag_value, ")"
+                nav.jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+                t.set_tag(tag_key, tag_value)
+
+
+    def restore_tags(self):
+        logger = self.web_session.logger
+
+        tags_5 = {
+            'Department': ['Engineering'],
+            'LifeCycle *': ['Fully retire VM and remove from Provider'],
+            'Quota - Max Storage *': ['1TB'],
+            'Auto Approve - Max VM *': ['5'],
+            'Auto Approve - Max Memory *': ['8GB']
+        }
+        t = tags(self.web_session)
+
+        nav = NavigationTree(self.web_session).jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+        logger.info("collect existent tags")
+        # stored_tags = t.ui_tags() # second way to store tags
+        stored_tags = tags_5
+        print "STORED TAGS == ", stored_tags
+
+        logger.info("drop all tags")
+        t.drop_all_tags()
+
+        logger.info("restoring saved tags")
+        for tag_key in stored_tags.keys():
+            for tag_value in stored_tags[tag_key]:
+                print "Restore (", tag_key, " - ", tag_value, ")"
+                nav.jump_to_middleware_servers_view().to_first_details().select_and_click('Policy', 'Edit Tags')
+                t.set_tag(tag_key, tag_value)

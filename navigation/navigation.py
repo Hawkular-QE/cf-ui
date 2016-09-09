@@ -100,6 +100,7 @@ class NavigationTree():
     def __init__(self, session):
         self.web_session = session
         self.web_driver = self.web_session.web_driver
+        #self.MIQ_URL = self.web_session.MIQ_URL
         time_delay = 7
         self.wait = WebDriverWait(self.web_driver, time_delay)
 
@@ -171,7 +172,7 @@ class NavigationTree():
         current_page = self.web_driver.current_url
         target_page = self.paths.get(target)
         if not current_page.endswith(target_page) or force_navigation:
-                self.web_driver.get(self.web_session.MIQ_URL + target_page)
+            self.web_driver.get(self.web_session.MIQ_URL + target_page)
         return self
 
 
