@@ -4,6 +4,10 @@ from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 class datasources():
     web_session = None
 
@@ -62,3 +66,58 @@ class datasources():
             assert dat_details_ui.get('Nativeid') == dat_details_api.get('Nativeid')
 
         return True
+
+    def count_datasources_ui(self):
+        return len(self.web_session.web_driver.find_elements_by_xpath("//div[@id='list_grid']/table/tbody/tr"))
+
+    def count_datasources_db(self):
+        return len(db(self.web_session).get_datasources())
+
+
+    def validate_delete_datasource_b(self):
+        self.web_session.logger.info("Begin undeletable datasource test B")
+        driver = self.web_session.web_driver
+
+        nav = NavigationTree(self.web_session).jump_to_middleware_datasources_view()
+        number_before = self.count_datasources_ui()
+        number_before_db = self.count_datasources_db()
+        nav.check_first_datasource()
+        nav.select_and_click('Operations', 'Remove')
+        alert = driver.switch_to_alert()
+        alert.accept()
+
+        # to verify deletion was formally completed
+        xpath_flash = "//strong[contains(.,'The selected datasources were removed')]"
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath_flash)))
+        flasher = driver.find_element_by_xpath(xpath_flash)
+        if flasher:
+            print "Flasher is displayed."
+
+        number_after = self.count_datasources_ui()
+        number_after_db = self.count_datasources_db()
+        assert (number_before == number_after + 1), " Datasource can't be deleted. "
+        assert (number_before_db == number_after_db + 1), " Datasource can't be deleted. (according DB) "
+
+
+    def validate_delete_datasource_a(self):
+        self.web_session.logger.info("Begin undeletable datasource test A")
+        driver = self.web_session.web_driver
+        ds = datasources(self.web_session)
+        nav = NavigationTree(self.web_session).jump_to_middleware_datasources_view().to_first_details()
+        number_before = ds.count_datasources_ui()
+        number_before_db = ds.count_datasources_db()
+        nav.select_and_click('Operations', 'Remove')
+        alert = driver.switch_to_alert()
+        alert.accept()
+
+        # to verify deletion was formally completed
+        xpath_flash = "//strong[contains(.,'The selected datasources were removed')]"
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath_flash)))
+        flasher = driver.find_element_by_xpath(xpath_flash)
+        if flasher:
+            print "Flasher is displayed."
+
+        number_after = ds.count_datasources_ui()
+        number_after_db = ds.count_datasources_db()
+        assert (number_before == number_after + 1), "Datasource can't be deleted."
+        assert (number_before_db == number_after_db + 1), "Datasource can't be deleted. (according DB)"
