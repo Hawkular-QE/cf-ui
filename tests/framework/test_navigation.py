@@ -114,3 +114,4 @@ def test_cfui_negative_domain_details(web_session):
     except(AssertionError):
         print "OK - negative test for key words"
 
+
