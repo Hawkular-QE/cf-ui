@@ -96,7 +96,7 @@ class servers():
         el = self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format('Save'))
         el[0].click()
 
-        self.ui_utils.waitForTextOnPage("My Company Tags", 5)
+        self.ui_utils.waitForTextOnPage("My Company Tags", 15)
 
         server_details = self.ui_utils.get_generic_table_as_dict()
         newValue = server_details.get('My Company Tags')[-1:]
