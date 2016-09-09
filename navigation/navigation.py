@@ -160,6 +160,7 @@ class NavigationTree():
 
     def jump_to_middleware_providers_view(self, force_navigation=True):
         self._jump_to('middleware_providers', force_navigation)
+        return self
 
     def jump_to_middleware_servers_view(self, force_navigation=True):
         self._jump_to('middleware_servers', force_navigation)
@@ -210,3 +211,35 @@ class NavigationTree():
             else:
                 self.go_up_till_clickable(click_point)
         return True
+
+    ################### {{ till next merge from master, then to delete/replace
+
+    def power_click(self, clickable):
+        driver = self.web_driver
+        hover = ActionChains(driver)
+        if clickable:
+            hover.move_to_element(clickable).perform()
+            clickable.click()
+
+    def select_and_click(self, click_point, select_option):
+        driver = self.web_driver
+        xpath_from = ".//*[contains(text(), '{}')]".format(click_point)
+        xpath_top = ".//div[contains(@class, 'dropdown')]/button[contains(.,'{}')]".format(click_point)
+        xpath_select = "{}/../ul[contains(@class, 'dropdown-menu')]/li/a[contains(.,'{}')]".format(xpath_top, select_option)
+        #xpath_select = "//a[contains(.,'{}')]".format(select_option)
+        # //a[@title='Add a New Middleware Provider']
+        #print "Exact xpath_from: ", xpath_from
+        #print "Exact xpath_select: ", xpath_select
+
+        self.power_click(driver.find_element_by_xpath(xpath_top))
+
+        found_from = driver.find_elements_by_xpath(xpath_from)
+        found_select = driver.find_elements_by_xpath(xpath_select)
+        if len(found_from) == 0 or len(found_select) == 0:
+            raise Exception("Page does not contain such pattern(s): '{}', '{}': ".format(click_point, select_option))
+
+
+        self.power_click(driver.find_element_by_xpath(xpath_select))
+        return self
+
+    ################### }}
