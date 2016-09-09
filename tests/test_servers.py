@@ -31,7 +31,7 @@ def test_cfui_server_policy_edit_eap(web_session):
     # EAP choice "JBoss" or "WildFly"
     assert servers(web_session).server_policy_edit('eap')
 
-def test_cfui_eap_power_stop(web_session):
+def _test_cfui_eap_power_stop(web_session):
     web_session.logger.info("Begin Server Stop")
     assert servers(web_session).eap_power_stop()
 
