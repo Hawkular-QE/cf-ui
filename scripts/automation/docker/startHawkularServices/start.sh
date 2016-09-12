@@ -1,49 +1,33 @@
 #!/bin/sh
 
+export DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 # choose env via scripts first arg or CF_UI_HS_ENV_SOURCE env variable, for both options string needs to be set to path to `source`
-if [[ $1 && ${1-x} ]] ; then
+if [ ! -z "$1" ]  ; then
   echo "Using env variables in $1"
-  source $1
+  source ${DIR}/$1
 elif [[ $CF_UI_HS_ENV_SOURCE && ${CF_UI_HS_ENV_SOURCE-x} ]] ; then
   echo "Using $CF_UI_HS_ENV_SOURCE.sh to export env variables"
-  source "$(pwd)"/$CF_UI_HS_ENV_SOURCE
+  source ${DIR}/$CF_UI_HS_ENV_SOURCE
 else
   echo "Using default env variables"
-  source "$(pwd)"/setDefaultEnv.sh
+  source ${DIR}/setDefaultEnv.sh
 fi
 
-HS_START_CMD="docker run -d  -e TEST_MODE=true -e CASSANDRA_NODES=HawkularServicesCassandra -e DB_TIMEOUT=300 -p 8080:${HS_PORT} -p 8443:${HS_SECURED_PORT} --link HawkularServicesCassandra:HawkularServicesCassandra ${HS_IMAGE}"
-CASSANDRA_START_CMD="docker run -d --name HawkularServicesCassandra -e CASSANDRA_START_RPC=true ${CASSANDRA_IMAGE}"
+echo "EAP7_MODE: $EAP7_MODE"
 
-# Stop HS if running
-HS_CONTAINER_ID=`docker ps | grep $HS_IMAGE | awk '{ print $1}'`
+changeRegister
 
-if [ ${#HS_CONTAINER_ID} -gt 0 ] ; then
-    echo "Stopping HS Container ${HS_CONTAINER_ID}"
-    docker stop ${HS_CONTAINER_ID}
-    docker rm ${HS_CONTAINER_ID}
-    IMAGE_ID=`docker images | grep "hawkular-services" | awk '{ print $3}'`
-    echo "Removing Image ${HS_IMAGE}   ID: ${IMAGE_ID}"
-    docker rmi -f ${IMAGE_ID}
-else
-    echo "No ${HS_IMAGE} container found to be running."
-fi
+stopEAP $EAP7_HAWKUALR_AGENT_IMAGE "domain"
+stopEAP $EAP7_HAWKUALR_AGENT_IMAGE "standalone"
 
-# Stop Cassandra if running
-CASSANDRA_CONTAINER_ID=`docker ps | grep ${CASSANDRA_IMAGE} | awk '{print $1}'`
+dockerStopAndRm "$HS_IMAGE" "hawkular-services"
 
-echo "SIZE: $CASSANDRA_CONTAINER_ID"
-if [ ${#CASSANDRA_CONTAINER_ID} -gt 0 ] ; then
-    echo "Stopping HS Container ${CASSANDRA_CONTAINER_ID}"
-    docker stop ${CASSANDRA_CONTAINER_ID}
-    docker rm ${CASSANDRA_CONTAINER_ID}
-    IMAGE_ID=`docker images | grep "cassandra" | awk '{print $3}'`
-    echo "Removing Image ${CASSANDRA_IMAGE}   ID: ${IMAGE_ID}"
-    docker rmi -f ${IMAGE_ID}
-else
-    echo "No ${CASSANDRA_IMAGE} container found to be running."
-fi
+dockerStopAndRm "$CASSANDRA_IMAGE" "cassandra"
 
+# pull jboss-eap-7-tech-preview/eap70
+echo "Pull ${TECH_PREVIEW_PULL_CMD}"
+${TECH_PREVIEW_PULL_CMD}
 
 # Start Cassandra
 echo "Starting ${CASSANDRA_IMAGE}"
@@ -55,25 +39,40 @@ sleep 5
 echo "Starting ${HS_IMAGE}"
 ${HS_START_CMD}
 
-# wait for HS to be up
-time=0
-while [ $time -lt $HS_MAX_WAIT ];
-do
-    echo "Trying to get ${HS_URL}/hawkular/inventory/status"
-    responseInventory=`curl -s -H "Content-Type: application/json" "${HS_URL}/hawkular/inventory/status"`
-    echo "Got response ${responseInventory}"
-    echo "Trying to get ${HS_URL}/hawkular/metrics/status"
-    responseMetrics=`curl -s -H "Content-Type: application/json" "${HS_URL}/hawkular/metrics/status"`
-    echo "Got response ${responseMetrics}"
-    if [[ $responseInventory == *"true"* && $responseMetrics == *"STARTED"* ]]
-    then
-        echo "Hawkular was started succesfully in ${time}s"
-        exit 0
-        return
-    fi
-    echo "Waiting for Hawkular server to start... ${time}s"
-    sleep 10s
-    let time+=10
-done
-echo "Hawkular failed or timed out to startup!!"
-exit 1
+waitForHS
+
+if ! [ -z "$EAP7_MODE+x" ]  ; then
+  sleep 5
+
+  # Start EAP7
+  EAP7_IMAGE=$EAP7_HAWKUALR_AGENT_IMAGE
+  EAP7_START_CMD=$EAP7_START_STANDALONE_CMD
+
+  if [ "$EAP7_MODE" == "domain" ]; then
+    EAP7_START_CMD=$EAP7_START_DOMAIN_CMD
+  elif [ "$EAP7_MODE" == "both" ]; then
+    EAP7_MODE="standalone"
+    echo "Starting EAP7 in both standalone and domain modes"
+    echo "Starting ${EAP7_IMAGE} in $EAP7_MODE mode"
+    ${EAP7_START_CMD}
+
+    sleep 5
+
+    waitForEapServer "/opt/eap/$EAP7_MODE/log/server.log" "eap7$EAP7_MODE"
+
+    EAP7_MODE="domain"
+    EAP7_START_CMD=$EAP7_START_DOMAIN_CMD
+  fi
+
+  echo "Starting ${EAP7_IMAGE} in $EAP7_MODE mode"
+  ${EAP7_START_CMD}
+
+  sleep 5
+
+  serverLogFileName="server.log"
+  if [ "$EAP7_MODE" == "domain" ]; then
+      serverLogFileName="host-controller.log"
+  fi
+
+  waitForEapServer "/opt/eap/$EAP7_MODE/log/$serverLogFileName" "eap7$EAP7_MODE"
+fi
