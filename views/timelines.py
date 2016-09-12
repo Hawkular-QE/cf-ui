@@ -13,6 +13,8 @@ class timelines():
     hawkular_api = None
     db = None
 
+    APPLICATION_WAR = "cfui_test_war.war"
+
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
@@ -20,8 +22,14 @@ class timelines():
         self.hawkular_api = hawkular_api(self.web_session)
 
     def test_event_for_successful_deployment(self):
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage("Middleware Deployments", 15)
 
-        servers(self.web_session).deploy_application_archive()
+        if self.ui_utils.get_elements_containing_text(self.APPLICATION_WAR):
+            self.ui_utils.click_on_row_containing_text(self.APPLICATION_WAR)
+        else:
+            servers(self.web_session).deploy_application_archive()
+
         self.navigate_to_timeline()
         self.select_event_group('Application')
         self.change_level('Detail')
@@ -73,10 +81,14 @@ class timelines():
         self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]").click()
         ui_utils(self.web_session).sleep(15)
 
-    def verify_event(self, type):
+    def verify_event(self, event_type):
 
         # Verify event where type for successful event is 'ok' and for unsuccessful event is 'error'
 
-        self.web_driver.find_element_by_xpath("//img[contains(@src,'/assets/timeline/vm_event')]").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(type), 15)
+        eap = servers(self.web_session).find_non_container_eap_in_state("running")
+        eap_name = eap.get('Server Name')
+        print eap_name
+        assert self.ui_utils.refresh_until_text_appears('{}'.format(eap_name), 300)
+        self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(eap_name)).click()
+        assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 15)
         return True
