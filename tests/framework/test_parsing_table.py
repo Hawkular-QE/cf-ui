@@ -1,7 +1,7 @@
 import pytest
 from common.session import session
 from parsing.table import table
-
+from navigation.navigation import NavigationTree
 
 @pytest.fixture (scope='session')
 def web_session(request):
@@ -16,7 +16,7 @@ def web_session(request):
 
 def _test_cfui_instance(web_session):
     t = table(web_session)
-    print "List of middleware datasources: ", t.get_middleware_datasource_table(), "\n"
+    print "List of middleware datasources: ", t.get_middleware_datasources_table(), "\n"
     print "List of middleware providers: ", t.get_middleware_providers_table(), "\n"
     print "List of middleware deployments: ", t.get_middleware_deployments_table(), "\n"
     servers_list = t.get_middleware_servers_table()
@@ -25,7 +25,7 @@ def _test_cfui_instance(web_session):
 
 def _test_cfui_details(web_session):
     t = table(web_session)
-    datasources_table = t.get_middleware_datasource_table()
+    datasources_table = t.get_middleware_datasources_table()
     ds_num = len(datasources_table)
     print "List of middleware datasources ({}): ".format(ds_num)
     t.pretty_print(datasources_table)
@@ -38,8 +38,6 @@ def _test_cfui_details(web_session):
     print "Middleware servers list: "
     t.pretty_print( t.get_servers_details())
 
-from navigation.navigation import NavigationTree
-from time import sleep
 
 def _test_cfui_single_detail_page(web_session):
     nav = NavigationTree(web_session)
@@ -48,17 +46,59 @@ def _test_cfui_single_detail_page(web_session):
     t = table(web_session)
     t.pretty_print(t.page_elements())
 
-def test_cfui_details_by_text(web_session):
 
+##   Example of usage routines
+#    nav.found_by_pattern(pattern)
+#    and table.page_as_dict()
+#
+#    If pattern matches to multiple instances would be used right first.
+#    Take correct patterns!
+#
+
+
+def test_cfui_server_details_by_text(web_session):
     nav = NavigationTree(web_session)
     nav.jump_to_middleware_servers_view()
 
-    pattern = "488ef4f1-9df2-4a79"
-    if nav.found_by_pattern(pattern):
-        sleep(5)
+    server_pattern = "488ef4f1-9df2-4a79"
+    if nav.found_by_pattern(server_pattern):
         t = table(web_session)
-        t.pretty_print(t.page_elements())
+        t.pretty_print(t.page_as_dict())
     else:
         raise ValueError("Detail page is still unavailable")
 
 
+def test_cfui_datasources_details_by_text(web_session):
+    nav = NavigationTree(web_session)
+    nav.jump_to_middleware_datasources_view()
+
+    datasource_pattern = "vso-eap7.bc.jonqe.lab.eng.bos"
+    if nav.found_by_pattern(datasource_pattern):
+        t = table(web_session)
+        t.pretty_print(t.page_as_dict())
+    else:
+        raise ValueError("Detail page is still unavailable")
+
+
+def test_cfui_deployment_details_by_text(web_session):
+    nav = NavigationTree(web_session)
+    nav.jump_to_middleware_deployment_view()
+
+    deployment_pattern = "hawkular-command-gateway-war"
+    if nav.found_by_pattern(deployment_pattern):
+        t = table(web_session)
+        t.pretty_print(t.page_as_dict())
+    else:
+        raise ValueError("Detail page is still unavailable")
+
+
+def test_cfui_provider_details_by_text(web_session):
+    nav = NavigationTree(web_session)
+    nav.jump_to_middleware_providers_view()
+
+    provider_pattern = "10.16.23.195"
+    if nav.found_by_pattern(provider_pattern):
+        t = table(web_session)
+        t.pretty_print(t.page_as_dict())
+    else:
+        raise ValueError("Detail page is still unavailable")

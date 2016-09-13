@@ -259,12 +259,21 @@ class NavigationTree():
     def found_by_pattern(self, pattern):
         driver = self.web_driver
         driver.find_element_by_name("view_list").click()
-        xpath = "//*[contains(text(), '{}')]".format(pattern)
+        xpath = ".//table/tbody/tr/td[contains(., '{}')]".format(pattern)
+
+        click_point = None
         click_points = driver.find_elements_by_xpath(xpath)
-        if len(click_points) > 1:
+        found = len(click_points)
+
+        if found == 0:
+            print "Nothing found by pattern '{}' ({}). Stop.".format(pattern, found)
+            return False
+
+        if found > 0:
             click_point = click_points[0]
-            if self.is_ok(click_point):
-                click_point.click()
-            else:
-                self.go_up_till_clickable(click_point)
+
+        if self.is_ok(click_point):
+            click_point.click()
+        else:
+            self.go_up_till_clickable(click_point)
         return True

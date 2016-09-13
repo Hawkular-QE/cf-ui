@@ -14,7 +14,6 @@ class table():
         self.web_session = web_session
         self.driver = web_session.web_driver
 
-    # temporary while fast navigation is merged
     def is_url_different(self, url):
         return (self.driver.current_url != url)
 
@@ -29,23 +28,12 @@ class table():
             self.driver.get(url)
         return self
 
-    ## TODO: utils for usage in navigation (move to navigation.py)
-
     def is_url(self):
         pass
     def is_path(self):
         pass
 
     def build_subtree(self, target):
-        """
-        if target.is_url:
-            self.from_url(target)
-        else:
-            if target.is_path():
-                self.from_path(target)
-        else:
-            print "Wrong target!"
-        """
         self.from_path(target)
         return self
 
@@ -82,34 +70,32 @@ class table():
             dictionary.append( table_row_list)
         return dictionary
 
-    def page_elements(self):
-
-        print "Page URL: ", self.driver.current_url
+    def page_as_dict(self):
+        #print "Page URL: ", self.driver.current_url
 
         dictionary = {}
         table_locator = ".//table//tbody//tr[not(ancestor::tr)]"
         table_rows = self.driver.find_elements_by_xpath(table_locator)
 
         for table_row in table_rows:
-            print "\n > table row: ", table_row.text
             tds = table_row.find_elements_by_tag_name("td")
-            property_name = "'{}'".format(tds[0].text)
-            print "tds's size: ", len(tds), " -- property_name: ", property_name
+            property_name = "{}".format(tds[0].text)
             property_value = None
 
             if len(tds) == 1:
                 property_value = "is empty"
 
             if len(tds) == 2:
-                property_value = "'{}'".format(tds[1].text)
+                property_value = "{}".format(tds[1].text)
             inner_rows = table_row.find_elements_by_xpath(".//table//tbody//tr")
 
             if inner_rows:
-                inner_elem = " '{}' ".format( "".join([inner.text for inner in inner_rows]))
+                inner_elem = " {} ".format( "".join([inner.text for inner in inner_rows]))
                 property_value = inner_elem
 
             if property_name != None and property_name != "":
                 dictionary.update( { property_name : property_value })
+
         return dictionary
 
 
@@ -215,7 +201,6 @@ class table():
     def get_deployments_details_ref(self, ref):
         return self.get_page_details_ref('middleware_deployments', ref)
 
-    ## TODO: next - to use python's magics with method's names substitution for eliminate this spagetti! -^^
 
     def pretty_print(self, complex_data, caption="DUMP: "):
         import pprint as pp
