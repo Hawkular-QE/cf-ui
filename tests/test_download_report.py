@@ -26,7 +26,7 @@ def web_session(request):
     return web_session
 
 def test_cfui_providers_download_txt(web_session):
-    nav= NavigationTree(web_session).navigate_to_middleware_providers_view()
+    web_session.web_driver.get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download provider report as text test")
     assert download_report(web_session,"ems_middleware").text_format()
 
@@ -43,7 +43,7 @@ def test_cfui_providers_download_txt(web_session):
 
 
 def test_cfui_domain_download_txt(web_session):
-    nav= NavigationTree(web_session).navigate_to_middleware_domains_view()
+    web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download domain report as text test")
     assert download_report(web_session,"middleware_domain").text_format()
 
@@ -58,7 +58,7 @@ def test_cfui_domain_download_txt(web_session):
     assert fnmatch.filter(r, '*.csv')
 
 def test_cfui_server_download_txt(web_session):
-    nav = NavigationTree(web_session).navigate_to_middleware_servers_view()
+    web_session.web_driver.get("{}//middleware_server/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download server report as text test")
     assert download_report(web_session,"middleware_server").text_format()
 
@@ -73,7 +73,7 @@ def test_cfui_server_download_txt(web_session):
 
 
 def test_cfui_datasource_download_txt(web_session):
-    nav = NavigationTree(web_session).navigate_to_middleware_datasources_view()
+    web_session.web_driver.get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download datasource report as text test")
     assert download_report(web_session,"middleware_datasource").text_format()
 
@@ -88,7 +88,7 @@ def test_cfui_datasource_download_txt(web_session):
 
 
 def test_cfui_deployment_download_txt(web_session):
-    nav = NavigationTree(web_session).navigate_to_middleware_deployment_view()
+    web_session.web_driver.get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download deployment report as text test")
     assert download_report(web_session,"middleware_deployment").text_format()
 

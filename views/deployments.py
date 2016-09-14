@@ -1,6 +1,4 @@
 from common.ui_utils import ui_utils
-from parsing.table import table
-from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 
