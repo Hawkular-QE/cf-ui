@@ -1,6 +1,4 @@
 from common.ui_utils import ui_utils
-from parsing.table import table
-from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 
@@ -15,7 +13,7 @@ class datasources():
 
 
     def validate_datasource_list(self):
-        NavigationTree(self.web_session).navigate_to_middleware_datasources_view()
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         datasource_api = self.hawkular_api.get_hawkular_datasources()
         datasource_ui = self.ui_utils.get_list_table();
@@ -36,7 +34,7 @@ class datasources():
         return True
 
     def validate_datasource_detail(self):
-        NavigationTree(self.web_session).navigate_to_middleware_datasources_view()
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         datasource_ui = self.ui_utils.get_list_table();
         datasource_api = self.hawkular_api.get_hawkular_datasources()

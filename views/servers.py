@@ -1,10 +1,7 @@
 from common.ui_utils import ui_utils
 from parsing.table import table
-from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
 import os
 import time
 from common.db import db
@@ -293,8 +290,7 @@ class servers():
 
         feed = eap_hawk.get('Feed') # Unique server id
 
-        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
-        #self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
         self.ui_utils.waitForTextOnPage("Properties", 15)
@@ -310,8 +306,7 @@ class servers():
 
     def deploy_application_archive(self, app_to_deploy = APPLICATION_WAR):
 
-        NavigationTree(self.web_session).navigate_to_middleware_servers_view()
-        #self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find EAP on which to deploy
         eap = self.find_non_container_eap_in_state("running")
@@ -341,7 +336,6 @@ class servers():
         return True
 
     def undeploy_application_archive(self, app_to_undeploy=APPLICATION_WAR):
-        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
         if self.ui_utils.get_elements_containing_text(app_to_undeploy):
@@ -365,7 +359,6 @@ class servers():
     def redeploy_application_archive(self, app_to_redeploy=APPLICATION_WAR):
 
         # Find EAP with application to redeploy
-        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
         if self.ui_utils.get_elements_containing_text(app_to_redeploy):
@@ -386,7 +379,6 @@ class servers():
     def stop_application_archive(self, app_to_stop=APPLICATION_WAR):
 
         # Find EAP with application to stop
-        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(app_to_stop)
@@ -404,7 +396,6 @@ class servers():
     def start_application_archive(self, app_to_start=APPLICATION_WAR):
 
         # Find EAP with application to start
-        #NavigationTree(self.web_session).navigate_to_middleware_deployment_view()
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(app_to_start)

@@ -1,8 +1,6 @@
 from common.ui_utils import ui_utils
-import time
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-from navigation.navigation import NavigationTree
 from selenium.webdriver.support import expected_conditions as EC
 from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
