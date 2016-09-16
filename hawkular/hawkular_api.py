@@ -179,6 +179,8 @@ class hawkular_api():
         auth_dict['username'] = auth[0]
         auth_dict['password'] = auth[1]
 
+        return auth_dict
+
     def get_metric_status(self):
         try:
             return self.__hawkular__.metric.status()
