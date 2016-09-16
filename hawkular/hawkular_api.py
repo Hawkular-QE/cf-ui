@@ -20,7 +20,7 @@ class hawkular_api():
         servers = []
 
         try:
-            rows = self.__hawkular__.list_server()
+            rows = self.__hawkular__.inventory.list_server()
         except Exception, e:
             self.__exception_handler(e)
 
@@ -41,7 +41,7 @@ class hawkular_api():
         datasources = []
 
         try:
-            rows = self.__hawkular__.list_server_datasource()
+            rows = self.__hawkular__.inventory.list_server_datasource()
         except:
             self.__exception_handler()
 
@@ -58,7 +58,7 @@ class hawkular_api():
         deployments = []
 
         try:
-            rows = self.__hawkular__.list_server_deployment()
+            rows = self.__hawkular__.inventory.list_server_deployment()
         except:
             self.__exception_handler()
 
@@ -75,7 +75,7 @@ class hawkular_api():
         domains = []
 
         try:
-            rows = self.__hawkular__.list_domain(feed_id)
+            rows = self.__hawkular__.inventory.list_domain(feed_id)
         except:
             self.__exception_handler()
 
@@ -107,5 +107,99 @@ class hawkular_api():
 
         return server_groups
 
-    def generic_for_testing(self):
-        return self.__hawkular__.list_server()
+    def get_port(self):
+        try:
+            return self.__hawkular__.port
+        except:
+            self.__exception_handler()
+
+    def get_ip_address(self):
+        try:
+            return self.__hawkular__.get_ip_address
+        except:
+            self.__exception_handler()
+
+        def generic_for_testing(self):
+            return self.__hawkular__.list_server()
+
+    ''' Alerts '''
+
+    def get_alert_list_event(self):
+        # TO-DO: Return formatted Dict
+        try:
+            return self.__hawkular__.alert.list_event()
+        except:
+            self.__exception_handler()
+
+    def get_alert_auth(self):
+        try:
+            auth =  self.__hawkular__.alert.auth
+        except:
+            self.__exception_handler()
+
+        auth_dict = {}
+        auth_dict['username'] = auth[0]
+        auth_dict['password'] = auth[1]
+
+        return auth_dict
+
+    def get_alert_tenant_id(self):
+        try:
+            return self.__hawkular__.alert.tenant_id
+        except:
+            self.__exception_handler()
+
+    def get_alert_hostname(self):
+        try:
+            return self.__hawkular__.alert.hostname
+        except:
+            self.__exception_handler()
+
+    def get_alert_status(self):
+        try:
+            return self.__hawkular__.alert.status()
+        except:
+            self.__exception_handler()
+
+    ''' Metrics '''
+
+    def get_metric_hostname(self):
+        try:
+            return self.__hawkular__.metric.hostname
+        except:
+            self.__exception_handler()
+
+    def get_metric_auth(self):
+        try:
+            auth = self.__hawkular__.metric.auth
+        except:
+            self.__exception_handler()
+
+        auth_dict = {}
+        auth_dict['username'] = auth[0]
+        auth_dict['password'] = auth[1]
+
+    def get_metric_status(self):
+        try:
+            return self.__hawkular__.metric.status()
+        except:
+            self.__exception_handler()
+
+    def get_metric_list_gauge_definition(self):
+        try:
+            return self.__hawkular__.metric.list_gauge_definition()
+        except:
+            self.__exception_handler()
+
+    def get_metric_tenant_id(self):
+        try:
+            return self.__hawkular__.metric.tenant_id()
+        except:
+            self.__exception_handler()
+
+    def get_metric_protocol(self):
+        try:
+            return self.__hawkular__.metric.protocol()
+        except:
+            self.__exception_handler()
+
