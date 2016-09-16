@@ -32,5 +32,5 @@ def test_cfui_datasources_entities(web_session):
 def test_cfui_datasources_entities(web_session):
     assert topology(web_session).validate_middleware_server_groups_entities()
 
-def test_cfui_datasources_entities(web_session):
+def test_cfui_domains_entities(web_session):
     assert topology(web_session).validate_middleware_domains_entities()
