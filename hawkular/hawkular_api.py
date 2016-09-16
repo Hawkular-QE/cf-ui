@@ -161,3 +161,45 @@ class hawkular_api():
         except:
             self.__exception_handler()
 
+    ''' Metrics '''
+
+    def get_metric_hostname(self):
+        try:
+            return self.__hawkular__.metric.hostname
+        except:
+            self.__exception_handler()
+
+    def get_metric_auth(self):
+        try:
+            auth = self.__hawkular__.metric.auth
+        except:
+            self.__exception_handler()
+
+        auth_dict = {}
+        auth_dict['username'] = auth[0]
+        auth_dict['password'] = auth[1]
+
+    def get_metric_status(self):
+        try:
+            return self.__hawkular__.metric.status()
+        except:
+            self.__exception_handler()
+
+    def get_metric_list_gauge_definition(self):
+        try:
+            return self.__hawkular__.metric.list_gauge_definition()
+        except:
+            self.__exception_handler()
+
+    def get_metric_tenant_id(self):
+        try:
+            return self.__hawkular__.metric.tenant_id()
+        except:
+            self.__exception_handler()
+
+    def get_metric_protocol(self):
+        try:
+            return self.__hawkular__.metric.protocol()
+        except:
+            self.__exception_handler()
+
