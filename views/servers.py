@@ -182,7 +182,7 @@ class servers():
         self.eap_power_action(power, eap_hawk)
         self.ui_utils.sleep(5)  # need a timer here
 
-        new_pid = ssh_.get_pid(eap_app)
+        # new_pid = ssh_.get_pid(eap_app)
 
         # assert orig_pid != new_pid, "Orig Pid: {}  New Pid: {}".format(orig_pid, new_pid)
 
@@ -205,17 +205,17 @@ class servers():
         eap_app = "{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk))
 
         eap_hostname = eap_hawk.get("details").get("Hostname")
-        ssh_ = ssh(self.web_session, eap_hostname)
-        assert ssh_.get_pid(eap_app) != None, "No EAP pid found."
+        # ssh_ = ssh(self.web_session, eap_hostname)
+        # assert ssh_.get_pid(eap_app) != None, "No EAP pid found."
 
         self.eap_power_action(power, eap_hawk)
         self.ui_utils.sleep(3)
-        assert ssh_.get_pid(eap_app) == None, "EAP pid unexpectedly found."
+        # assert ssh_.get_pid(eap_app) == None, "EAP pid unexpectedly found."
 
-        start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "bin/standalone.sh")
-        self.web_session.logger.debug("About to start EAP: {}".format(start_str))
-        ssh_.execute_command(start_str)
-        assert ssh_.get_pid(eap_app) != None, "EAP pid not found."
+        #start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "bin/standalone.sh")
+        #self.web_session.logger.debug("About to start EAP: {}".format(start_str))
+        # ssh_.execute_command(start_str)
+        #assert ssh_.get_pid(eap_app) != None, "EAP pid not found."
 
         return True
 
@@ -444,15 +444,16 @@ class servers():
     def find_non_container_eap_in_state(self, state):
         for row in self.hawkular_api.get_hawkular_servers():
             #if row.get("Product Name") != 'Hawkular' and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
-            if row.get("Product Name") == 'JBoss EAP' and row.get("Node Name") != 'master:server-*' and (
+            if (row.get("Product Name") == 'JBoss EAP' or 'wildfly' in row.get("Product Name").lower()) and row.get("Node Name") != 'master:server-*' and (
                     state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
-                    ip = row.get("details").get("Hostname")
-                    try:
-                        socket.gethostbyaddr(ip)
-                        self.web_session.logger.info("Found EAP Hostname: {}  state: {}".format(ip, state))
-                        return row
-                    except:
-                        self.web_session.logger.info("Note a resolvable Hostname/IP: {}".format(ip))
+                    #ip = row.get("details").get("Hostname")
+                    #try:
+                    #    socket.gethostbyaddr(ip)
+                    #    self.web_session.logger.info("Found EAP Hostname: {}  state: {}".format(ip, state))
+                    #   return row
+                    # except:
+                    #    self.web_session.logger.info("Note a resolvable Hostname/IP: {}".format(ip))
+                return row
 
         return None
 
