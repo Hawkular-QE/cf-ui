@@ -138,6 +138,9 @@ class providers():
 
         # Edit and save the name, port and number to default value.( This will additionally check edit from the provider details page)
 
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.PROVIDER)
+
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.web_driver.find_element_by_xpath("//a[@title='Edit this Middleware Provider']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("Basic Information", 30)
