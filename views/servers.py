@@ -174,9 +174,9 @@ class servers():
         # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
         eap_app = "{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk))
 
-        eap_host = eap_hawk.get("details").get("Hostname")
-        ssh_ = ssh(self.web_session, eap_host)
-        orig_pid = ssh_.get_pid(eap_app)
+        #eap_host = eap_hawk.get("details").get("Hostname")
+        #ssh_ = ssh(self.web_session, eap_host)
+        #orig_pid = ssh_.get_pid(eap_app)
 
         self.web_session.logger.info("About to Restart EAP server {} Feed {}".format(eap_hawk.get('Product'), eap_hawk.get('Feed')))
         self.eap_power_action(power, eap_hawk)
