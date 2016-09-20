@@ -93,7 +93,7 @@ class hawkular_api():
         server_groups = []
 
         try:
-            rows = self.__hawkular__.list_server_group(feed_id)
+            rows = self.__hawkular__.inventory.list_server_group(feed_id)
         except:
             self.__exception_handler()
 
