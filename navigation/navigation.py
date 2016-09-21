@@ -100,8 +100,8 @@ class NavigationTree():
     def __init__(self, session):
         self.web_session = session
         self.web_driver = self.web_session.web_driver
-        #self.MIQ_URL = self.web_session.MIQ_URL
-        time_delay = 7
+        self.MIQ_URL = self.web_session.MIQ_URL
+        time_delay = 20
         self.wait = WebDriverWait(self.web_driver, time_delay)
 
         self.add_point("middleware", ".//*[@id='maintab']/li[6]/a/span[contains(.,'Middleware')]", "Hover")
@@ -128,22 +128,16 @@ class NavigationTree():
 
 
     def click_turn(self, driver, step):
-        try:
             hover = ActionChains(driver)
             action = self._tree.get(step)
             target = action._point._value
             operation = action._operation._operation
             elem = driver.find_element_by_xpath(target)
             hover.move_to_element(elem).perform()
-            wait = WebDriverWait(self.web_driver, 5)
-            wait.until(EC.element_to_be_clickable(elem))
+            self.wait.until(EC.element_to_be_clickable(elem))
             if operation == "Click":
                 elem.click()
 
-        except:
-            #self.web_session.logger.warning(" Clicking goes on next turn. Possibly, recursion...")
-            #self.click_turn( driver, step )
-            pass
 
 
     def navigate_to_middleware_providers_view(self):
@@ -200,20 +194,21 @@ class NavigationTree():
         self._jump_to('middleware_domains', force_navigation)
         return self
 
-    def waiting_ability(self, xpath, seconds):
+    def _waiting_ability(self, xpath, seconds):
         try:
             WebDriverWait(self.web_driver, seconds).until(
                 EC.visibility_of_element_located((By.XPATH, xpath)))
         except:
             self.web_session.logger.info(" Given object is not clickable. (waiting_clickability)")
-            self.waiting_ability(xpath, seconds - 1)
+            self._waiting_ability(xpath, seconds - 1)
 
     def power_click(self, clickable):
         driver = self.web_driver
         hover = ActionChains(driver)
+        #wait = WebDriverWait(self.web_driver, 15)
         if clickable:
             hover.move_to_element(clickable).perform()
-
+            self.wait.until(EC.visibility_of(clickable))
             clickable.click()
 
     def select_and_click(self, click_point, select_option):
@@ -221,19 +216,16 @@ class NavigationTree():
         xpath_top = ".//div[contains(@class, 'dropdown')]/button[contains(.,'{}')]".format(click_point)
         xpath_select = "{}/../ul[contains(@class, 'dropdown-menu')]/li/a[contains(.,'{}')]".format(xpath_top, select_option)
 
-        WebDriverWait(self.web_driver, 7).until(
-            EC.visibility_of_element_located((By.XPATH, xpath_top))
-            )
+        self.wait.until(EC.visibility_of_element_located((By.XPATH, xpath_top)))
 
         found_top = driver.find_elements_by_xpath(xpath_top)
         found_select = driver.find_elements_by_xpath(xpath_select)
         if len(found_top)==0 or len(found_select)==0:
             raise Exception("Page does not contain such pattern(s) {}, {}: ".format(click_point, select_option))
 
-        self.waiting_ability(xpath_top, 7)
+        self.wait.until(EC.visibility_of_element_located((By.XPATH, xpath_top)))
         self.power_click(driver.find_element_by_xpath(xpath_top))
 
-        self.waiting_ability(xpath_select, 7)
         self.power_click(driver.find_element_by_xpath(xpath_select))
         return self
 
@@ -266,7 +258,6 @@ class NavigationTree():
                 assert (ind <= num_link and ind >= 0), "-- Definitely wrong value of param: '{}'".format(param)
                 sub_links[ind].click()
         else:
-            # raise ValueError("Not enough items for searching!") # ??
             print "Not enough items for selection!"
         return self
 
