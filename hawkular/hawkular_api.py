@@ -223,6 +223,12 @@ class hawkular_api():
             self.__exception_handler()
 
 
+    def list_availability_server(self, feed_id, server_id):
+        try:
+            return self.__hawkular__.metric.list_availability_server(feed_id, server_id)
+        except:
+            self.__exception_handler()
+
     ''' Operations '''
 
     def add_jdbc_driver(self, feed_id, server_id, driver_name, module_name,
