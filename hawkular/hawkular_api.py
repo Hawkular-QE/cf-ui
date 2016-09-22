@@ -252,7 +252,7 @@ class hawkular_api():
     def undeploy(self, feed_id, server_id, destination_file_name, remove_content=True, server_groups=None):
 
         try:
-            return self.__hawkular__.undeploy(destination_file_name, remove_content, server_groups)
+            return self.__hawkular__.undeploy(feed_id, server_id, destination_file_name, remove_content, server_groups)
         except:
             self.__exception_handler()
 
