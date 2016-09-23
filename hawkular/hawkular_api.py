@@ -14,7 +14,7 @@ class hawkular_api():
         return self.__hawkular__
 
     def __exception_handler(self, e):
-        assert False, "Hawkular Server {} failed to connect, Exception: {}".format(self.web_session.HAWKULAR_HOSTNAME, e)
+        assert False, "Hawkular Services {} failed to connect, Exception: {}".format(self.web_session.HAWKULAR_HOSTNAME, e)
 
     def get_hawkular_servers(self):
         servers = []
@@ -106,6 +106,23 @@ class hawkular_api():
             server_groups.append(dict)
 
         return server_groups
+
+    def get_hawkular_messaging(self):
+        messaging = []
+
+        try:
+            rows = self.__hawkular__.inventory.list_messaging()
+        except:
+            self.__exception_handler()
+
+        for message in rows:
+            dict = {}
+            dict['id'] = message.id
+            dict['name'] = message.name
+            dict['path'] = message.path
+            messaging.append(dict)
+
+        return messaging
 
     def get_port(self):
         try:
@@ -205,3 +222,63 @@ class hawkular_api():
         except:
             self.__exception_handler()
 
+
+    def list_availability_server(self, feed_id, server_id):
+        try:
+            return self.__hawkular__.metric.list_availability_server(feed_id, server_id)
+        except:
+            self.__exception_handler()
+
+    ''' Operations '''
+
+    def add_jdbc_driver(self, feed_id, server_id, driver_name, module_name,
+                        driver_class, driver_jar_name=None, binary_content=None, binary_file_location=None):
+        try:
+            return self.__hawkular__.add_jdbc_driver(feed_id, server_id, driver_name, module_name,
+                                                    driver_class, driver_jar_name, binary_content, binary_file_location)
+        except:
+            self.__exception_handler()
+
+    def remove_jdbc_driver(self, feed_id, server_id, driver_name):
+
+        try:
+            return self.__hawkular__.remove_jdbc_driver(feed_id, server_id, driver_name)
+        except:
+            self.__exception_handler()
+
+    def add_deployment(self, feed_id, server_id, destination_file_name, force_deploy=False,
+                       enabled=True, server_groups=None, binary_file_location=None, binary_content=None):
+
+        try:
+            return self.__hawkular__.add_deployment(feed_id, server_id, destination_file_name, force_deploy,
+                                                    enabled, server_groups, binary_file_location, binary_content)
+        except:
+            self.__exception_handler()
+
+    def undeploy(self, feed_id, server_id, destination_file_name, remove_content=True, server_groups=None):
+
+        try:
+            return self.__hawkular__.undeploy(feed_id, server_id, destination_file_name, remove_content, server_groups)
+        except:
+            self.__exception_handler()
+
+    def disable_deployment(self, feed_id, server_id, destination_file_name, server_groups=None):
+
+        try:
+            return self.__hawkular__.disable_deployment(feed_id, server_id, destination_file_name, server_groups)
+        except:
+            self.__exception_handler()
+
+    def enable_deployment(self, feed_id, server_id, destination_file_name, server_groups=None):
+
+        try:
+            return self.__hawkular__.enable_deployment(feed_id, server_id, destination_file_name, server_groups)
+        except:
+            self.__exception_handler()
+
+    def restart_deployment(self, feed_id, server_id, destination_file_name, server_groups=None):
+
+        try:
+            return self.__hawkular__.restart_deployment(feed_id, server_id, destination_file_name, server_groups)
+        except:
+            self.__exception_handler()
