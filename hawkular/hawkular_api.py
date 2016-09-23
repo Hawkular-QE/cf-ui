@@ -107,8 +107,8 @@ class hawkular_api():
 
         return server_groups
 
-    def get_hawkular_messaging(self):
-        messaging = []
+    def get_hawkular_messagings(self):
+        messagings = []
 
         try:
             rows = self.__hawkular__.inventory.list_messaging()
@@ -120,9 +120,9 @@ class hawkular_api():
             dict['id'] = message.id
             dict['name'] = message.name
             dict['path'] = message.path
-            messaging.append(dict)
+            messagings.append(dict)
 
-        return messaging
+        return messagings
 
     def get_port(self):
         try:
