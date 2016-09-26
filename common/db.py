@@ -20,6 +20,7 @@ class db():
     sql_deployments = 'select * from middleware_deployments'
     sql_domains = 'select * from middleware_domains'
     sql_server_groups = 'select * from  middleware_server_groups'
+    sql_messagings = 'select * from middleware_messagings'
 
     def __init__(self, web_session, miq_ip = None, username = None, password = None, db_port = None):
 
@@ -78,3 +79,6 @@ class db():
 
     def get_server_groups(self):
         return self.execute(self.sql_server_groups)
+
+    def get_messagings(self):
+        return self.execute(self.sql_messagings)
