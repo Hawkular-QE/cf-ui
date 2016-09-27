@@ -193,6 +193,10 @@ class providers():
 
     def delete_hawkular_provider(self):
 
+        if not self.does_provider_exist():
+            self.web_session.logger.warning("Provider {} not present.".format(self.web_session.HAWKULAR_HOSTNAME))
+            return True
+
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_session.logger.info("Deleting the provider- {}".format(self.web_session.HAWKULAR_HOSTNAME))
