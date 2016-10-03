@@ -29,6 +29,22 @@ class properties(object):
         # TODO: parse *.properties file name & path from command line arguments
         # load properties from same dir as this file is in
         propertyArray = self.read_properties_file(os.path.dirname(__file__) + '/' + self.PROPERTIES_FILE_NAME)
+
+        # overwrite with env variables if possible
+        for (propName, propVal) in propertyArray.items():
+            try:
+                propVal=os.environ[propName]
+                if propVal:
+                    propertyArray[propName]=propVal
+            except KeyError:
+                pass
+            try:
+                propVal=os.environ['CFUI_'+propName]
+                if propVal:
+                    propertyArray[propName]=propVal
+            except KeyError:
+                pass
+
         # check if propertyArray is not empty
         if propertyArray:
             # set this class's attributes from propertyArray

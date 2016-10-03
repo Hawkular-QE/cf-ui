@@ -122,7 +122,8 @@ class session(properties):
     def close_web_driver(self):
         if "True" in self.RECORD_TESTS:
             self.session_recorder.stop()
-        # close browser window
-        self.web_driver.close()
-        # close browser windows & exit webdriver
-        self.web_driver.quit()
+        if not "True" in self.KEEP_BROWSER_RUNNING:
+            # close browser window
+            self.web_driver.close()
+            # close browser windows & exit webdriver
+            self.web_driver.quit()

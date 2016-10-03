@@ -22,5 +22,18 @@ driver = webdriver.Chrome("/path/to/.cf-ui/")
 ## Configuration
 All configuration on which automation is relied upon should be stored in conf/properties.properties
 
-```
+Properties in conf/properties.properties are overwritten by env variables with same name as in conf/properties.properties or with prefix ```CFUI_```
+So we can use framework testcases to prepare MIQ/CFME+HS for manual testcase if needed without changing conf/properties.properties file.  
 
+```
+export KEEP_BROWSER_RUNNING=True
+export MIQ_HOSTNAME=<your_MIQ_HOSTNAME>
+export MIQ_PORT=80
+
+export HAWKULAR_HOSTNAME=<your_HAWKULAR_HOSTNAME>
+export HAWKULAR_PORT=80
+
+source .cf-ui/bin/activate
+
+python -m pytest tests/framework/test_fast_navigation.py::test_cfui_provider_details
+```
