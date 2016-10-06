@@ -17,6 +17,6 @@ def test_cfui_test_event_successful_deployment(web_session):
     web_session.logger.info("Begin test to check event generated for successful deployment")
     assert timelines(web_session).test_event_for_successful_deployment()
 
-#def test_cfui_test_event_unsuccessful_deployment(web_session):
-#    web_session.logger.info("Begin test to check event generated for unsuccessful deployment")
-#   assert timelines(web_session).test_event_for_unsuccessful_deployment()
+def test_cfui_test_event_unsuccessful_deployment(web_session):
+    web_session.logger.info("Begin test to check event generated for unsuccessful deployment")
+    assert timelines(web_session).test_event_for_unsuccessful_deployment()

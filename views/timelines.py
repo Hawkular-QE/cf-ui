@@ -5,6 +5,7 @@ from hawkular.hawkular_api import hawkular_api
 from views.servers import servers
 from common.view import view
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 
 class timelines():
     web_session = None
@@ -14,6 +15,7 @@ class timelines():
     db = None
 
     APPLICATION_WAR = "cfui_test_war.war"
+    TextFile = "TestFile.txt"
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -39,29 +41,38 @@ class timelines():
 
     def test_event_for_unsuccessful_deployment(self):
 
-        """
-        TO-DO
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
-    1) Deploy a war - should fail ( maybe a text file )
-    2) then navigate to Monitoring->Timelines
-    3) Select Event Groups  - "Application"
-    4) Select Level as "Summary"
-    5) See whether the element is present
-    6) test if pop up is present with summary having text 'Event Type: hawkular_deployment.error'
+        # Find EAP on which to deploy
+        eap = servers(self.web_session).find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
 
-        """
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        self.ui_utils.waitForTextOnPage('Version', 15)
+
+        servers(self.web_session).add_server_deployment(self.TextFile)
+
+        self.navigate_to_timeline()
+        self.select_event_group('Application')
+        self.change_level('Summary')
+        self.verify_event('error')
+
         return True
 
     def select_event_group(self, group):
 
         # Select group from timeline ex: Application
 
-        self.web_driver.find_element_by_xpath("//button[@data-dismiss='alert']").click()
-        ui_utils(self.web_session).sleep(5)
+        if ui_utils(self.web_session).isElementPresent(By.XPATH, "//button[@data-dismiss='alert']"):
+            self.web_session.logger.info("Alert is present on the page.")
+            self.web_driver.find_element_by_xpath("//button[@data-dismiss='alert']").click()
+            ui_utils(self.web_session).sleep(30)
+        else:
+            ui_utils(self.web_session).sleep(30)
 
         self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_fl_grp1')]").click()
         self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(group)).click()
-        ui_utils(self.web_session).sleep(15)
+        ui_utils(self.web_session).sleep(30)
         return True
 
     def change_level(self, level):
@@ -70,7 +81,7 @@ class timelines():
 
         self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_fl_typ')]").click()
         self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(level)).click()
-        ui_utils(self.web_session).sleep(15)
+        ui_utils(self.web_session).sleep(30)
         return True
 
     def navigate_to_timeline(self):
@@ -79,7 +90,7 @@ class timelines():
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
         self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]").click()
-        ui_utils(self.web_session).sleep(15)
+        ui_utils(self.web_session).sleep(30)
 
     def verify_event(self, event_type):
 
@@ -87,7 +98,6 @@ class timelines():
 
         eap = servers(self.web_session).find_non_container_eap_in_state("running")
         eap_name = eap.get('Server Name')
-        print eap_name
         assert self.ui_utils.refresh_until_text_appears('{}'.format(eap_name), 300)
         self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(eap_name)).click()
         assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 15)
