@@ -13,7 +13,7 @@ class topology():
 
     entities = {'servers':'Middleware Servers','deployments':'Middleware Deployments',
                 'datasources':'Middleware Datasources','server_groups':'Middleware Server Groups',
-                'domains':'Middleware Domains'}
+                'domains':'Middleware Domains','messagings':'Middleware Messaging'}
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -73,6 +73,7 @@ class topology():
         assert servers_list, "No servers found."
 
         self.__navigate_to_topology__()
+        self.ui_utils.adjust_screen_resolution(1400, 1050)
 
         self.__display_names__(select=True)
 
@@ -99,14 +100,15 @@ class topology():
         assert deployments_list, "No Deployments found."
 
         self.__navigate_to_topology__()
+        self.ui_utils.adjust_screen_resolution(1400, 1050)
 
         self.__display_names__(select=True)
 
         # Select "Middleware Deployments"
-        self.__select_entities_view__(self.entities.get('deployments'), self.__get_deployment_name__(deployments_list[0].get('Name')))
+        self.__select_entities_view__(self.entities.get('deployments'), self.__get_actual_name__(deployments_list[0].get('Name')))
 
         for deployment in deployments_list:
-            name = self.__get_deployment_name__(deployment.get('Name'))
+            name = self.__get_actual_name__(deployment.get('Name'))
             if not self.__is_name_displayed__(name):
                 self.web_session.logger.error("Display Names - {} Not Displayed.".format(name))
                 return False
@@ -126,6 +128,7 @@ class topology():
         assert deployments_list, "No Datasources found."
 
         self.__navigate_to_topology__()
+        self.ui_utils.adjust_screen_resolution(1400, 1050)
 
         self.__display_names__(select=True)
 
@@ -155,6 +158,7 @@ class topology():
             return True
 
         self.__navigate_to_topology__()
+        self.ui_utils.adjust_screen_resolution(1400, 1050)
 
         self.__display_names__(select=True)
 
@@ -184,6 +188,7 @@ class topology():
             return True
 
         self.__navigate_to_topology__()
+        self.ui_utils.adjust_screen_resolution(1400, 1050)
 
         self.__display_names__(select=True)
 
@@ -198,7 +203,35 @@ class topology():
 
         return True
 
-    def __get_deployment_name__(self, text):
+    def validate_middleware_messaging_entities(self):
+        self.web_session.logger.info("Validate that Topology View shows expected JMS Queues/Topics")
+
+        # Validate that each JMS Queue/Topic is displayed in Topology:
+        # 1) Get Messaging list (from Messaging view)
+        # 2) Enable Display Names
+        # 3) Enable Middleware Messaging entities (by validating whether 1st JMS Queue/Topic Name in Messaging-List is displayed)
+        # 4) Validate that each JMS Queue/Topic in Messaging-List is displayed
+
+        messaging_list = self.hawkular_api.get_hawkular_messagings()
+        assert messaging_list, "No Queues/Topics found."
+
+        self.__navigate_to_topology__()
+        self.ui_utils.adjust_screen_resolution(1400, 1050)
+
+        self.__display_names__(select=True)
+
+        # Select "Middleware Messagings-Queues/Entities"
+        self.__select_entities_view__(self.entities.get('messagings'),
+                                      self.__get_actual_name__(messaging_list[0].get('name')))
+        for queues_topics in messaging_list:
+            name = self.__get_actual_name__(queues_topics.get('name'))
+            if not self.__is_name_displayed__(name):
+                self.web_session.logger.error("Display Names - {} Not Displayed.".format(name))
+                return False
+
+        return True
+
+    def __get_actual_name__(self, text):
         # Filter all but the actual Name. Ex: 'Deployment [hawkular-command-gateway-war.war]'
         return re.match(r"[^[]*\[([^]]*)\]", text).groups()[0]
 
@@ -285,4 +318,4 @@ class topology():
 
     def __navigate_to_topology__(self):
         self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Middleware Server Groups', 10)
+        self.ui_utils.waitForTextOnPage('Server Groups', 10)
