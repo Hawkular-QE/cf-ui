@@ -341,7 +341,8 @@ class servers():
         if self.ui_utils.get_elements_containing_text(app_to_undeploy):
             self.ui_utils.click_on_row_containing_text(app_to_undeploy)
         else:
-            self.web_session.logger.info("The archive to undeploy does not exist.")
+            self.web_session.logger.warning("The archive to undeploy does not exist. Expected: {}".format(app_to_undeploy))
+            return True
 
         # Undeploy
         self.undeploy_server_deployment(app_to_undeploy)
@@ -468,7 +469,7 @@ class servers():
 
         el = self.web_driver.find_element_by_id("upload_file")
         el.send_keys(app)
-
+        self.ui_utils.sleep(2)
         self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
         self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
 
