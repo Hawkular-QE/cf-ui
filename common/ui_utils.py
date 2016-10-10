@@ -180,3 +180,6 @@ class ui_utils():
                 self.sleep(1)
 
         assert False, "Timed out waiting for Alert dialog."
+
+    def adjust_screen_resolution(self, horizontal, vertical):
+        self.web_driver.set_window_size(horizontal, vertical)
