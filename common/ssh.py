@@ -79,3 +79,29 @@ class ssh():
         self.web_session.logger.info("Returning pid: {} for process: {}  on ip: {}".format(pid, process_name, self.ip))
 
         return pid
+
+    def get_appliance_version(self):
+        version = None
+        version_file = '/var/www/miq/vmdb/VERSION'
+        command = None
+
+        # First, attempt to 'cat /var/www/miq/vmdb/VERSION'
+        # If 'No such file', then most likely appliance is running in a container. Thus, get version via 'docker cp'
+
+        try:
+            command = 'cat {}'.format(version_file)
+            ssh_result = self.execute_command(command)
+
+            if ssh_result['result'] != 0:
+                if 'No such file or directory' in ssh_result['output']:
+                    command = "docker cp `docker ps | grep cfme |  awk {}`:{} VERSION_CFUI ; cat ./VERSION_CFUI".format("'{ print $1 }'", version_file)
+                    ssh_result = self.execute_command(command)
+                    if ssh_result['result'] == 0:
+                        version = ssh_result["output"]
+            else:
+                version = ssh_result["output"]
+
+        except Exception, e:
+            self.web_session.logger.error('Failed to execute command \"{}\" on IP \"{}\".'.format(command, self.ip))
+
+        return version.rstrip()
