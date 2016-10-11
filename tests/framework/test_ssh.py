@@ -14,7 +14,7 @@ def web_session(request):
 
     return web_session
 
-def _test_cfui_test(web_session):
+def test_cfui_test(web_session):
     server = servers(web_session).find_eap_in_state("running")
     assert server
     
@@ -24,7 +24,7 @@ def _test_cfui_test(web_session):
     web_session.logger.info("result: {}".format(ssh_result.get('result')))
     web_session.logger.info("output: {}".format(ssh_result.get('output')))
 
-def _test_cfui_get_ip(web_session):
+def test_cfui_get_ip(web_session):
     server = servers(web_session).find_non_container_eap_in_state("any")
     assert server
 
