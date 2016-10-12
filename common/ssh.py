@@ -45,7 +45,7 @@ class ssh():
             stdin, stdout, stderr = self.ssh.exec_command(command)
 
             while not stdout.channel.exit_status_ready():
-                self.web_session.logger.info('Exit status not ready after command execute: {}'.format(command))
+                self.web_session.logger.debug('Exit status not ready after command execute: {}'.format(command))
                 ui_utils(self.web_session).sleep(1)
 
             if stdout.channel.exit_status == 0:
