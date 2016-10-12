@@ -25,7 +25,7 @@ class session(properties):
     session_recorder = None
     fixture_request = None
 
-    appliance_version = False
+    appliance_version = None
 
     def __init__(self, login=True, add_provider=True, request = None):
         # call parent method to load properties from files
