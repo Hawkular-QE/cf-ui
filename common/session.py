@@ -7,8 +7,8 @@ import os
 from views.providers import providers
 import logging
 import logging.config
-from selenium.webdriver.remote.remote_connection import LOGGER
 from selenium.webdriver.chrome.options import Options
+from common.ssh import ssh
 
 class session(properties):
 
@@ -24,6 +24,8 @@ class session(properties):
 
     session_recorder = None
     fixture_request = None
+
+    appliance_version = None
 
     def __init__(self, login=True, add_provider=True, request = None):
         # call parent method to load properties from files
@@ -95,6 +97,17 @@ class session(properties):
         self.web_driver.set_window_size(self.BROWSER_WIDTH, self.BROWSER_HEIGHT)
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
         self.web_driver.get(self.MIQ_URL)
+
+        ''' Get Appliance Version - MIQ will be 'master', CFME will be 5.x '''
+        try:
+            # Appliance is running in a container on a Docker server - use SSH creds
+            ssh_session = ssh(self, self.MIQ_HOSTNAME)
+        except:
+            # Appliance is Sprout provisioned running on the Host VM - use MIQ-PASSWORD
+            ssh_session = ssh( self, self.MIQ_HOSTNAME, self.SSH_PORT, self.SSH_USERNAME, self.MIQ_PASSWORD )
+
+        self.appliance_version = ssh_session.get_appliance_version()
+        assert self.appliance_version, "Appliance version not found"
 
         if (self.login):
             miq_login(self).login(self.MIQ_USERNAME, self.MIQ_PASSWORD)
