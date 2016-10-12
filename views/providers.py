@@ -36,56 +36,61 @@ class providers():
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
 
-        elem_config = self.web_driver.find_element_by_xpath("//button[@title='Configuration']")
-        elem_config.click()
-        # assert ui_utils(self.web_session).waitForTextOnPage("Add a New Middleware Provider", 15)
+        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         ui_utils(self.web_session).sleep(2)
         elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a New Middleware Provider']")
         elem_add_new_provider.click()
         self.web_driver.implicitly_wait(15)
-        assert ui_utils(self.web_session).waitForTextOnPage("Confirm Password", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Add New Middleware Provider", 15)
+        ui_utils(self.web_session).sleep(2)
 
-        # Enter the form details and submit to add the provider
+        self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
+
+        if self.web_session.appliance_version == "master":
+            self.submit_provider_form_miq()
+            self.verify_add_provider_success()
+
+        else:
+            self.submit_provider_form_cfme()
+            self.verify_add_provider_success()
+
+    def submit_provider_form_miq(self):
+
+        # Enter the form details and submit if the appliance version is master i.e; ManageIQ upstream.
 
         self.web_driver.find_element_by_xpath("//button[@data-id='server_emstype']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("Hawkular", 30)
         self.web_driver.find_element_by_xpath("//span[contains(.,'Hawkular')]").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("Hostname or IP address", 30)
+        assert ui_utils(self.web_session).waitForTextOnPage("Hostname", 30)
 
         # Enter the name of provider after selecting hawkular type from dropdown to take care of page load issues.
 
-        elem_provider_name = self.web_driver.find_element_by_xpath("//input[@id='name']")
-        elem_provider_name.send_keys(self.provider_name)
-
-        elem_provider_hostname = self.web_driver.find_element_by_xpath("//input[@id='hostname']")
-        elem_provider_hostname.send_keys(self.host_name)
-
-        elem_provider_port = self.web_driver.find_element_by_xpath("//input[@id='port']")
-        elem_provider_port.send_keys(self.port)
-        elem_hawkular_user = self.web_driver.find_element_by_xpath("//input[@id='default_userid']")
-        elem_hawkular_user.send_keys(self.hawkular_user)
-        elem_hawkular_password = self.web_driver.find_element_by_xpath("//input[@id='default_password']")
-        elem_hawkular_password.send_keys(self.hawkular_password)
-        elem_hawkularVerify_password = self.web_driver.find_element_by_xpath("//input[@id='default_verify']")
-        elem_hawkularVerify_password.send_keys(self.hawkular_password)
+        self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys(self.provider_name)
+        self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys(self.host_name)
+        self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(self.port)
+        self.web_driver.find_element_by_xpath("//input[@id='default_userid']").send_keys(self.hawkular_user)
+        self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(self.hawkular_password)
+        self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
         self.web_driver.find_element_by_xpath("//button[@alt='Add this Middleware Provider']").click()
 
-        assert ui_utils(self.web_session).waitForTextOnPage(
-            'Middleware Providers "{}" was saved'.format(self.provider_name), 15)
+    def submit_provider_form_cfme(self):
 
-        if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
-                self.provider_name)):
-            self.web_session.logger.info("Middleware Provider added successfully.")
+        # Enter the form details and submit if the appliance version is CFME Downstream
 
-        # Navigate to the provider details page and check if the last refresh status is - Success.
+        self.web_driver.find_element_by_xpath("//button[@data-id='emstype']").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Hawkular", 30)
+        self.web_driver.find_element_by_xpath("//span[contains(.,'Hawkular')]").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Hostname", 30)
 
-        view(self.web_session).list_View()
-        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
-        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
-
-        assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
-
-        assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
+        self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.provider_name)
+        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys(self.host_name)
+        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.port)
+        self.web_driver.find_element_by_xpath("//input[@id='default_userid']").send_keys(self.hawkular_user)
+        self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(
+            self.hawkular_password)
+        self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
+        self.validate_provider()
+        self.save_provider()
 
     def delete_provider(self, delete_all_providers=True):
 
@@ -110,31 +115,61 @@ class providers():
         elem_editprovider_link = self.web_driver.find_element_by_xpath(
             "//a[contains(.,'Edit Selected Middleware Provider')]")
         elem_editprovider_link.click()
-        assert ui_utils(self.web_session).waitForTextOnPage("Confirm Password", 30)
+        ui_utils(self.web_session).sleep(5)
+        assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
+
+        if self.web_session.appliance_version == "master":
+            self.edit_provider_form_miq_newvalues()
+            self.validate_provider()
+            self.edit_save_miq()
+            self.verify_edit_provider_success_newvalues()
+            self.edit_provider_form_miq_originalvalues()
+            self.validate_provider()
+            self.edit_save_miq()
+            self.verify_edit_provider_success_originalvalues()
+
+        else:
+            self.edit_provider_form_cfme_newvalues()
+            self.validate_provider()
+            self.edit_save_cfme()
+            self.verify_edit_provider_success_newvalues()
+            self.edit_provider_form_cfme_originalvalues()
+            self.validate_provider()
+            self.edit_save_cfme()
+            self.verify_edit_provider_success_originalvalues()
+
+    def edit_provider_form_miq_newvalues(self):
 
         self.web_driver.find_element_by_xpath("//input[@id='name']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys(self.web_session.PROVIDER)
 
         self.web_driver.find_element_by_xpath("//input[@id='hostname']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys("Demo.hawkular.org")
+        self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys("livingontheedge.hawkular.org")
 
         self.web_driver.find_element_by_xpath("//input[@id='port']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(8080)
+        self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(80)
 
-        # Wait till Save button is enabled before click
+    def edit_provider_form_cfme_newvalues(self):
 
-        WebDriverWait(self.web_driver, 30).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
-        self.web_driver.find_element_by_xpath("//button[contains(.,'Save')]").click()
+        self.web_driver.find_element_by_xpath("//input[@id='ems_name']").clear()
+        self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.web_session.PROVIDER)
 
-        assert ui_utils(self.web_session).waitForTextOnPage('Middleware Provider "{}" was saved'.format(self.web_session.PROVIDER), 15)
+        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").clear()
+        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys("livingontheedge.hawkular.org")
+
+        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").clear()
+        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(80)
+
+    def verify_edit_provider_success_newvalues(self):
 
         # Verify if the provider name, hostname and port number is successfully updated and shown in UI
 
         assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(self.web_session.PROVIDER))
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(text(),'Demo')]")
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'8080')]")
+        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(text(),'livingontheedge')]")
+        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'80')]")
         self.web_session.logger.info("The middleware provider is edited successfully.")
+
+    def edit_provider_form_miq_originalvalues(self):
 
         # Edit and save the name, port and number to default value.( This will additionally check edit from the provider details page)
 
@@ -154,13 +189,46 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='port']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(self.web_session.HAWKULAR_PORT)
 
+    def edit_provider_form_cfme_originalvalues(self):
+
+        # Edit and save the name, port and number to default value.( This will additionally check edit from the provider details page)
+
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.PROVIDER)
+
+        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        self.web_driver.find_element_by_xpath("//a[@title='Edit this Middleware Provider']").click()
+        ui_utils(self.web_session).sleep(5)
+        assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
+
+        self.web_driver.find_element_by_xpath("//input[@id='ems_name']").clear()
+        self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.web_session.HAWKULAR_PROVIDER_NAME)
+
+        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").clear()
+        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys(self.web_session.HAWKULAR_HOSTNAME)
+
+        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").clear()
+        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.web_session.HAWKULAR_PORT)
+
+    def edit_save_miq(self):
+
         # Wait till Save button is enabled before click
 
         WebDriverWait(self.web_driver, 30).until(
             EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
         self.web_driver.find_element_by_xpath("//button[contains(.,'Save')]").click()
-        assert ui_utils(self.web_session).waitForTextOnPage(
-            'Middleware Provider "{}" was saved'.format(self.web_session.HAWKULAR_PROVIDER_NAME), 15)
+        assert ui_utils(self.web_session).waitForTextOnPage('saved', 15)
+
+    def edit_save_cfme(self):
+
+        # Wait till Save button is enabled before click
+
+        edit_save_cfme = WebDriverWait(self.web_driver, 30).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@ng-click='saveClicked($event, true)']")))
+        edit_save_cfme.click()
+        assert ui_utils(self.web_session).waitForTextOnPage('saved', 15)
+
+    def verify_edit_provider_success_originalvalues(self):
 
         assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(
             self.web_session.HAWKULAR_PROVIDER_NAME))
@@ -320,3 +388,33 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage("Authentication status will be saved and workers will be restarted for the selected Middleware Provider", 15)
 
         return True
+
+    def verify_add_provider_success(self):
+
+        assert ui_utils(self.web_session).waitForTextOnPage(
+            'Middleware Providers "{}" was saved'.format(self.provider_name), 15)
+
+        if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
+                self.provider_name)):
+            self.web_session.logger.info("Middleware Provider added successfully.")
+
+        # Navigate to the provider details page and check if the last refresh status is - Success.
+
+        view(self.web_session).list_View()
+        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+
+        assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
+
+        assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
+
+    def validate_provider(self):
+        validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
+            (By.XPATH, "//button[@title='Validate the credentials by logging into the Server']")))
+        validate.click()
+        assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
+
+    def save_provider(self):
+        save = WebDriverWait(self.web_driver, 10).until(
+            EC.element_to_be_clickable((By.XPATH, "//button[@ng-click='addClicked($event, true)']")))
+        save.click()
