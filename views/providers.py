@@ -9,6 +9,7 @@ from common.db import db
 
 class providers():
     web_session = None
+    MIQ_BASE_VERSION = "master"
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -46,7 +47,7 @@ class providers():
 
         self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
 
-        if "master" in self.web_session.appliance_version:
+        if self.MIQ_BASE_VERSION in self.web_session.appliance_version:
             self.submit_provider_form_miq()
             self.verify_add_provider_success()
 
@@ -118,7 +119,7 @@ class providers():
         ui_utils(self.web_session).sleep(5)
         assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
 
-        if "master" in self.web_session.appliance_version:
+        if self.MIQ_BASE_VERSION in self.web_session.appliance_version:
             self.edit_provider_form_miq_newvalues()
             self.validate_provider()
             self.edit_save_miq()
