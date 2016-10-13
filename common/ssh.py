@@ -99,10 +99,16 @@ class ssh():
                     ssh_result = self.execute_command(command)
                     if ssh_result['result'] == 0:
                         version = ssh_result["output"]
+                else:
+                    self.web_session.logger.error('Unexpected result while getting appliance version: {}'.
+                                                   format(ssh_result['output']))
             else:
                 version = ssh_result["output"]
 
         except Exception, e:
             self.web_session.logger.error('Failed to execute command \"{}\" on IP \"{}\".'.format(command, self.ip))
 
-        return version.rstrip()
+        version = version.rstrip()
+        self.web_session.logger.debug('Appliance version: {}'.format(version))
+
+        return version
