@@ -108,6 +108,7 @@ class session(properties):
 
         self.appliance_version = ssh_session.get_appliance_version()
         assert self.appliance_version, "Appliance version not found"
+        self.logger.info("MIQ/CFME Version: %s", self.appliance_version)
 
         if (self.login):
             miq_login(self).login(self.MIQ_USERNAME, self.MIQ_PASSWORD)
