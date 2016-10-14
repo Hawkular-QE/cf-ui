@@ -21,3 +21,6 @@ def test_cfui_datasource_list(web_session):
 def test_cfui_datasource_detail(web_session):
     web_session.logger.info("Begin datasource detail page test")
     assert datasources(web_session).validate_datasource_detail()
+
+def test_cfui_validate_datasource_wait_and_creation_times(web_session):
+    web_session.logger.info("EAP Monitoring - Wait and Creation Times (MET-007)")

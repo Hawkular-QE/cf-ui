@@ -56,3 +56,28 @@ class datasources():
             assert dat_details_ui.get('Name') == dat_details_api.get('Name')
 
         return True
+
+    def validate_datasource_wait_and_creation_times(self):
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+
+        # 'server' will be an EAP Domain server
+        self.ui_utils.click_on_row_containing_text('server-one')
+        assert self.ui_utils.waitForTextOnPage("Summary", 10)
+
+        self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
+        self.ui_utils.sleep(1)
+        self.web_driver.find_element_by_id('middleware_datasource_monitoring_choice__middleware_datasource_perf').click()
+        assert self.ui_utils.waitForTextOnPage('Options', 30)
+
+        # Validate that graphs are present
+        assert self.ui_utils.isTextOnPage('Availability')
+        assert self.ui_utils.isTextOnPage('Available')
+        assert self.ui_utils.isTextOnPage('In Use')
+        assert self.ui_utils.isTextOnPage('Time-out')
+
+        assert self.ui_utils.isTextOnPage('Responsiveness')
+        assert self.ui_utils.isTextOnPage('Get Time')
+        assert self.ui_utils.isTextOnPage('Creation Time')
+        assert self.ui_utils.isTextOnPage('Wait Time')
+
+        return True
