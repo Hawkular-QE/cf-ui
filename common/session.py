@@ -100,7 +100,7 @@ class session(properties):
 
         ''' Get Appliance Version - MIQ will be 'master', CFME will be 5.x '''
         try:
-            # Appliance is running in a container on a Docker server - use SSH creds
+            # Appliance is running on a Forman provisioned vm or in a container on a Docker server - use SSH creds
             ssh_session = ssh(self, self.MIQ_HOSTNAME)
         except:
             # Appliance is Sprout provisioned running on the Host VM - use MIQ-PASSWORD
