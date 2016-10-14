@@ -21,3 +21,7 @@ def test_cfui_validate_messagings_view(web_session):
 def test_cfui_message_details(web_session):
     web_session.logger.info("Begin validate Message Details")
     assert messagings(web_session).validate_messageing_details()
+
+def test_cfui_validate_eap_jms_queues(web_session):
+    web_session.logger.info("Begin validate EAP JMS Queues (INV-011a).")
+    assert messagings(web_session).validate_eap_jms_queues()
