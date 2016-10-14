@@ -9,7 +9,7 @@ class monitoring():
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
 
-    def validate_provider_monitoring(self):
+    def validate_provider_monitoring_timelines(self):
         self.web_session.web_driver.get("{}/ems_middleware/show_list".format(self.web_session.MIQ_URL))
         view(self.web_session).list_View()
 
@@ -25,7 +25,7 @@ class monitoring():
 
         return True
 
-    def validate_servers_monitoring(self):
+    def validate_servers_monitoring_utilization(self):
         self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text('server-one')
@@ -43,7 +43,7 @@ class monitoring():
 
         return True
 
-    def validate_messagings_monitoring(self):
+    def validate_messagings_monitoring_utilization(self):
         self.web_session.web_driver.get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text('JMS Queue')
@@ -60,7 +60,7 @@ class monitoring():
 
         return True
 
-    def validate_datasources_monitoring(self):
+    def validate_datasources_monitoring_utilization(self):
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         # 'server' will be an EAP Domain server
