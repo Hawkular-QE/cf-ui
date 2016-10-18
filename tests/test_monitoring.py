@@ -13,7 +13,7 @@ def web_session(request):
 
     return web_session
 
-def test_provider_monitoring_timelines(web_session):
+def test_cfui_provider_monitoring_timelines(web_session):
     web_session.logger.info("Provider Monitoring Timelines")
     assert monitoring(web_session).validate_provider_monitoring_timelines()
 
