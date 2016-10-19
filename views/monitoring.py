@@ -25,7 +25,7 @@ class monitoring():
 
         return True
 
-    def validate_servers_monitoring_utilization(self):
+    def validate_eap_servers_monitoring_utilization(self):
         self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text('server-one')
@@ -40,6 +40,11 @@ class monitoring():
         assert self.ui_utils.isTextOnPage('JVM Heap Usage (Bytes)')
         assert self.ui_utils.isTextOnPage('Non Heap Usage (Bytes)')
         assert self.ui_utils.isTextOnPage('GC Duration (ms)')
+        assert self.ui_utils.isTextOnPage('Web Sessions')
+        assert self.ui_utils.isTextOnPage('Active')
+        assert self.ui_utils.isTextOnPage('Expired')
+        assert self.ui_utils.isTextOnPage('Rejected')
+        assert self.ui_utils.isTextOnPage('Transactions')
 
         return True
 
