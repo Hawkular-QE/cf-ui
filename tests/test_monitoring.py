@@ -21,10 +21,14 @@ def test_cfui_servers_monitoring_utilization(web_session):
     web_session.logger.info("Servers Monitoring Utilization")
     assert monitoring(web_session).validate_servers_monitoring_utilization()
 
-def test_cfui_messagings_monitoring_utilization(web_session):
-    web_session.logger.info("Messaging Monitoring Utilization")
-    assert monitoring(web_session).validate_messagings_monitoring_utilization()
+def test_cfui_messagings_monitoring_utilization_jms_queues(web_session):
+    web_session.logger.info("EAP Monitoring Utilization - JMS Queues (MET-008)")
+    assert monitoring(web_session).validate_messagings_monitoring_utilization_jms_queues()
+
+def test_cfui_messagings_monitoring_utilization_jms_topics(web_session):
+    web_session.logger.info("EAP Monitoring Utilization - JMS Topoics (MET-009)")
+    assert monitoring(web_session).validate_messagings_monitoring_utilization_jms_topics()
 
 def test_cfui_datasources_monitoring_utilization(web_session):
-    web_session.logger.info("EAP Monitoring Utilization- Wait and Creation Times (MET-007)")
+    web_session.logger.info("EAP Monitoring Utilization - Wait and Creation Times (MET-006 and MET-007)")
     assert monitoring(web_session).validate_datasources_monitoring_utilization()
