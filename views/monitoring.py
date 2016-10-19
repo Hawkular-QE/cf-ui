@@ -43,7 +43,7 @@ class monitoring():
 
         return True
 
-    def validate_messagings_monitoring_utilization(self):
+    def validate_messagings_monitoring_utilization_jms_queues(self):
         self.web_session.web_driver.get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text('JMS Queue')
@@ -56,7 +56,26 @@ class monitoring():
 
         # Validate that graphs are present
         assert self.ui_utils.isTextOnPage('Messages')
+
         assert self.ui_utils.isTextOnPage('Consumers')
+
+        return True
+
+    def validate_messagings_monitoring_utilization_jms_topics(self):
+        self.web_session.web_driver.get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+
+        self.ui_utils.click_on_row_containing_text('JMS Topic')
+        assert self.ui_utils.waitForTextOnPage("Summary", 10)
+
+        self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
+        self.ui_utils.sleep(1)
+        self.web_driver.find_element_by_id('middleware_messaging_monitoring_choice__middleware_messaging_perf').click()
+        assert self.ui_utils.waitForTextOnPage('Options', 30)
+
+        # Validate that graphs are present
+        assert self.ui_utils.isTextOnPage('Messages')
+
+        assert self.ui_utils.isTextOnPage('Subscriptors')
 
         return True
 
