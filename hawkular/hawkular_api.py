@@ -6,8 +6,11 @@ class hawkular_api():
 
     def __init__(self, web_session):
         self.web_session = web_session
-        self.__hawkular__ = Hawkular(hostname=web_session.HAWKULAR_HOSTNAME, port=web_session.HAWKULAR_PORT,
+        try:
+            self.__hawkular__ = Hawkular(hostname=web_session.HAWKULAR_HOSTNAME, port=web_session.HAWKULAR_PORT,
                                      username=web_session.HAWKULAR_USERNAME, password=web_session.HAWKULAR_PASSWORD)
+        except Exception, e:
+            raise Exception(e)
 
     # Hide the Hawkular object, but provide ability to get and use if need be
     def get_hawkular(self):
