@@ -18,7 +18,7 @@ def test_cfui_provider_monitoring_timelines(web_session):
     assert monitoring(web_session).validate_provider_monitoring_timelines()
 
 def test_cfui_eap_servers_monitoring_utilization(web_session):
-    web_session.logger.info("Servers Monitoring Utilization - Middlware Server (MET-005)")
+    web_session.logger.info("Servers Monitoring Utilization - Middlware Server (MET-003 and MET-005)")
     assert monitoring(web_session).validate_eap_servers_monitoring_utilization()
 
 def test_cfui_messagings_monitoring_utilization_jms_queues(web_session):

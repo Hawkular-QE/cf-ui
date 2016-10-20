@@ -44,7 +44,14 @@ class monitoring():
         assert self.ui_utils.isTextOnPage('Active')
         assert self.ui_utils.isTextOnPage('Expired')
         assert self.ui_utils.isTextOnPage('Rejected')
+
         assert self.ui_utils.isTextOnPage('Transactions')
+        assert self.ui_utils.isTextOnPage('Committed')
+        assert self.ui_utils.isTextOnPage('Timed-out')
+        assert self.ui_utils.isTextOnPage('Heuristic')
+        assert self.ui_utils.isTextOnPage('Aborted')
+        assert self.ui_utils.isTextOnPage('Application Failure')
+        assert self.ui_utils.isTextOnPage('Resource Failure')
 
         return True
 
