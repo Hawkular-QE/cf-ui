@@ -167,6 +167,21 @@ class ui_utils():
 
         return None
 
+    # Ex: [{'column_name':'Feed', 'value':'Feed Value'},{'column_name':'Server Name', 'value':'Server Name Value')}]
+    def find_row_in_list_by_multi_value(self, list, key_value_pairs):
+
+        for row in list:
+            count = 0
+            for pair in key_value_pairs:
+                if pair.get('value') not in row.get(pair.get('column_name')):
+                    break
+
+                count += 1
+                if count == len(key_value_pairs):
+                    return row
+
+        return None
+
     def accept_alert(self, waitTime):
         currentTime = time.time()
 

@@ -1,5 +1,5 @@
 from common.ui_utils import ui_utils
-from parsing.table import table
+#from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
 from selenium.webdriver.common.by import By
 import os
@@ -43,7 +43,8 @@ class servers():
         origValue = -1
         server = None
 
-        servers_ui = table(self.web_session).get_middleware_servers_table()
+        self.web_session.web_driver.get("{}/middleware_serve/show_list".format(self.web_session.MIQ_URL))
+        servers_ui = self.ui_utils.get_list_table()
         assert servers_ui, "No servers found."
 
         if server_type == 'provider':
@@ -130,7 +131,9 @@ class servers():
 
     def validate_servers_list(self):
         servers_db = None
-        servers_ui = table(self.web_session).get_middleware_servers_table()
+        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.waitForTextOnPage('Middleware Servers', 10)
+        servers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
 
         if self.db:
@@ -140,13 +143,15 @@ class servers():
             assert len(servers_ui) == len(servers_hawk), "Servers lists size mismatch."
 
         for serv_ui in servers_ui:
-            serv_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', serv_ui.get('Feed'))
+            vals = [{'column_name':'Feed', 'value':serv_ui.get('Feed')},
+                    {'column_name':'Server Name', 'value':serv_ui.get('Server Name')}]
+            serv_hawk = self.ui_utils.find_row_in_list_by_multi_value(servers_hawk, vals)
 
             assert serv_hawk, "Feed {} not found in Hawkular Server".format(serv_ui.get('Feed'))
-            assert (serv_ui.get('Host Name') == serv_hawk.get("details").get("Hostname")), \
-                "Host Name mismatch ui:{}, hawk:{}".format(serv_ui.get('Feed'), serv_hawk.get("details").get("Hostname"))
-            assert (serv_ui.get('Product') == serv_hawk.get("details").get("Product Name")), \
-                "Product mismatch ui:{}, hawk:{}".format(serv_ui.get('Product'), serv_hawk.get("Product Name"))
+            # BZ 1376929 assert (serv_ui.get('Host Name') == serv_hawk.get("details").get("Hostname")), \
+            #    "Host Name mismatch ui:{}, hawk:{}".format(serv_ui.get('Feed'), serv_hawk.get("details").get("Hostname"))
+            # BZ 1376929 assert (serv_ui.get('Product') == serv_hawk.get("details").get("Product Name")), \
+            #    "Product mismatch ui:{}, hawk:{}".format(serv_ui.get('Product'), serv_hawk.get("Product Name"))
 
         return True
 
@@ -290,7 +295,7 @@ class servers():
 
         feed = eap_hawk.get('Feed') # Unique server id
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_servers/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
         self.ui_utils.waitForTextOnPage("Properties", 15)
