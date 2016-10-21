@@ -159,7 +159,7 @@ class ui_utils():
 
         return None
 
-    # Given a list of directories, dictionary key, and value to search - find a specific row
+    # Given a list of directories, dictionary key and value - find a specific row
     def find_row_in_list(self, list, key, value):
         for row in list:
             if value in row.get(key):
