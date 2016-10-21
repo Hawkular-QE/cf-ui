@@ -7,6 +7,10 @@ class hawkular_api():
     def __init__(self, web_session):
         self.web_session = web_session
         try:
+            self.web_session.logger.info("hostname: {}, port: {}, username: {}, password: {}"
+                                         .format(web_session.HAWKULAR_HOSTNAME, web_session.HAWKULAR_PORT,
+                                                 web_session.HAWKULAR_USERNAME, web_session.HAWKULAR_PASSWORD))
+
             self.__hawkular__ = Hawkular(hostname=web_session.HAWKULAR_HOSTNAME, port=web_session.HAWKULAR_PORT,
                                      username=web_session.HAWKULAR_USERNAME, password=web_session.HAWKULAR_PASSWORD)
         except Exception, e:
