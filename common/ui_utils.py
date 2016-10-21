@@ -185,7 +185,6 @@ class ui_utils():
     def accept_alert(self, waitTime):
         currentTime = time.time()
 
-        print time.time() - currentTime
         while (time.time() - currentTime < waitTime):
             try:
                 self.web_driver.switch_to_alert().accept()
