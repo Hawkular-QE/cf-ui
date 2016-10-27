@@ -4,8 +4,6 @@ from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 from views.servers import servers
 from common.view import view
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.by import By
 
 class timelines():
     web_session = None
@@ -33,13 +31,17 @@ class timelines():
             servers(self.web_session).deploy_application_archive()
 
         self.navigate_to_timeline()
+        self.select_timepivot()
         self.select_event_group('Application')
-        self.change_level('Detail')
+        self.change_level()
+        self.apply()
         self.verify_event('ok')
 
         return True
 
     def test_event_for_unsuccessful_deployment(self):
+
+        # Existing issue: https://bugzilla.redhat.com/show_bug.cgi?id=1388040
 
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
@@ -53,8 +55,9 @@ class timelines():
         servers(self.web_session).add_server_deployment(self.TextFile)
 
         self.navigate_to_timeline()
+        self.select_timepivot()
         self.select_event_group('Application')
-        self.change_level('Summary')
+        self.apply()
         self.verify_event('error')
 
         return True
@@ -63,26 +66,29 @@ class timelines():
 
         # Select group from timeline ex: Application
 
-        if ui_utils(self.web_session).isElementPresent(By.XPATH, "//button[@data-dismiss='alert']"):
-            self.web_session.logger.info("Alert is present on the page.")
-            self.web_driver.find_element_by_xpath("//button[@data-dismiss='alert']").click()
-            ui_utils(self.web_session).sleep(30)
-        else:
-            ui_utils(self.web_session).sleep(30)
-
-        self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_fl_grp1')]").click()
-        self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(group)).click()
-        ui_utils(self.web_session).sleep(30)
+        assert self.ui_utils.waitForTextOnPage("Options", 15)
+        self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_category_management')]").click()
+        self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group)).click()
+        ui_utils(self.web_session).sleep(5)
         return True
 
-    def change_level(self, level):
+    def change_level(self):
 
-        # Select the level either 'Detail' or 'Summary'
+        # Check the 'Show Detailed Events' checkbox
 
-        self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_fl_typ')]").click()
-        self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(level)).click()
-        ui_utils(self.web_session).sleep(30)
-        return True
+        self.web_driver.find_element_by_xpath("//input[@name='showDetailedEvents']").click()
+
+    def select_timepivot(self):
+
+        # Select the 'starting' week
+
+        self.web_driver.find_element_by_xpath("//button[@data-id='tl_timepivot']").click()
+        self.web_driver.find_element_by_xpath("//span[contains(.,'starting')]").click()
+
+    def apply(self):
+
+        self.web_driver.find_element_by_xpath("//div[@ng-click='applyButtonClicked()']").click()
+        ui_utils(self.web_session).sleep(10)
 
     def navigate_to_timeline(self):
 
@@ -90,15 +96,13 @@ class timelines():
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
         self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]").click()
-        ui_utils(self.web_session).sleep(30)
+        ui_utils(self.web_session).sleep(5)
 
     def verify_event(self, event_type):
 
         # Verify event where type for successful event is 'ok' and for unsuccessful event is 'error'
 
-        eap = servers(self.web_session).find_non_container_eap_in_state("running")
-        eap_name = eap.get('Server Name')
-        assert self.ui_utils.refresh_until_text_appears('{}'.format(eap_name), 300)
-        self.web_driver.find_element_by_xpath("//span[contains(.,'{}')]".format(eap_name)).click()
+        self.web_driver.find_element_by_xpath(
+            "//*[@id = 'chart_placeholder']/div[1]/*[name() = 'svg']/*[name() = 'g'][4]/*[name() = 'g'][1]/* [name() = 'text']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 15)
         return True
