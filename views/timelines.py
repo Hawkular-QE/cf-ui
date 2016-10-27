@@ -31,9 +31,9 @@ class timelines():
             servers(self.web_session).deploy_application_archive()
 
         self.navigate_to_timeline()
+        self.select_timepivot()
         self.select_event_group('Application')
         self.change_level()
-        self.select_timepivot()
         self.apply()
         self.verify_event('ok')
 
@@ -55,8 +55,8 @@ class timelines():
         servers(self.web_session).add_server_deployment(self.TextFile)
 
         self.navigate_to_timeline()
-        self.select_event_group('Application')
         self.select_timepivot()
+        self.select_event_group('Application')
         self.apply()
         self.verify_event('error')
 

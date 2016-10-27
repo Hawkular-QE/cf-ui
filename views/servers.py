@@ -1,7 +1,9 @@
 from common.ui_utils import ui_utils
 #from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
+from views.providers import providers
 from selenium.webdriver.common.by import By
+from common.view import view
 import os
 import time
 from common.db import db
@@ -321,6 +323,7 @@ class servers():
         self.ui_utils.waitForTextOnPage('Version', 15)
 
         self.add_server_deployment(self.APPLICATION_WAR)
+        self.navigate_and_refresh_provider()
 
         # Validate UI
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
@@ -351,6 +354,7 @@ class servers():
 
         # Undeploy
         self.undeploy_server_deployment(app_to_undeploy)
+        self.navigate_and_refresh_provider()
 
         # Validate that application is "Removed from the deployments list"
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
@@ -362,7 +366,7 @@ class servers():
 
         return True
 
-    def redeploy_application_archive(self, app_to_redeploy=APPLICATION_WAR):
+    def restart_application_archive(self, app_to_redeploy=APPLICATION_WAR):
 
         # Find EAP with application to redeploy
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
@@ -374,15 +378,17 @@ class servers():
 
         # Redeploy
 
-        self.redeploy_server_deployment(app_to_redeploy)
+        self.restart_server_deployment(app_to_redeploy)
+        self.navigate_and_refresh_provider()
 
         # Validate that application status is enabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/9876, Issue#10138 )
-
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.click_on_row_containing_text(app_to_redeploy)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         return True
 
-    def stop_application_archive(self, app_to_stop=APPLICATION_WAR):
+    def disable_application_archive(self, app_to_stop=APPLICATION_WAR):
 
         # Find EAP with application to stop
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
@@ -391,15 +397,17 @@ class servers():
 
         # Stop the application archive
 
-        self.stop_server_deployment(app_to_stop)
+        self.disable_server_deployment(app_to_stop)
+        self.navigate_and_refresh_provider()
 
         # Validate that application status is Disabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
-
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.click_on_row_containing_text(app_to_stop)
         assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
         return True
 
-    def start_application_archive(self, app_to_start=APPLICATION_WAR):
+    def enable_application_archive(self, app_to_start=APPLICATION_WAR):
 
         # Find EAP with application to start
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
@@ -408,11 +416,13 @@ class servers():
 
         # Start the application archive
 
-        self.start_server_deployment(app_to_start)
+        self.enable_server_deployment(app_to_start)
+        self.navigate_and_refresh_provider()
 
         # Validate that application status is Enabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
-
+        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.click_on_row_containing_text(app_to_start)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         return True
 
@@ -486,29 +496,29 @@ class servers():
         self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
 
-    def redeploy_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
+    def restart_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
         self.web_session.logger.info("Redeploying App: {}".format(app_to_redeploy))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id(
-            'middleware_deployment_deploy_choice__middleware_deployment_redeploy').click()
+            'middleware_deployment_deploy_choice__middleware_deployment_restart').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Redeployment initiated for selected deployment(s)', 15)
 
-    def stop_server_deployment(self, app_to_stop=APPLICATION_WAR):
+    def disable_server_deployment(self, app_to_stop=APPLICATION_WAR):
         self.web_session.logger.info("Stopping App: {}".format(app_to_stop))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id(
-            'middleware_deployment_deploy_choice__middleware_deployment_stop').click()
+            'middleware_deployment_deploy_choice__middleware_deployment_disable').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Stop initiated for selected deployment(s)', 15)
 
-    def start_server_deployment(self, app_to_start=APPLICATION_WAR):
+    def enable_server_deployment(self, app_to_start=APPLICATION_WAR):
         self.web_session.logger.info("Starting App: {}".format(app_to_start))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
         self.web_driver.find_element_by_id(
-            'middleware_deployment_deploy_choice__middleware_deployment_start').click()
+            'middleware_deployment_deploy_choice__middleware_deployment_enable').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
         self.ui_utils.waitForTextOnPage('Start initiated for selected deployment(s)', 15)
@@ -539,3 +549,10 @@ class servers():
                     time.sleep(2)
 
         return True
+
+    def navigate_and_refresh_provider(self):
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        view(self.web_session).list_View()
+        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+        providers(self.web_session).refresh_provider()
+
