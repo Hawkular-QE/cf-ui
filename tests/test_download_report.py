@@ -6,6 +6,7 @@ import glob
 import fnmatch
 from common.ui_utils import ui_utils
 from common.view import view
+from views.domains import domains
 
 @pytest.fixture (scope='session')
 def web_session(request):
@@ -169,6 +170,41 @@ def test_cfui_messaging_detail_download_pdf(web_session):
 
     assert_pdf_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Messaging*'))
 
+def test_cfui_server_groups(web_session):
+    web_session.logger.info("Begin download Server Groups PDF text")
+    utils = ui_utils(web_session)
+
+    nav_to_server_groups(web_session)
+    utils.web_driver.find_element_by_xpath('.//*[@title="Download"]').click()
+    utils.sleep(2)
+    utils.web_driver.find_element_by_id('download_choice__download_pdf').click()
+    utils.sleep(5)
+    assert_pdf_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server Groups*'))
+
+def test_cfui_server_groups_detail(web_session):
+    web_session.logger.info("Begin download Server Groups Detail PDF text")
+    utils = ui_utils(web_session)
+
+    nav_to_server_groups(web_session)
+    servers = utils.get_list_table()
+    utils.click_on_row_containing_text(servers[0].get('Server Group Name'))
+    utils.waitForTextOnPage("Properties", 5)
+
+    assert download_report(web_session, '').pdf_format()
+
+    assert_pdf_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server Group*'))
+
+
 def assert_pdf_download_exist(file):
     r = glob.glob(file)
     assert fnmatch.filter(r, '*.pdf')
+
+def nav_to_server_groups(web_session):
+    utils = ui_utils(web_session)
+    web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
+    domains_ui = utils.get_list_table()
+    if not domains_ui:
+        web_session.logger.warning("No Domains found")
+        pass
+
+    domains(web_session).nav_to_all_middleware_server_groups(domains_ui[0].get('Domain Name'))
