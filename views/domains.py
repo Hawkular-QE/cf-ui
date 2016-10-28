@@ -113,14 +113,7 @@ class domains():
             self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
             assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
-            self.ui_utils.click_on_row_containing_text(domain.get('Domain Name'))
-
-            try:
-                self.ui_utils.get_elements_containing_text('Middleware Server Groups')[0].click()
-            except Exception, e:
-                raise Exception(e)
-
-            self.ui_utils.waitForTextOnPage("All Middleware Server Groups", 15)
+            self.nav_to_all_middleware_server_groups(domain.get('Domain Name'))
 
             server_groups_ui = self.ui_utils.get_list_table()
             server_groups_hawk = self.hawkular_api.get_hawkular_server_groups(domain.get('Feed'))
@@ -139,3 +132,14 @@ class domains():
                 self.web_driver.back()
 
         return True
+
+    def nav_to_all_middleware_server_groups(self, domain):
+
+        self.ui_utils.click_on_row_containing_text(domain)
+
+        try:
+            self.ui_utils.get_elements_containing_text('Middleware Server Groups')[0].click()
+        except Exception, e:
+            raise Exception(e)
+
+        self.ui_utils.waitForTextOnPage("All Middleware Server Groups", 15)
