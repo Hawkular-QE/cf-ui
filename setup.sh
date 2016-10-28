@@ -25,13 +25,13 @@ pip install pycurl
 
 pip install mgmtsystem==1.4.10
 
+## End - Install mgmtsystem
+
 # setup test recorder
 pip install http://pypi.python.org/packages/source/v/vnc2flv/vnc2flv-20100207.tar.gz
 mkdir records
 
 # setup flv2gif converter
 pip install moviepy
-
-## End - Install mgmtsystem
 
 echo -e "\nSetup Complete."
