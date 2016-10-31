@@ -138,6 +138,6 @@ class session(properties):
             self.session_recorder.stop()
         if not "True" in self.KEEP_BROWSER_RUNNING:
             # close browser window
-            self.web_driver.close()
+            # self.web_driver.close()
             # close browser windows & exit webdriver
             self.web_driver.quit()
