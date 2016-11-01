@@ -1,6 +1,7 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
+import time
 
 class datasources():
     web_session = None
@@ -54,5 +55,112 @@ class datasources():
             self.web_session.logger.info("dat_details_api: {}".format(dat_details_api))
 
             assert dat_details_ui.get('Name') == dat_details_api.get('Name')
+
+        return True
+
+    def delete_datasource_list_view(self):
+        datasource_to_delete = 'Example'
+
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        datasources = self.ui_utils.get_list_table_as_elements()
+        currrent_datasource_count = len(datasources)
+
+        if not datasources:
+            self.web_session.logger.warn("No Datasource found.")
+            return True
+
+        for row in datasources:
+            datasource = self.ui_utils.find_row_in_element_table_by_text(datasources, datasource_to_delete)
+            datasource_name = datasource[2].text
+            server = datasource[3].text
+            host_name = datasource[4].text
+
+            self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
+                                          format(datasource_name, server, host_name))
+
+            # Select checkbox
+            datasource[0].click()
+            self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
+            self.ui_utils.sleep(1)
+            self.ui_utils.web_driver.find_element_by_id(
+                'middleware_datasource_operations_choice__middleware_datasource_remove').click()
+            self.ui_utils.accept_alert(5)
+
+            # Hawkular Datasources can not be deleted
+            try:
+                if not self.ui_utils.waitForTextOnPage('datasources were removed', 5):
+                    self.web_session.logger.warn("Datasource Note Removed: Name: {}  Server: {}  Host Name: {}".
+                                                  format(datasource_name, server, host_name))
+                    # Deselect checkbox
+                    datasource[0].click()
+                    raise
+                break
+            except:
+                assert self.ui_utils.waitForTextOnPage('Not removed datasources for {} on the provider itself'.
+                                                       format(datasource_name), 5)
+                datasources.remove(datasource)
+
+        assert self.wait_for_datasource_to_be_deleted(currrent_datasource_count, (60 * 5))
+
+        return True
+
+    def delete_datasource_detail_view(self, list_view=True):
+        index = 0
+
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        datasources = self.ui_utils.get_list_table_as_elements()
+        currrent_datasource_count = len(datasources)
+
+        if not datasources:
+            self.web_session.logger.warn("No Datasource found.")
+            return True
+
+        for row in datasources:
+            datasource = datasources[index]
+            datasource_name = datasource[2].text
+            server = datasource[3].text
+            host_name = datasource[4].text
+
+            self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
+                                         format(datasource_name, server, host_name))
+
+            # Click on Datasource to get to Detail view
+            datasource[2].click()
+
+            # Operations will not be present for a Datasource on a Provider
+            try:
+                self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
+                self.ui_utils.sleep(1)
+                self.ui_utils.web_driver.find_element_by_id(
+                    'middleware_datasource_operations_choice__middleware_datasource_remove').click()
+                self.ui_utils.accept_alert(5)
+
+                assert self.ui_utils.waitForTextOnPage('datasources were removed', 5)
+                break
+            except:
+                self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+                datasources = self.ui_utils.get_list_table_as_elements()
+                index += 1
+                continue;
+
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        assert self.wait_for_datasource_to_be_deleted(currrent_datasource_count, (60 * 5))
+
+        return True
+
+    def wait_for_datasource_to_be_deleted(self, starting_count, time_to_wait):
+
+        currentTime = time.time()
+
+        while True:
+            if len(self.ui_utils.get_list_table_as_elements()) < starting_count:
+                break
+
+            if time.time() - currentTime >= time_to_wait:
+                self.web_session.logger.error("Timed out waiting for Datasource to be Deleted in Datasource List.")
+                return False
+
+            time.sleep(2)
+            self.web_driver.refresh()
 
         return True

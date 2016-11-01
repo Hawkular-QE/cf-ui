@@ -21,3 +21,11 @@ def test_cfui_datasource_list(web_session):
 def test_cfui_datasource_detail(web_session):
     web_session.logger.info("Begin datasource detail page test")
     assert datasources(web_session).validate_datasource_detail()
+
+def test_cfui_delete_datasource_list_view(web_session):
+    web_session.logger.info("Begin List view delete datasource test - OPR-036a")
+    assert datasources(web_session).delete_datasource_list_view()
+
+def test_cfui_delete_datasource_detail_view(web_session):
+    web_session.logger.info("Begin Detail view delete datasource test - OPR-036a")
+    assert datasources(web_session).delete_datasource_detail_view()

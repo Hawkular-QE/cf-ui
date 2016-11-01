@@ -118,6 +118,24 @@ class ui_utils():
 
         return dict
 
+    def get_list_table_as_elements(self):
+        table = []
+        for tr in self.web_driver.find_elements_by_xpath('.//tr'):
+            tds = tr.find_elements_by_tag_name('td')
+            if tds:
+                table.append(tds)
+
+        return table
+
+    def find_row_in_element_table_by_text(self, table, value):
+        for row in table:
+            for el in row:
+                if value in el.text:
+                    # self.web_session.logger.info("Found row with text: %s", value)
+                    return row
+
+        return None
+
     # Refresh the page and wait till expected text appears on the page
 
     def refresh_until_text_appears(self, text, waitTime):
