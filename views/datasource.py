@@ -70,23 +70,33 @@ class datasources():
 
         for row in datasources:
             datasource = self.ui_utils.find_row_in_element_table_by_text(datasources, datasource_to_delete)
+            datasource_name = datasource[2].text
+            server = datasource[3].text
+            host_name = datasource[4].text
+
+            self.web_session.logger.info("About to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
+                                          format(datasource_name, server, host_name))
 
             # Select checkbox
             datasource[0].click()
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
             self.ui_utils.sleep(1)
-            self.ui_utils.web_driver.find_element_by_id('middleware_datasource_operations_choice__middleware_datasource_remove').click()
+            self.ui_utils.web_driver.find_element_by_id(
+                'middleware_datasource_operations_choice__middleware_datasource_remove').click()
             self.ui_utils.accept_alert(5)
 
             # Hawkular Datasources can not be deleted
             try:
                 if not self.ui_utils.waitForTextOnPage('datasources were removed', 5):
+                    self.web_session.logger.warn("Datasource Note Removed: Name: {}  Server: {}  Host Name: {}".
+                                                  format(datasource_name, server, host_name))
                     # Deselect checkbox
                     datasource[0].click()
                     raise
                 break
             except:
-                assert self.ui_utils.waitForTextOnPage('Not removed', 5)
+                assert self.ui_utils.waitForTextOnPage('Not removed datasources for {} on the provider itself'.
+                                                       format(datasource_name), 5)
                 datasources.remove(datasource)
 
         return True
