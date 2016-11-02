@@ -39,13 +39,13 @@ def test_cfui_eap_power_restart(web_session):
     web_session.logger.info("Begin Server Restart")
     assert servers(web_session).eap_power_restart()
 
-def test_cfui_eap_power_suspend(web_session):
-    web_session.logger.info("Begin Server Suspend - OPR-005")
+def test_cfui_eap_operation_suspend(web_session):
+    web_session.logger.info("Begin Server Suspend (OPR-005)")
     assert servers(web_session).eap_power_suspend()
 
-def test_cfui_eap_power_resume(web_session):
-    web_session.logger.info("Begin Server Resume - OPR-006")
-    assert servers(web_session).eap_power_resume()
+def test_cfui_eap_operation_resume(web_session):
+    web_session.logger.info("Begin Server Resume (OPR-006)")
+    assert servers(web_session).eap_powePastr_resume()
 
 # EAP Power Not fully functional, as of yet
 
@@ -73,8 +73,3 @@ def test_cfui_stop_application_archive(web_session):
 
 def test_cfui_start_application_archive(web_session):
     assert servers(web_session).enable_application_archive()
-
-# Add JDBC Driver
-def test_cfui_add_jdbc_driver(web_session):
-    web_session.logger.info("Begin Add JDBC driver test - Operations: OPR-034a")
-    assert servers(web_session).add_jdbc_driver()

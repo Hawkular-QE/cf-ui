@@ -15,7 +15,7 @@ def web_session(request):
     return web_session
 
 def test_cfui_deployment_details(web_session):
-    web_session.logger.info("Begin deployment details test")
+    web_session.logger.info("Begin deployment details test (INV-011c)")
     assert deployments(web_session).validate_deployment_details()
 
 def test_cfui_deployment_list(web_session):
