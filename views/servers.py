@@ -29,6 +29,13 @@ class servers():
     APPLICATION_WAR = "cfui_test_war.war"
     APPLICATION_JAR = "cfui_test_jar.jar"
     APPLICATION_EAR = "cfui_test_ear.ear"
+    JDBCDriver = "mysql-connector-java-5.1.36-bin.jar"
+    JDBCDriver_Name = "MySQLDriver"
+    JDBCDriver_Module_Name = "com.mysql.driver"
+    JDBCDriver_Class_Name = "com.mysql.jdbc.Driver"
+    JDBCDriver_Major_Version = "5"
+    JDBCDriver_Minor_Version = "1"
+
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -556,3 +563,43 @@ class servers():
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         providers(self.web_session).refresh_provider()
 
+    def add_jdbc_driver(self):
+
+        # Adds MySQL JDBC driver to EAP server and validates success message in UI
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        # Find running EAP server
+        eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.deploy_jdbc_driver(self.JDBCDriver)
+        self.navigate_and_refresh_provider()
+
+        # TODO : Validate if added JDBC driver is available while creating the datasource
+        # Reference bug: https://bugzilla.redhat.com/show_bug.cgi?id=1383426
+
+        return True
+
+    def deploy_jdbc_driver(self, app_to_add = JDBCDriver):
+        app = "{}/data/{}".format(os.getcwd(), app_to_add)
+        self.web_session.logger.info("Adding MySQL JDBC Driver: {}".format(app))
+
+        self.web_driver.find_element_by_xpath("//button[@title='JDBC Drivers']").click()
+        self.web_driver.find_element_by_id('middleware_server_jdbc_drivers_choice__middleware_jdbc_driver_add').click()
+        self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
+
+        el = self.web_driver.find_element_by_id("jdbc_driver_file")
+        el.send_keys(app)
+        self.ui_utils.sleep(2)
+        self.web_driver.find_element_by_id("jdbc_driver_name_input").send_keys(self.JDBCDriver_Name)
+        self.web_driver.find_element_by_id("jdbc_module_name_input").send_keys(self.JDBCDriver_Module_Name)
+        self.web_driver.find_element_by_id("jdbc_driver_class_input").send_keys(self.JDBCDriver_Class_Name)
+        self.web_driver.find_element_by_id("major_version_input").send_keys(self.JDBCDriver_Major_Version)
+        self.web_driver.find_element_by_id("minor_version_input").send_keys(self.JDBCDriver_Minor_Version)
+
+        self.web_driver.find_element_by_xpath("//button[@ng-click='addJdbcDriver()']").click()
+        self.ui_utils.waitForTextOnPage('JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 90)
