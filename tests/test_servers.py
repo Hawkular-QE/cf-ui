@@ -40,7 +40,7 @@ def test_cfui_eap_power_restart(web_session):
     assert servers(web_session).eap_power_restart()
 
 def test_cfui_eap_operation_suspend(web_session):
-    web_session.logger.info("Begin Server Suspend (OPR-005)")
+    web_session.logger.info("Begin Server Suspend (OPR-005 and OPR-007)")
     assert servers(web_session).eap_power_suspend()
 
 def test_cfui_eap_operation_resume(web_session):
@@ -69,7 +69,9 @@ def test_cfui_redeploy_application_archive(web_session):
     assert servers(web_session).restart_application_archive()
 
 def test_cfui_stop_application_archive(web_session):
+    web_session.logger.info("Begin Stop Application Archive (OPR-03)")
     assert servers(web_session).disable_application_archive()
 
 def test_cfui_start_application_archive(web_session):
+    web_session.logger.info("Begin Start Application Archive (OPR-03)")
     assert servers(web_session).enable_application_archive()
