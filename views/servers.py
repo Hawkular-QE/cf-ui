@@ -1,5 +1,4 @@
 from common.ui_utils import ui_utils
-#from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
 from views.providers import providers
 from selenium.webdriver.common.by import By
@@ -23,8 +22,10 @@ class servers():
     # TO-DO - Validate Start / End states:
     power_reload = {'action': 'Reload Server', 'wait_for': 'Reload initiated for selected server', 'start_state':'running', 'end_state':'running'}
     power_graceful_shutdown = {'action': 'Gracefully shutdown Server', 'wait_for': 'Shutdown initiated for selected server', 'start_state':'running', 'end_state':'running'}
+
+    # Note: EAP Status always shows "real" state and not just always "running":
     power_suspend = {'action': 'Suspend Server', 'wait_for': 'Suspend initiated for selected server', 'start_state':'running', 'end_state':'running'}
-    power_resume = {'action': 'Resume Server', 'wait_for': 'Resume initiated for selected server', 'start_state':'stopped', 'end_state':'running'}
+    power_resume = {'action': 'Resume Server', 'wait_for': 'Resume initiated for selected server', 'start_state':'running', 'end_state':'running'}
 
     APPLICATION_WAR = "cfui_test_war.war"
     APPLICATION_JAR = "cfui_test_jar.jar"
@@ -109,7 +110,7 @@ class servers():
 
     def validate_server_details(self):
 
-        servers_ui = table(self.web_session).get_middleware_servers_table()
+        servers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
 
         for serv_ui in servers_ui:
@@ -252,7 +253,7 @@ class servers():
         eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
-        self.eap_power_action(power, eap_hawk)
+        self.eap_power_action(power, eap_hawk, alert_button_name='Suspend')
 
         # TO-DO - Validate
 
@@ -260,7 +261,7 @@ class servers():
 
     def eap_power_resume(self):
         power = self.power_resume
-
+        # 'Resume initiated for selected server(s)'
         # Find an EAP in 'start state'
         # Resume EAP
         # Validate - TO-DO
@@ -290,21 +291,21 @@ class servers():
 
         return True
 
-    def eap_power_action(self, power, eap_hawk):
+    def eap_power_action(self, power, eap_hawk, alert_button_name = None):
 
         self.web_session.logger.info(
             "About to {} EAP server {} Feed {}".format(power.get('action'), eap_hawk.get('Product'), eap_hawk.get('Feed')))
 
         feed = eap_hawk.get('Feed') # Unique server id
 
-        self.web_session.web_driver.get("{}//middleware_servers/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
         self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
-        self.ui_utils.accept_alert(10)
+        self.ui_utils.accept_alert(10, alert_button_name)
         assert self.ui_utils.waitForTextOnPage(power.get('wait_for'), 15)
 
         # Validate backend - Hawkular

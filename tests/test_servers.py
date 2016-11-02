@@ -39,19 +39,19 @@ def test_cfui_eap_power_restart(web_session):
     web_session.logger.info("Begin Server Restart")
     assert servers(web_session).eap_power_restart()
 
+def test_cfui_eap_power_suspend(web_session):
+    web_session.logger.info("Begin Server Suspend - OPR-005")
+    assert servers(web_session).eap_power_suspend()
+
+def test_cfui_eap_power_resume(web_session):
+    web_session.logger.info("Begin Server Resume - OPR-006")
+    assert servers(web_session).eap_power_resume()
+
 # EAP Power Not fully functional, as of yet
 
 def _test_cfui_eap_power_reload(web_session):
     web_session.logger.info("Begin Server Reload")
     assert servers(web_session).eap_power_reload()
-
-def _test_cfui_eap_power_suspend(web_session):
-    web_session.logger.info("Begin Server Suspend")
-    assert servers(web_session).eap_power_suspend()
-
-def _test_cfui_eap_power_resume(web_session):
-    web_session.logger.info("Begin Server Resume")
-    assert servers(web_session).eap_power_resume()
 
 def _test_cfui_eap_power_graceful_shutdown(web_session):
     web_session.logger.info("Begin Server Graceful Shutdown")

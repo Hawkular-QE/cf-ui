@@ -200,12 +200,15 @@ class ui_utils():
 
         return None
 
-    def accept_alert(self, waitTime):
+    def accept_alert(self, waitTime, button_name = None):
         currentTime = time.time()
 
         while (time.time() - currentTime < waitTime):
             try:
-                self.web_driver.switch_to_alert().accept()
+                if button_name:
+                    self.web_driver.find_element_by_xpath("//button[@title='{}']".format(button_name)).click()
+                else:
+                    self.web_driver.switch_to_alert().accept()
                 return True
             except:
                 self.web_session.logger.info('Alert not present.')
