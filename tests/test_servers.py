@@ -45,7 +45,7 @@ def test_cfui_eap_operation_suspend(web_session):
 
 def test_cfui_eap_operation_resume(web_session):
     web_session.logger.info("Begin Server Resume (OPR-006)")
-    assert servers(web_session).eap_powePastr_resume()
+    assert servers(web_session).eap_power_resume()
 
 # EAP Power Not fully functional, as of yet
 
