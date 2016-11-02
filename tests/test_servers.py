@@ -69,9 +69,9 @@ def test_cfui_redeploy_application_archive(web_session):
     assert servers(web_session).restart_application_archive()
 
 def test_cfui_stop_application_archive(web_session):
-    web_session.logger.info("Begin Stop Application Archive (OPR-03)")
+    web_session.logger.info("Begin Stop Application Archive (OPR-038)")
     assert servers(web_session).disable_application_archive()
 
 def test_cfui_start_application_archive(web_session):
-    web_session.logger.info("Begin Start Application Archive (OPR-03)")
+    web_session.logger.info("Begin Start Application Archive (OPR-038)")
     assert servers(web_session).enable_application_archive()
