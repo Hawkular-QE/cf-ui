@@ -47,13 +47,8 @@ class providers():
 
         self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
 
-        if self.MIQ_BASE_VERSION in self.web_session.appliance_version:
-            self.submit_provider_form_miq()
-            self.verify_add_provider_success()
-
-        else:
-            self.submit_provider_form_cfme()
-            self.verify_add_provider_success()
+        self.submit_provider_form_cfme()
+        self.verify_add_provider_success()
 
     def submit_provider_form_miq(self):
 
