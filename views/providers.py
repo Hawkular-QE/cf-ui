@@ -2,7 +2,6 @@ from common.ui_utils import ui_utils
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from parsing.table import table
 from hawkular.hawkular_api import hawkular_api
 from common.view import view
 from common.db import db
@@ -10,11 +9,13 @@ from common.db import db
 class providers():
     web_session = None
     MIQ_BASE_VERSION = "master"
+    ui_utils = None
 
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
         self.hawkular_api = hawkular_api(self.web_session)
+        self.ui_utils = ui_utils(self.web_session)
 
     def add_provider(self, delete_if_provider_present=True):
         self.provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
@@ -50,24 +51,6 @@ class providers():
         self.submit_provider_form_cfme()
         self.verify_add_provider_success()
 
-    def submit_provider_form_miq(self):
-
-        # Enter the form details and submit if the appliance version is master i.e; ManageIQ upstream.
-
-        self.web_driver.find_element_by_xpath("//button[@data-id='server_emstype']").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("Hawkular", 30)
-        self.web_driver.find_element_by_xpath("//span[contains(.,'Hawkular')]").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("Hostname", 30)
-
-        # Enter the name of provider after selecting hawkular type from dropdown to take care of page load issues.
-
-        self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys(self.provider_name)
-        self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys(self.host_name)
-        self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(self.port)
-        self.web_driver.find_element_by_xpath("//input[@id='default_userid']").send_keys(self.hawkular_user)
-        self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(self.hawkular_password)
-        self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
-        self.web_driver.find_element_by_xpath("//button[@alt='Add this Middleware Provider']").click()
 
     def submit_provider_form_cfme(self):
 
@@ -114,36 +97,14 @@ class providers():
         ui_utils(self.web_session).sleep(5)
         assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
 
-        if self.MIQ_BASE_VERSION in self.web_session.appliance_version:
-            self.edit_provider_form_miq_newvalues()
-            self.validate_provider()
-            self.edit_save_miq()
-            self.verify_edit_provider_success_newvalues()
-            self.edit_provider_form_miq_originalvalues()
-            self.validate_provider()
-            self.edit_save_miq()
-            self.verify_edit_provider_success_originalvalues()
-
-        else:
-            self.edit_provider_form_cfme_newvalues()
-            self.validate_provider()
-            self.edit_save_cfme()
-            self.verify_edit_provider_success_newvalues()
-            self.edit_provider_form_cfme_originalvalues()
-            self.validate_provider()
-            self.edit_save_cfme()
-            self.verify_edit_provider_success_originalvalues()
-
-    def edit_provider_form_miq_newvalues(self):
-
-        self.web_driver.find_element_by_xpath("//input[@id='name']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys(self.web_session.PROVIDER)
-
-        self.web_driver.find_element_by_xpath("//input[@id='hostname']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys("livingontheedge.hawkular.org")
-
-        self.web_driver.find_element_by_xpath("//input[@id='port']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(80)
+        self.edit_provider_form_cfme_newvalues()
+        self.validate_provider()
+        self.edit_save_cfme()
+        self.verify_edit_provider_success_newvalues()
+        self.edit_provider_form_cfme_originalvalues()
+        self.validate_provider()
+        self.edit_save_cfme()
+        self.verify_edit_provider_success_originalvalues()
 
     def edit_provider_form_cfme_newvalues(self):
 
@@ -165,26 +126,6 @@ class providers():
         assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'80')]")
         self.web_session.logger.info("The middleware provider is edited successfully.")
 
-    def edit_provider_form_miq_originalvalues(self):
-
-        # Edit and save the name, port and number to default value.( This will additionally check edit from the provider details page)
-
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
-        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.PROVIDER)
-
-        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        self.web_driver.find_element_by_xpath("//a[@title='Edit this Middleware Provider']").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("Basic Information", 30)
-
-        self.web_driver.find_element_by_xpath("//input[@id='name']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='name']").send_keys(self.web_session.HAWKULAR_PROVIDER_NAME)
-
-        self.web_driver.find_element_by_xpath("//input[@id='hostname']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='hostname']").send_keys(self.web_session.HAWKULAR_HOSTNAME)
-
-        self.web_driver.find_element_by_xpath("//input[@id='port']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='port']").send_keys(self.web_session.HAWKULAR_PORT)
-
     def edit_provider_form_cfme_originalvalues(self):
 
         # Edit and save the name, port and number to default value.( This will additionally check edit from the provider details page)
@@ -205,15 +146,6 @@ class providers():
 
         self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.web_session.HAWKULAR_PORT)
-
-    def edit_save_miq(self):
-
-        # Wait till Save button is enabled before click
-
-        WebDriverWait(self.web_driver, 30).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
-        self.web_driver.find_element_by_xpath("//button[contains(.,'Save')]").click()
-        assert ui_utils(self.web_session).waitForTextOnPage('saved', 15)
 
     def edit_save_cfme(self):
 
@@ -324,8 +256,7 @@ class providers():
 
         self.web_session.logger.info("Begin providers list test.")
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
-        providers_ui = table(self.web_session).get_middleware_providers_table()
-
+        providers_ui = self.ui_utils.get_list_table()
         assert len(providers_ui) > 0, "Providers list is empty."
 
         for prov_ui in providers_ui:
@@ -343,7 +274,8 @@ class providers():
 
         self.web_session.logger.info("Begin providers details test.")
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
-        providers_ui = table(self.web_session).get_middleware_providers_table()
+        view(self.web_session).list_View()
+        providers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
         deployments_hawk = self.hawkular_api.get_hawkular_deployments()
         datasources_hawk = self.hawkular_api.get_hawkular_datasources()

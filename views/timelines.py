@@ -1,9 +1,6 @@
 from common.ui_utils import ui_utils
-from parsing.table import table
-from navigation.navigation import NavigationTree
 from hawkular.hawkular_api import hawkular_api
 from views.servers import servers
-from common.view import view
 
 class timelines():
     web_session = None
