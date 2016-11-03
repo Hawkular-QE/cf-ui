@@ -54,7 +54,7 @@ class servers():
         origValue = -1
         server = None
 
-        self.web_session.web_driver.get("{}/middleware_serve/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
         servers_ui = self.ui_utils.get_list_table()
         assert servers_ui, "No servers found."
 
