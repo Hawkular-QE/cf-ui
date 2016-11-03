@@ -75,3 +75,8 @@ def test_cfui_stop_application_archive(web_session):
 def test_cfui_start_application_archive(web_session):
     web_session.logger.info("Begin Start Application Archive (OPR-038)")
     assert servers(web_session).enable_application_archive()
+
+# Add JDBC Driver
+def test_cfui_add_jdbc_driver(web_session):
+    web_session.logger.info("Begin Add JDBC driver test (OPR-034a)")
+    assert servers(web_session).add_jdbc_driver()
