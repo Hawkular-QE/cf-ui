@@ -36,6 +36,8 @@ class servers():
     JDBCDriver_Class_Name = "com.mysql.jdbc.Driver"
     JDBCDriver_Major_Version = "5"
     JDBCDriver_Minor_Version = "1"
+    DatasourceName = "MySQL-DS"
+    DatasourceUsernamePasswd = "admin"
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -603,5 +605,58 @@ class servers():
         self.web_driver.find_element_by_xpath("//button[@ng-click='addJdbcDriver()']").click()
         self.ui_utils.waitForTextOnPage(
             'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 90)
+
+    def add_datasource(self):
+
+        # Adds MySQL datasource to EAP server, validates success message
+        # verifies if the added datasource is listed in datasource list page
+        # Add datasource form may change in future to accommodate selection of existing JDBC drivers
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        # Find running EAP server
+        eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.add_datasource_eap()
+        self.navigate_and_refresh_provider()
+
+        # Validate UI if added datasource is available in the datasource list
+        # Reference existing bug: https://bugzilla.redhat.com/show_bug.cgi?id=1383414
+
+        self.web_session.web_driver.get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.refresh_until_text_appears(self.DatasourceName, 60)
+
+        return True
+
+    def add_datasource_eap(self):
+        self.web_session.logger.info("Adding MySQL datasource")
+
+        self.web_driver.find_element_by_xpath("//button[@title='Datasources']").click()
+        self.web_driver.find_element_by_id(
+            'middleware_server_datasources_choice__middleware_datasource_add').click()
+        self.ui_utils.sleep(2)
+        self.ui_utils.waitForTextOnPage('Create Datasource', 15)
+
+        self.web_driver.find_element_by_id("chooose_datasource_input")
+        self.web_driver.find_element_by_xpath("//option[@label='MySql']").click()
+        self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceChooseNext()']").click()
+        # self.ui_utils.sleep(2)
+        self.web_driver.find_element_by_id("ds_name_input").clear()
+        self.web_driver.find_element_by_id("ds_name_input").send_keys(self.DatasourceName)
+
+        self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceStep1Next()']").click()
+        self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceStep2Next()']").click()
+
+        self.web_driver.find_element_by_id("user_name_input").send_keys(self.DatasourceUsernamePasswd)
+        self.web_driver.find_element_by_id("password_input").send_keys(self.DatasourceUsernamePasswd)
+
+        self.web_driver.find_element_by_xpath("//button[@ng-click='finishAddDatasource()']").click()
+        self.ui_utils.waitForTextOnPage(
+            'Datasource "{}" has been installed on this server.'.format(self.DatasourceName), 15)
+
 
 
