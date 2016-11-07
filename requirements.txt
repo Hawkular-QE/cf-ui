@@ -9,4 +9,4 @@ psycopg2
 lxml
 # Chrome driver installation
 chromedriver
-libffi
+libffi-devel
