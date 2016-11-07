@@ -4,7 +4,6 @@
 selenium
 pytest
 pytz
-# cryptography
 paramiko
 psycopg2
 lxml
