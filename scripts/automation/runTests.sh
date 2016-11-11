@@ -9,13 +9,14 @@ export DISPLAY=:${DISPLAY_PORT}
 source .cf-ui/bin/activate
 
 echo "Starting tests..."
-echo $TEST_FILES
+echo "TEST_FILE: $TEST_FILES"
+echo "OUTPUT_FILE: $OUTPUT_FILE"
 
 # for debug purposes
 if [ "$RUN_TESTS" = true ] ; then
 
     # all tests should be independent so order of testing does not matter
-    python -m pytest -s $TEST_FILES --junitxml=output.xml --ignore=tests/framework # | tee -a ${WORKSPACE}/pytest.log
+    python -m pytest -s $TEST_FILES --junitxml=$OUTPUT_FILE --ignore=tests/framework # | tee -a ${WORKSPACE}/pytest.log
     if [ $? -eq 0 ]; then
         echo "Test Success."
     else
