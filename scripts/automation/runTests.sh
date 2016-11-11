@@ -9,7 +9,7 @@ export DISPLAY=:${DISPLAY_PORT}
 source .cf-ui/bin/activate
 
 echo "Starting tests..."
-echo "TEST_FILE: $TEST_FILES"
+echo "TESTS_FILE: $TEST_FILES"
 echo "OUTPUT_FILE: $OUTPUT_FILE"
 
 # for debug purposes
