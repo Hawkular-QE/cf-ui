@@ -359,8 +359,8 @@ class providers():
                 return True
 
             if 'Error' in last_refresh and 'Success' in expected_status:
-                self.web_session.logger.error("Provider Last Refresh Status contains Error, but expected: {}".
-                                              format(expected_status))
+                self.web_session.logger.error("Provider Last Refresh Status contains Error: {}   but expected: {}".
+                                              format(last_refresh, expected_status))
                 return False
 
             if time.time() - currentTime >= waitTime:
