@@ -87,7 +87,7 @@ class monitoring():
         # Validate that graphs are present
         assert self.ui_utils.isTextOnPage('Messages')
 
-        assert self.ui_utils.isTextOnPage('Subscriptors')
+        assert self.ui_utils.isTextOnPage('Subscribers')
 
         return True
 
