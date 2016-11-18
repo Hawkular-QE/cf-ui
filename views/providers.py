@@ -321,7 +321,7 @@ class providers():
     def verify_add_provider_success(self):
 
         assert ui_utils(self.web_session).waitForTextOnPage(
-            'Middleware Providers "{}" was saved'.format(self.provider_name), 15)
+            'Middleware Providers "{}" was saved'.format(self.provider_name), 30)
 
         if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
                 self.provider_name)):
@@ -330,10 +330,10 @@ class providers():
         # Navigate to the provider details page and check if the last refresh status is - Success.
 
         view(self.web_session).list_View()
-        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
+        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 30)
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
 
-        assert ui_utils(self.web_session).waitForTextOnPage("Status", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Status", 30)
 
         assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
 
