@@ -101,5 +101,5 @@ class timelines():
 
         self.web_driver.find_element_by_xpath(
             "//*[@id = 'chart_placeholder']/div[1]/*[name() = 'svg']/*[name() = 'g'][4]/*[name() = 'g'][1]/* [name() = 'text']").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 120)
         return True
