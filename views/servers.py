@@ -6,8 +6,6 @@ from common.view import view
 import os
 import time
 from common.db import db
-from common.ssh import ssh
-import socket
 
 class servers():
     web_session = None
@@ -80,7 +78,7 @@ class servers():
 
         self.web_driver.find_element_by_xpath("//button[@title='Policy']").click()
         self.web_driver.find_element_by_id('middleware_server_policy_choice__middleware_server_tag').click()
-        self.ui_utils.waitForTextOnPage('Tag Assignment', 5)
+        assert self.ui_utils.waitForTextOnPage('Tag Assignment', 5)
 
         # Click on Drop-down title Name
         tag = '"&lt;Select a value to assign&gt;"'
@@ -105,7 +103,7 @@ class servers():
         el = self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format('Save'))
         el[0].click()
 
-        self.ui_utils.waitForTextOnPage("My Company Tags", 15)
+        assert self.ui_utils.waitForTextOnPage("My Company Tags", 15)
 
         server_details = self.ui_utils.get_generic_table_as_dict()
         newValue = server_details.get('My Company Tags')[-1:]
@@ -126,7 +124,7 @@ class servers():
             self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
 
             self.ui_utils.click_on_row_containing_text(serv_ui.get('Feed'))
-            self.ui_utils.waitForTextOnPage("Properties", 15)
+            assert self.ui_utils.waitForTextOnPage("Properties", 15)
 
             server_details_ui = self.ui_utils.get_generic_table_as_dict()
             server_details_hawk = self.ui_utils.find_row_in_list(servers_hawk, 'Feed', feed)
@@ -143,7 +141,7 @@ class servers():
     def validate_servers_list(self):
         servers_db = None
         self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Middleware Servers', 10)
+        assert self.ui_utils.waitForTextOnPage('Middleware Servers', 10)
         servers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
 
@@ -309,7 +307,7 @@ class servers():
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
-        self.ui_utils.waitForTextOnPage("Properties", 15)
+        assert self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
@@ -329,7 +327,7 @@ class servers():
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
-        self.ui_utils.waitForTextOnPage('Version', 15)
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
 
         self.add_server_deployment(self.APPLICATION_WAR)
         self.navigate_and_refresh_provider()
@@ -379,7 +377,7 @@ class servers():
 
         # Find EAP with application to redeploy
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Server Name', 20)
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
         if self.ui_utils.get_elements_containing_text(app_to_redeploy):
             self.ui_utils.click_on_row_containing_text(app_to_redeploy)
@@ -492,13 +490,13 @@ class servers():
 
         self.web_driver.find_element_by_xpath("//button[@title='Deployments']").click()
         self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
-        self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
+        assert self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
 
         el = self.web_driver.find_element_by_id("upload_file")
         el.send_keys(app)
         self.ui_utils.sleep(2)
         self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
-        self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+        assert self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
 
     def undeploy_server_deployment(self, app_to_undeploy = APPLICATION_WAR):
         self.web_session.logger.info("Undeploying App: {}".format(app_to_undeploy))
@@ -506,7 +504,7 @@ class servers():
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice__middleware_deployment_undeploy').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Undeployment initiated for selected deployment(s)', 15)
 
     def restart_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
         self.web_session.logger.info("Redeploying App: {}".format(app_to_redeploy))
@@ -515,7 +513,7 @@ class servers():
             'middleware_deployment_deploy_choice__middleware_deployment_restart').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        self.ui_utils.waitForTextOnPage('Redeployment initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Redeployment initiated for selected deployment(s)', 15)
 
     def disable_server_deployment(self, app_to_stop=APPLICATION_WAR):
         self.web_session.logger.info("Stopping App: {}".format(app_to_stop))
@@ -524,7 +522,7 @@ class servers():
             'middleware_deployment_deploy_choice__middleware_deployment_disable').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        self.ui_utils.waitForTextOnPage('Stop initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Stop initiated for selected deployment(s)', 15)
 
     def enable_server_deployment(self, app_to_start=APPLICATION_WAR):
         self.web_session.logger.info("Starting App: {}".format(app_to_start))
@@ -533,7 +531,7 @@ class servers():
             'middleware_deployment_deploy_choice__middleware_deployment_enable').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        self.ui_utils.waitForTextOnPage('Start initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Start initiated for selected deployment(s)', 15)
 
     def wait_for_deployment_state(self, deployment_name, state, wait_time):
         currentTime = time.time()
@@ -594,7 +592,7 @@ class servers():
 
         self.web_driver.find_element_by_xpath("//button[@title='JDBC Drivers']").click()
         self.web_driver.find_element_by_id('middleware_server_jdbc_drivers_choice__middleware_jdbc_driver_add').click()
-        self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
+        assert self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
 
         el = self.web_driver.find_element_by_id("jdbc_driver_file")
         el.send_keys(app)
@@ -606,7 +604,7 @@ class servers():
         self.web_driver.find_element_by_id("minor_version_input").send_keys(self.JDBCDriver_Minor_Version)
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='addJdbcDriver()']").click()
-        self.ui_utils.waitForTextOnPage(
+        assert self.ui_utils.waitForTextOnPage(
             'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 90)
 
     def add_datasource(self):
@@ -642,7 +640,7 @@ class servers():
         self.web_driver.find_element_by_id(
             'middleware_server_datasources_choice__middleware_datasource_add').click()
         self.ui_utils.sleep(2)
-        self.ui_utils.waitForTextOnPage('Create Datasource', 15)
+        assert self.ui_utils.waitForTextOnPage('Create Datasource', 15)
 
         self.web_driver.find_element_by_id("chooose_datasource_input")
         self.web_driver.find_element_by_xpath("//option[@label='MySql']").click()
@@ -658,7 +656,7 @@ class servers():
         self.web_driver.find_element_by_id("password_input").send_keys(self.DatasourceUsernamePasswd)
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='finishAddDatasource()']").click()
-        self.ui_utils.waitForTextOnPage(
+        assert self.ui_utils.waitForTextOnPage(
             'Datasource "{}" has been installed on this server.'.format(self.DatasourceName), 15)
 
 
