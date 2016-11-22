@@ -338,7 +338,7 @@ class servers():
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         # deployments_ui = table(self.web_session).get_middleware_deployments_table()
         #assert self.ui_utils.find_row_in_list(deployments_ui, "Deployment Name", self.APPLICATION_WAR), "Deployment {} not found on UI.".format(app_to_deploy)
-        self.ui_utils.refresh_until_text_appears(self.APPLICATION_WAR, 300)
+        assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_WAR, 300)
         self.ui_utils.click_on_row_containing_text(app_to_deploy)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
 
@@ -402,7 +402,7 @@ class servers():
 
         # Find EAP with application to stop
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Server Name', 20)
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_stop)
 
         # Stop the application archive
@@ -421,7 +421,7 @@ class servers():
 
         # Find EAP with application to start
         self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Server Name', 20)
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_start)
 
         # Start the application archive
@@ -470,21 +470,17 @@ class servers():
     def find_non_container_eap_in_state(self, state):
         rows = self.hawkular_api.get_hawkular_servers()
         for row in rows:
-            #if row.get("Product Name") != 'Hawkular' and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
+            self.web_session.logger.info("Product: {}  Feed: {}   State: {}".
+                            format(row.get("Product Name"), row.get("Feed"), row.get("details").get("Server State")))
+
             if not row.get("Product Name"):
-                self.web_session.logger.warning ("Found Server 'None'.")
+                self.web_session.logger.warning ("Product Name 'None'. Feed: {}.".format(row.get("Feed")))
 
             elif (row.get("Product Name") == 'JBoss EAP' or 'wildfly' in row.get("Product Name").lower()) \
                     and row.get("Node Name") != 'master:server-*' \
                     and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()) \
                     and "domain" not in row.get("Feed").lower():
-                    #ip = row.get("details").get("Hostname")
-                    #try:
-                    #    socket.gethostbyaddr(ip)
-                    #    self.web_session.logger.info("Found EAP Hostname: {}  state: {}".format(ip, state))
-                    #   return row
-                    # except:
-                    #    self.web_session.logger.info("Note a resolvable Hostname/IP: {}".format(ip))
+
                 return row
 
         return None
@@ -582,7 +578,7 @@ class servers():
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
-        self.ui_utils.waitForTextOnPage('Version', 15)
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
 
         self.deploy_jdbc_driver(self.JDBCDriver)
         self.navigate_and_refresh_provider()
@@ -626,7 +622,7 @@ class servers():
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
-        self.ui_utils.waitForTextOnPage('Version', 15)
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
 
         self.add_datasource_eap()
         self.navigate_and_refresh_provider()
