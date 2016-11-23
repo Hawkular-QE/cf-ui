@@ -85,7 +85,7 @@ class timelines():
     def apply(self):
 
         self.web_driver.find_element_by_xpath("//div[@ng-click='applyButtonClicked()']").click()
-        ui_utils(self.web_session).sleep(10)
+        ui_utils(self.web_session).sleep(60)
 
     def navigate_to_timeline(self):
 
@@ -93,7 +93,7 @@ class timelines():
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
         self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]").click()
-        ui_utils(self.web_session).sleep(5)
+        ui_utils(self.web_session).sleep(30)
 
     def verify_event(self, event_type):
 
