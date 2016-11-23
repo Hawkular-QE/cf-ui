@@ -31,6 +31,12 @@ for node in system_err:
     parent = node.getparent()
     parent.remove(node)
 
+#Remove failure texts
+failures = root.findall('testcase/failure')
+for node in failures:
+    node.text = ''
+    node.set('type', 'failure')
+
 # Remove Node Attributes
 for e in root.iter():
     # print e.tag, e.attrib
