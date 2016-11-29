@@ -37,6 +37,12 @@ for node in failures:
     node.text = ''
     node.set('type', 'failure')
 
+#Remove error texts
+errors = root.findall('testcase/error')
+for node in errors:
+    node.text = ''
+    node.set('type', 'error')
+
 # Remove Node Attributes
 for e in root.iter():
     # print e.tag, e.attrib
