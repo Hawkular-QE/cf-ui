@@ -50,8 +50,8 @@ class hawkular_api():
 
         try:
             rows = self.__hawkular__.inventory.list_server_datasource()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         for datasource in rows:
             dict = {}
@@ -67,8 +67,8 @@ class hawkular_api():
 
         try:
             rows = self.__hawkular__.inventory.list_server_deployment()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         for deployment in rows:
             dict = {}
@@ -84,8 +84,8 @@ class hawkular_api():
 
         try:
             rows = self.__hawkular__.inventory.list_domain(feed_id)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         for domain in rows:
             dict = {}
@@ -102,8 +102,8 @@ class hawkular_api():
 
         try:
             rows = self.__hawkular__.inventory.list_server_group(feed_id)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         for group in rows:
             dict = {}
@@ -120,8 +120,8 @@ class hawkular_api():
 
         try:
             rows = self.__hawkular__.inventory.list_messaging()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         for message in rows:
             dict = {}
@@ -135,14 +135,14 @@ class hawkular_api():
     def get_port(self):
         try:
             return self.__hawkular__.port
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_ip_address(self):
         try:
             return self.__hawkular__.get_ip_address
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         def generic_for_testing(self):
             return self.__hawkular__.list_server()
@@ -153,14 +153,14 @@ class hawkular_api():
         # TO-DO: Return formatted Dict
         try:
             return self.__hawkular__.alert.list_event()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_alert_auth(self):
         try:
             auth =  self.__hawkular__.alert.auth
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         auth_dict = {}
         auth_dict['username'] = auth[0]
@@ -171,34 +171,34 @@ class hawkular_api():
     def get_alert_tenant_id(self):
         try:
             return self.__hawkular__.alert.tenant_id
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_alert_hostname(self):
         try:
             return self.__hawkular__.alert.hostname
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_alert_status(self):
         try:
             return self.__hawkular__.alert.status()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     ''' Metrics '''
 
     def get_metric_hostname(self):
         try:
             return self.__hawkular__.metric.hostname
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_metric_auth(self):
         try:
             auth = self.__hawkular__.metric.auth
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
         auth_dict = {}
         auth_dict['username'] = auth[0]
@@ -209,33 +209,33 @@ class hawkular_api():
     def get_metric_status(self):
         try:
             return self.__hawkular__.metric.status()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_metric_list_gauge_definition(self):
         try:
             return self.__hawkular__.metric.list_gauge_definition()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_metric_tenant_id(self):
         try:
             return self.__hawkular__.metric.tenant_id()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def get_metric_protocol(self):
         try:
             return self.__hawkular__.metric.protocol()
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
 
     def list_availability_server(self, feed_id, server_id):
         try:
             return self.__hawkular__.metric.list_availability_server(feed_id, server_id)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     ''' Operations '''
 
@@ -244,15 +244,15 @@ class hawkular_api():
         try:
             return self.__hawkular__.add_jdbc_driver(feed_id, server_id, driver_name, module_name,
                                                     driver_class, driver_jar_name, binary_content, binary_file_location)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def remove_jdbc_driver(self, feed_id, server_id, driver_name):
 
         try:
             return self.__hawkular__.remove_jdbc_driver(feed_id, server_id, driver_name)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def add_deployment(self, feed_id, server_id, destination_file_name, force_deploy=False,
                        enabled=True, server_groups=None, binary_file_location=None, binary_content=None):
@@ -260,33 +260,33 @@ class hawkular_api():
         try:
             return self.__hawkular__.add_deployment(feed_id, server_id, destination_file_name, force_deploy,
                                                     enabled, server_groups, binary_file_location, binary_content)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def undeploy(self, feed_id, server_id, destination_file_name, remove_content=True, server_groups=None):
 
         try:
             return self.__hawkular__.undeploy(feed_id, server_id, destination_file_name, remove_content, server_groups)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def disable_deployment(self, feed_id, server_id, destination_file_name, server_groups=None):
 
         try:
             return self.__hawkular__.disable_deployment(feed_id, server_id, destination_file_name, server_groups)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def enable_deployment(self, feed_id, server_id, destination_file_name, server_groups=None):
 
         try:
             return self.__hawkular__.enable_deployment(feed_id, server_id, destination_file_name, server_groups)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
 
     def restart_deployment(self, feed_id, server_id, destination_file_name, server_groups=None):
 
         try:
             return self.__hawkular__.restart_deployment(feed_id, server_id, destination_file_name, server_groups)
-        except:
-            self.__exception_handler()
+        except Exception, e:
+            self.__exception_handler(e)
