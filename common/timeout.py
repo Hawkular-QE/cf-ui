@@ -1,7 +1,7 @@
 import signal
 
 class timeout:
-    def __init__(self, seconds=1, error_message='Timeout'):
+    def __init__(self, seconds=1, error_message='Timeout Exception'):
         self.seconds = seconds
         self.error_message = error_message
     def handle_timeout(self, signum, frame):
