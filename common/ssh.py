@@ -1,6 +1,7 @@
 import paramiko
 from common.ui_utils import ui_utils
 import re
+from common.timeout import timeout
 
 class ssh():
     web_session = None
@@ -36,7 +37,7 @@ class ssh():
             raise Exception(e)
 
 
-    def execute_command(self, command):
+    def execute_command(self, command, time_to_wait=30):
         ssh_result = {}
 
         self.web_session.logger.info('Execute command \"{}\" on IP \"{}\".'.format(command, self.ip))
@@ -44,9 +45,10 @@ class ssh():
         try:
             stdin, stdout, stderr = self.ssh.exec_command(command)
 
-            while not stdout.channel.exit_status_ready():
-                self.web_session.logger.debug('Exit status not ready after command execute: {}'.format(command))
-                ui_utils(self.web_session).sleep(1)
+            with timeout(time_to_wait):
+                while not stdout.channel.exit_status_ready():
+                    self.web_session.logger.debug('Exit status not ready after command execute: {}'.format(command))
+                    ui_utils(self.web_session).sleep(1)
 
             if stdout.channel.exit_status == 0:
                 ssh_result['output'] = stdout.read()
@@ -108,7 +110,8 @@ class ssh():
         except Exception, e:
             self.web_session.logger.error('Failed to execute command \"{}\" on IP \"{}\".'.format(command, self.ip))
 
-        version = version.rstrip()
+        if version:
+            version = version.rstrip()
         self.web_session.logger.debug('Appliance version: {}'.format(version))
 
         return version
