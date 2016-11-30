@@ -2,6 +2,7 @@ from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 import time
+from views.servers import servers
 
 class datasources():
     web_session = None
@@ -59,7 +60,8 @@ class datasources():
         return True
 
     def delete_datasource_list_view(self):
-        datasource_to_delete = 'Example'
+        servers(self.web_session).add_datasource("H2-Test")
+        datasource_to_delete = 'H2-Test'
 
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         datasources = self.ui_utils.get_list_table_as_elements()
@@ -105,6 +107,8 @@ class datasources():
         return True
 
     def delete_datasource_detail_view(self, list_view=True):
+
+        servers(self.web_session).add_datasource("H2-datasource")
         index = 0
 
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
@@ -125,7 +129,9 @@ class datasources():
                                          format(datasource_name, server, host_name))
 
             # Click on Datasource to get to Detail view
-            datasource[2].click()
+
+            if self.ui_utils.get_elements_containing_text("H2-datasource"):
+                datasource[2].click()
 
             # Operations will not be present for a Datasource on a Provider
             try:
@@ -149,6 +155,9 @@ class datasources():
         return True
 
     def wait_for_datasource_to_be_deleted(self, starting_count, time_to_wait):
+
+        servers(self.web_session).navigate_and_refresh_provider()
+        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         currentTime = time.time()
 
