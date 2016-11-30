@@ -84,4 +84,4 @@ def test_cfui_add_jdbc_driver(web_session):
 # Add datasource
 def test_cfui_add_datasource(web_session):
     web_session.logger.info("Begin Add datasource test (OPR-035a)")
-    assert servers(web_session).add_datasource()
+    assert servers(web_session).add_datasource("H2-DS")

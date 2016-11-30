@@ -5,6 +5,7 @@ from selenium.webdriver.common.by import By
 from common.view import view
 import os
 import time
+import datetime
 from common.db import db
 
 class servers():
@@ -19,6 +20,7 @@ class servers():
     power_restart = {'action': 'Restart Server', 'wait_for': 'Restart initiated for selected server', 'start_state': 'running', 'end_state': 'running'}
     # TO-DO - Validate Start / End states:
     power_reload = {'action': 'Reload Server', 'wait_for': 'Reload initiated for selected server', 'start_state':'running', 'end_state':'running'}
+    power_force_reload = {'action': 'Reload Server', 'wait_for': 'Reload initiated for selected server', 'start_state': 'reload-required', 'end_state': 'running'}
     power_graceful_shutdown = {'action': 'Gracefully shutdown Server', 'wait_for': 'Shutdown initiated for selected server', 'start_state':'running', 'end_state':'running'}
 
     # Note: BZ - EAP currently showing only "running" state:
@@ -34,7 +36,6 @@ class servers():
     JDBCDriver_Class_Name = "com.mysql.jdbc.Driver"
     JDBCDriver_Major_Version = "5"
     JDBCDriver_Minor_Version = "1"
-    DatasourceName = "MySQL-DS"
     DatasourceUsernamePasswd = "admin"
 
     def __init__(self, web_session):
@@ -179,6 +180,10 @@ class servers():
         # Get EAP pid
         # Restart EAP
         # Validate that pid changed
+
+        if self.find_non_container_eap_in_state("reload-required"):
+            self.force_reload_eap()
+            self.navigate_and_refresh_provider()
 
         power = self.power_restart
 
@@ -513,7 +518,7 @@ class servers():
             'middleware_deployment_deploy_choice__middleware_deployment_restart').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        assert self.ui_utils.waitForTextOnPage('Redeployment initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Restart initiated for selected deployment(s)', 15)
 
     def disable_server_deployment(self, app_to_stop=APPLICATION_WAR):
         self.web_session.logger.info("Stopping App: {}".format(app_to_stop))
@@ -522,7 +527,7 @@ class servers():
             'middleware_deployment_deploy_choice__middleware_deployment_disable').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        assert self.ui_utils.waitForTextOnPage('Stop initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Disable initiated for selected deployment(s)', 15)
 
     def enable_server_deployment(self, app_to_start=APPLICATION_WAR):
         self.web_session.logger.info("Starting App: {}".format(app_to_start))
@@ -531,7 +536,7 @@ class servers():
             'middleware_deployment_deploy_choice__middleware_deployment_enable').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
-        assert self.ui_utils.waitForTextOnPage('Start initiated for selected deployment(s)', 15)
+        assert self.ui_utils.waitForTextOnPage('Enable initiated for selected deployment(s)', 15)
 
     def wait_for_deployment_state(self, deployment_name, state, wait_time):
         currentTime = time.time()
@@ -607,7 +612,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage(
             'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 90)
 
-    def add_datasource(self):
+    def add_datasource(self, datasourceName):
 
         # Adds MySQL datasource to EAP server, validates success message
         # verifies if the added datasource is listed in datasource list page
@@ -622,18 +627,19 @@ class servers():
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
 
-        self.add_datasource_eap()
+        self.add_datasource_eap(datasourceName)
         self.navigate_and_refresh_provider()
 
         # Validate UI if added datasource is available in the datasource list
         # Reference existing bug: https://bugzilla.redhat.com/show_bug.cgi?id=1383414
 
         self.web_session.web_driver.get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.refresh_until_text_appears(self.DatasourceName, 60)
+        assert self.ui_utils.refresh_until_text_appears(datasourceName, 60)
 
         return True
 
-    def add_datasource_eap(self):
+    def add_datasource_eap(self, datasourceName):
+        now = datetime.datetime.now()
         self.web_session.logger.info("Adding MySQL datasource")
 
         self.web_driver.find_element_by_xpath("//button[@title='Datasources']").click()
@@ -643,11 +649,13 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Create Datasource', 15)
 
         self.web_driver.find_element_by_id("chooose_datasource_input")
-        self.web_driver.find_element_by_xpath("//option[@label='MySql']").click()
+        self.web_driver.find_element_by_xpath("//option[@label='H2']").click()
         self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceChooseNext()']").click()
         # self.ui_utils.sleep(2)
         self.web_driver.find_element_by_id("ds_name_input").clear()
-        self.web_driver.find_element_by_id("ds_name_input").send_keys(self.DatasourceName)
+        self.web_driver.find_element_by_id("ds_name_input").send_keys(datasourceName + str(now.second))
+        self.web_driver.find_element_by_id("jndi_name_input").clear()
+        self.web_driver.find_element_by_id("jndi_name_input").send_keys("java:/H2DS" + datasourceName + str(now.second))
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceStep1Next()']").click()
         self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceStep2Next()']").click()
@@ -656,8 +664,17 @@ class servers():
         self.web_driver.find_element_by_id("password_input").send_keys(self.DatasourceUsernamePasswd)
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='finishAddDatasource()']").click()
-        assert self.ui_utils.waitForTextOnPage(
-            'Datasource "{}" has been installed on this server.'.format(self.DatasourceName), 15)
+        self.ui_utils.waitForTextOnPage(
+            'Datasource "{}" has been installed on this server.'.format(datasourceName), 15)
+
+    def force_reload_eap(self):
+        self.web_session.logger.info("Reloading non-container EAP standalone")
+        power = self.power_force_reload
+        eap_hawk = self.find_non_container_eap_in_state('reload-required')
+        assert eap_hawk
+        self.eap_power_action(power, eap_hawk)
+        return True
+
 
 
 
