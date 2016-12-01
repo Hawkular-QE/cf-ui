@@ -6,6 +6,15 @@ git clone https://github.com/Hawkular-QE/cf-ui.git
 cd cf-ui
 ./setup.sh
 ```
+## Configuration
+```shell
+Edit the following property values in the conf/properties.properties file so that they represent the configuration under test:
+
+    MIQ_HOSTNAME=
+    HAWKULAR_HOSTNAME=
+    HAWKULAR_PORT=
+
+```
 ### Using Chrome web driver
 Chrome driver is by default installed into .cf-ui directory and it is necessary to set PATH to it so Python Interpreter would know where to find the driver.
 ```shell
