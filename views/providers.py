@@ -378,7 +378,7 @@ class providers():
     def add_provider_invalid_port(self):
 
         if self.does_provider_exist():
-            self.web_session.logger.info("Middleware Provider exist - Delete the provicer.")
+            self.web_session.logger.info("Middleware Provider exist - Delete the provider.")
             self.delete_provider(delete_all_providers=True)
 
         try:
