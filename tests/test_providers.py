@@ -43,3 +43,5 @@ def test_cfui_validate_providers_details(web_session):
 def test_cfui_recheck_authentication(web_session):
     assert providers(web_session).recheck_authentication()
 
+def test_cfui_add_provider_with_invalid_port(web_session):
+    assert providers(web_session).add_provider_invalid_port()
