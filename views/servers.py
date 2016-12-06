@@ -488,7 +488,7 @@ class servers():
 
         return None
 
-    def add_server_deployment(self, app_to_deploy):
+    def add_server_deployment(self, app_to_deploy,runtime_name=None, enable_deploy=True, overwrite=False, cancel=False):
         app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
 
         self.web_session.logger.info("Deploying App: {}".format(app))
@@ -500,8 +500,19 @@ class servers():
         el = self.web_driver.find_element_by_id("upload_file")
         el.send_keys(app)
         self.ui_utils.sleep(2)
-        self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
-        assert self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+        if runtime_name:
+            self.web_driver.find_element_by_id('runtime_name_input').clear()
+            self.web_driver.find_element_by_id('runtime_name_input').send_keys(runtime_name)
+        if not enable_deploy:
+            self.web_driver.find_element_by_xpath("//span[contains(.,'Yes')]").click()
+        if overwrite:
+            self.ui_utils.waitForElementOnPage(By.XPATH, "//input[@id='force_deployment_cb']", 120)
+            self.web_driver.find_element_by_xpath("//input[@id='force_deployment_cb']").click()
+        if cancel:
+            self.web_driver.find_element_by_xpath("//button[@title='Cancel']").click()
+        else:
+            self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
+            assert self.ui_utils.waitForTextOnPage('Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
 
     def undeploy_server_deployment(self, app_to_undeploy = APPLICATION_WAR):
         self.web_session.logger.info("Undeploying App: {}".format(app_to_undeploy))
@@ -673,6 +684,76 @@ class servers():
         eap_hawk = self.find_non_container_eap_in_state('reload-required')
         assert eap_hawk
         self.eap_power_action(power, eap_hawk)
+        return True
+
+    def add_deployment_disable(self, app_to_deploy=APPLICATION_EAR):
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        # Find EAP on which to deploy
+        eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.add_server_deployment(self.APPLICATION_EAR, enable_deploy=False)
+        self.navigate_and_refresh_provider()
+
+        # Validate UI
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_EAR, 300)
+        self.ui_utils.click_on_row_containing_text(app_to_deploy)
+        assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
+
+        return True
+
+    def add_deployment_overwrite(self, app_to_deploy=APPLICATION_EAR):
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        if not self.ui_utils.get_elements_containing_text(self.APPLICATION_EAR):
+            self.add_deployment_disable()
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+        self.add_server_deployment(self.APPLICATION_EAR, overwrite=True)
+        self.navigate_and_refresh_provider()
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_EAR, 300)
+        self.ui_utils.click_on_row_containing_text(app_to_deploy)
+        assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
+
+        return True
+
+    def add_deployment_runtime_name(self, app_to_deploy=APPLICATION_EAR):
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        if self.ui_utils.get_elements_containing_text(self.APPLICATION_EAR):
+            self.undeploy_application_archive(self.APPLICATION_EAR)
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+        self.add_server_deployment(self.APPLICATION_EAR, runtime_name="TestDeployment.ear")
+        self.navigate_and_refresh_provider()
+        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.refresh_until_text_appears("TestDeployment.ear", 300)
+        self.ui_utils.click_on_row_containing_text("TestDeployment.ear")
+        assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
+
+        return True
+
+    def add_deployment_cancel(self, app_to_deploy=APPLICATION_JAR):
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        eap = self.find_non_container_eap_in_state("running")
+        assert eap, "No EAP found in desired state."
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+        self.add_server_deployment(self.APPLICATION_EAR, cancel=True)
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+
         return True
 
 
