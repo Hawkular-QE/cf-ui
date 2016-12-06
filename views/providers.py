@@ -18,10 +18,10 @@ class providers():
         self.hawkular_api = hawkular_api(self.web_session)
         self.ui_utils = ui_utils(self.web_session)
 
-    def add_provider(self, delete_if_provider_present=True):
+    def add_provider(self, delete_if_provider_present=True, port=None, validate_provider=True):
         self.provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
         self.host_name = self.web_session.HAWKULAR_HOSTNAME
-        self.port = self.web_session.HAWKULAR_PORT
+        self.port = self.web_session.HAWKULAR_PORT if port == None else port
         self.hawkular_user = self.web_session.HAWKULAR_USERNAME
         self.hawkular_password = self.web_session.HAWKULAR_PASSWORD
 
@@ -49,11 +49,11 @@ class providers():
 
         self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
 
-        self.submit_provider_form_cfme()
+        self.submit_provider_form_cfme(validate_provider)
         self.verify_add_provider_success()
 
 
-    def submit_provider_form_cfme(self):
+    def submit_provider_form_cfme(self, validate_provider=True):
 
         # Enter the form details and submit if the appliance version is CFME Downstream
 
@@ -69,7 +69,9 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(
             self.hawkular_password)
         self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
-        self.validate_provider()
+
+        if validate_provider:
+            self.validate_provider()
         self.save_provider()
 
     def delete_provider(self, delete_all_providers=True):
@@ -372,3 +374,18 @@ class providers():
                 time.sleep(1)
 
         return True
+
+    def add_provider_invalid_port(self):
+
+        if self.does_provider_exist():
+            self.web_session.logger.info("Middleware Provider exist - Delete the provider.")
+            self.delete_provider(delete_all_providers=True)
+
+        try:
+            self.add_provider(port="1234", validate_provider=False)
+            raise Exception('Add Provider Unexpectedly passed.')
+        except:
+            # Expected timeout waiting for form Add button to be clickable, since button should not be clickable.
+            pass
+
+        return True;
