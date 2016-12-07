@@ -118,20 +118,27 @@ class session(properties):
     def __logger__(self):
 
         self.logger = logging.getLogger('cf-ui')
-        self.logger.setLevel(logging.DEBUG)
 
-        # create formatter
-        formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
-        ch = logging.StreamHandler()
-        ch.setLevel(self.logging_level)
-        ch.setFormatter(formatter)
-        self.logger.addHandler(ch)
+        if len(self.logger.handlers[:]) == 0:
+            self.logger.setLevel(logging.DEBUG)
 
-        if "True" in self.RECORD_TESTS:
-            ch = logging.FileHandler(os.path.dirname(__file__) + "/../pytest.log")
+            # create formatter
+            formatter = logging.Formatter('%(asctime)s - %(levelname)s: %(message)s')
+            ch = logging.StreamHandler()
             ch.setLevel(self.logging_level)
             ch.setFormatter(formatter)
             self.logger.addHandler(ch)
+
+            if "True" in self.RECORD_TESTS:
+                ch = logging.FileHandler(os.path.dirname(__file__) + "/../pytest.log")
+                ch.setLevel(self.logging_level)
+                ch.setFormatter(formatter)
+                self.logger.addHandler(ch)
+
+            self.logger.info("Logger created.")
+
+        else:
+            self.logger.info("Logger already created.")
 
     def close_web_driver(self):
         if "True" in self.RECORD_TESTS:
@@ -141,3 +148,4 @@ class session(properties):
             # self.web_driver.close()
             # close browser windows & exit webdriver
             self.web_driver.quit()
+
