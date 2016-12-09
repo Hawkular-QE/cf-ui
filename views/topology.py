@@ -81,9 +81,8 @@ class topology():
         self.__select_entities_view__(self.entities.get('servers'), servers_list[0].get('name'))
 
         for server in servers_list:
-            if not self.__is_name_displayed__(server.get('name')):
-                self.web_session.logger.error("Display Names - {} Not Displayed.".format(server.get("Server Name")))
-                return False
+            name = server.get('name')
+            assert self.ui_utils.waitForTextOnPage(name, 5), "Server not found in Topology: {}".format(name)
 
         return True
 
@@ -109,9 +108,7 @@ class topology():
 
         for deployment in deployments_list:
             name = self.__get_actual_name__(deployment.get('Name'))
-            if not self.__is_name_displayed__(name):
-                self.web_session.logger.error("Display Names - {} Not Displayed.".format(name))
-                return False
+            assert self.ui_utils.waitForTextOnPage(name, 5), "Deployment not found in Topology: {}".format(name)
 
         return True
 
@@ -124,22 +121,20 @@ class topology():
         # 3) Enable Middleware Datasource entities (by validating whether 1st Datasource Name in Datasource-List is displayed)
         # 4) Validate that each Datasource in Datasource-List is displayed
 
-        deployments_list = self.hawkular_api.get_hawkular_datasources()
-        assert deployments_list, "No Datasources found."
+        datasources_list = self.hawkular_api.get_hawkular_datasources()
+        assert datasources_list, "No Datasources found."
 
         self.__navigate_to_topology__()
         self.ui_utils.adjust_screen_resolution(1400, 1050)
 
         self.__display_names__(select=True)
 
-        # Select "Middleware Deployments"
-        self.__select_entities_view__(self.entities.get('datasources'), deployments_list[0].get('Name'))
+        # Select "Middleware Datasource"
+        self.__select_entities_view__(self.entities.get('datasources'), datasources_list[0].get('Name'))
 
-        for deployment in deployments_list:
-            if not self.__is_name_displayed__(deployment.get('Name')):
-                self.web_session.logger.error(
-                    "Display Names - {} Not Displayed.".format(deployment.get("Name")))
-                return False
+        for datasource in datasources_list:
+            name = datasource.get('Name')
+            assert self.ui_utils.waitForTextOnPage(name, 5), "Datasource not found in Topology: {}".format(name)
 
         return True
 
@@ -166,10 +161,8 @@ class topology():
         self.__select_entities_view__(self.entities.get('server_groups'), server_groups_list[0].get('name'))
 
         for server_group in server_groups_list:
-            if not self.__is_name_displayed__(server_group.get('name')):
-                self.web_session.logger.error(
-                    "Display Names - {} Not Displayed.".format(server_group.get("name")))
-                return False
+            name = server_group.get("name")
+            assert self.ui_utils.waitForTextOnPage(name, 5), "Server Group not found in Topology: {}".format(name)
 
         return True
 
@@ -196,10 +189,8 @@ class topology():
         self.__select_entities_view__(self.entities.get('domains'), domains_list[0].get('name'))
 
         for domain in domains_list:
-            if not self.__is_name_displayed__(domain.get('name')):
-                self.web_session.logger.error(
-                    "Display Names - {} Not Displayed.".format(domain.get("name")))
-                return False
+            name = domain.get("name")
+            assert self.ui_utils.waitForTextOnPage(name, 5), "Domain not found in Topology: {}".format(name)
 
         return True
 
@@ -225,9 +216,7 @@ class topology():
                                       self.__get_actual_name__(messaging_list[0].get('name')))
         for queues_topics in messaging_list:
             name = self.__get_actual_name__(queues_topics.get('name'))
-            if not self.__is_name_displayed__(name):
-                self.web_session.logger.error("Display Names - {} Not Displayed.".format(name))
-                return False
+            assert self.ui_utils.waitForTextOnPage(name, 5), "Messaging not found in Topology: {}".format(name)
 
         return True
 
