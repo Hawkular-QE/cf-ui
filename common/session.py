@@ -135,10 +135,10 @@ class session(properties):
                 ch.setFormatter(formatter)
                 self.logger.addHandler(ch)
 
-            self.logger.info("Logger created.")
+            self.logger.info("Logger Handler created.")
 
         else:
-            self.logger.info("Logger already created.")
+            self.logger.info("Logger Handler already created.")
 
     def close_web_driver(self):
         if "True" in self.RECORD_TESTS:
