@@ -3,6 +3,7 @@ from hawkular.hawkular_api import hawkular_api
 from common.db import db
 import time
 from views.servers import servers
+from selenium.webdriver.common.by import By
 
 class datasources():
     web_session = None
@@ -83,7 +84,8 @@ class datasources():
             # Select checkbox
             datasource[0].click()
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
-            self.ui_utils.sleep(1)
+            self.ui_utils.waitForElementOnPage(By.ID,
+                                            'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
             self.ui_utils.web_driver.find_element_by_id(
                 'middleware_datasource_operations_choice__middleware_datasource_remove').click()
             self.ui_utils.accept_alert(5)
@@ -136,7 +138,8 @@ class datasources():
             # Operations will not be present for a Datasource on a Provider
             try:
                 self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
-                self.ui_utils.sleep(1)
+                self.ui_utils.waitForElementOnPage(By.ID,
+                                        'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
                 self.ui_utils.web_driver.find_element_by_id(
                     'middleware_datasource_operations_choice__middleware_datasource_remove').click()
                 self.ui_utils.accept_alert(5)

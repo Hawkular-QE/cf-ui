@@ -40,7 +40,7 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        ui_utils(self.web_session).sleep(2)
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[@title='Add a New Middleware Provider']", 5)
         elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a New Middleware Provider']")
         elem_add_new_provider.click()
         self.web_driver.implicitly_wait(15)
@@ -94,6 +94,7 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'Edit Selected Middleware Provider')]", 5)
         elem_editprovider_link = self.web_driver.find_element_by_xpath(
             "//a[contains(.,'Edit Selected Middleware Provider')]")
         elem_editprovider_link.click()
@@ -137,6 +138,7 @@ class providers():
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.PROVIDER)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[@title='Edit this Middleware Provider']", 5)
         self.web_driver.find_element_by_xpath("//a[@title='Edit this Middleware Provider']").click()
         ui_utils(self.web_session).sleep(5)
         assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
@@ -201,6 +203,8 @@ class providers():
         self.web_session.logger.info("Deleting the provider- {}".format(self.web_session.HAWKULAR_HOSTNAME))
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        assert self.ui_utils.waitForElementOnPage(By.XPATH,
+                                                  "//a[@title='Remove selected Middleware Providers']", 5)
         self.web_driver.find_element_by_xpath(
             "//a[@title='Remove selected Middleware Providers']").click()
         ui_utils(self.web_session).accept_alert(10)
@@ -218,6 +222,8 @@ class providers():
         self.web_session.logger.info("Deleting all the providers from providers list.")
         self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        assert self.ui_utils.waitForElementOnPage(By.XPATH,
+                                         "//a[@title='Remove selected Middleware Providers']", 5)
         self.web_driver.find_element_by_xpath(
             "//a[@title='Remove selected Middleware Providers']").click()
         ui_utils(self.web_session).accept_alert(10)
@@ -249,6 +255,7 @@ class providers():
 
     def refresh_provider(self):
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        assert self.ui_utils.waitForElementOnPage(By.ID, 'ems_middleware_vmdb_choice__ems_middleware_refresh', 5)
         self.web_driver.find_element_by_id('ems_middleware_vmdb_choice__ems_middleware_refresh').click()
         ui_utils(self.web_session).accept_alert(10)
         ui_utils(self.web_session).waitForTextOnPage("Refresh Provider initiated", 15)
@@ -313,6 +320,7 @@ class providers():
         self.web_driver.find_element_by_xpath("//h1[contains(.,'Hawkular-Provider (Summary)')]")
 
         self.web_driver.find_element_by_xpath("//button[@title='Authentication']").click()
+        assert self.ui_utils.waitForElementOnPage(By.ID, 'ems_middleware_authentication_choice__ems_middleware_recheck_auth_status', 5)
         self.web_driver.find_element_by_id('ems_middleware_authentication_choice__ems_middleware_recheck_auth_status').click()
 
         ui_utils(self.web_session).sleep(2)
