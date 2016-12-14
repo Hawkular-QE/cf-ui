@@ -255,8 +255,9 @@ class providers():
 
     def refresh_provider(self):
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        assert self.ui_utils.waitForElementOnPage(By.ID, 'ems_middleware_vmdb_choice__ems_middleware_refresh', 5)
-        self.web_driver.find_element_by_id('ems_middleware_vmdb_choice__ems_middleware_refresh').click()
+        el = self.web_driver.find_element_by_id('ems_middleware_vmdb_choice__ems_middleware_refresh')
+        assert self.ui_utils.wait_util_element_displayed(el, 5)
+        el.click()
         ui_utils(self.web_session).accept_alert(10)
         ui_utils(self.web_session).waitForTextOnPage("Refresh Provider initiated", 15)
 
