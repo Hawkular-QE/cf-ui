@@ -62,6 +62,20 @@ class ui_utils():
 
         return True
 
+    def wait_util_element_displayed(self, element, waitTime):
+        currentTime = time.time()
+
+        while True:
+            if time.time() - currentTime >= waitTime:
+                self.web_session.logger.error("Timed out waiting for element to be displayed.")
+                return False
+            else:
+                if element.is_displayed():
+                    break;
+                time.sleep(1)
+
+        return True
+
     def sleep(self, waitTime):
         time.sleep(waitTime)
 
