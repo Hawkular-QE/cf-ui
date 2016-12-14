@@ -1,5 +1,6 @@
 from common.ui_utils import ui_utils
 from common.view import view
+from selenium.webdriver.common.by import By
 
 class monitoring():
     web_session = None
@@ -17,7 +18,7 @@ class monitoring():
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
-        self.ui_utils.sleep(1)
+        self.ui_utils.waitForElementOnPage(By.ID, 'ems_middlewarer_monitoring_choice__ems_middleware_timeline', 5)
         self.web_driver.find_element_by_id('ems_middlewarer_monitoring_choice__ems_middleware_timeline').click()
         assert self.ui_utils.waitForTextOnPage('Timeline View', 30)
 
@@ -32,7 +33,7 @@ class monitoring():
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
-        self.ui_utils.sleep(1)
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_monitoring_choice__middleware_server_perf', 5)
         self.web_driver.find_element_by_id('middleware_server_monitoring_choice__middleware_server_perf').click()
         assert self.ui_utils.waitForTextOnPage('Options', 30)
 
@@ -62,7 +63,7 @@ class monitoring():
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
-        self.ui_utils.sleep(1)
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_messaging_monitoring_choice__middleware_messaging_perf', 5)
         self.web_driver.find_element_by_id('middleware_messaging_monitoring_choice__middleware_messaging_perf').click()
         assert self.ui_utils.waitForTextOnPage('Options', 30)
 
@@ -80,7 +81,7 @@ class monitoring():
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
-        self.ui_utils.sleep(1)
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_messaging_monitoring_choice__middleware_messaging_perf', 5)
         self.web_driver.find_element_by_id('middleware_messaging_monitoring_choice__middleware_messaging_perf').click()
         assert self.ui_utils.waitForTextOnPage('Options', 30)
 
@@ -99,7 +100,7 @@ class monitoring():
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
-        self.ui_utils.sleep(1)
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_datasource_monitoring_choice__middleware_datasource_perf', 5)
         self.web_driver.find_element_by_id('middleware_datasource_monitoring_choice__middleware_datasource_perf').click()
         assert self.ui_utils.waitForTextOnPage('Options', 30)
 

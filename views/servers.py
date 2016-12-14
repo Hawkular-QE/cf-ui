@@ -68,7 +68,7 @@ class servers():
 
         # Feed is unique ID for this server
         self.ui_utils.click_on_row_containing_text(server.get('Feed'))
-
+        self.ui_utils.waitForTextOnPage('Relationships')
         server_details = self.ui_utils.get_generic_table_as_dict()
         assert server_details, "No server details found for {}.".format(self.web_session.PROVIDER)
 
@@ -78,6 +78,7 @@ class servers():
         self.web_session.logger.info("Current Company Tags: {}".format(origValue))
 
         self.web_driver.find_element_by_xpath("//button[@title='Policy']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_policy_choice__middleware_server_tag', 5)
         self.web_driver.find_element_by_id('middleware_server_policy_choice__middleware_server_tag').click()
         assert self.ui_utils.waitForTextOnPage('Tag Assignment', 5)
 
@@ -315,6 +316,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]", 5)
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
         self.ui_utils.accept_alert(10, alert_button_name)
         assert self.ui_utils.waitForTextOnPage(power.get('wait_for'), 15)
@@ -494,6 +496,7 @@ class servers():
         self.web_session.logger.info("Deploying App: {}".format(app))
 
         self.web_driver.find_element_by_xpath("//button[@title='Deployments']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_deployments_choice__middleware_deployment_add', 5)
         self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
         assert self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
 
@@ -506,6 +509,7 @@ class servers():
     def undeploy_server_deployment(self, app_to_undeploy = APPLICATION_WAR):
         self.web_session.logger.info("Undeploying App: {}".format(app_to_undeploy))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_deployment_deploy_choice__middleware_deployment_undeploy', 5)
         self.web_driver.find_element_by_id('middleware_deployment_deploy_choice__middleware_deployment_undeploy').click()
         self.ui_utils.sleep(2)
         self.ui_utils.accept_alert(10)
@@ -514,6 +518,7 @@ class servers():
     def restart_server_deployment(self, app_to_redeploy=APPLICATION_WAR):
         self.web_session.logger.info("Redeploying App: {}".format(app_to_redeploy))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_deployment_deploy_choice__middleware_deployment_restart', 5)
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_restart').click()
         self.ui_utils.sleep(2)
@@ -523,6 +528,7 @@ class servers():
     def disable_server_deployment(self, app_to_stop=APPLICATION_WAR):
         self.web_session.logger.info("Stopping App: {}".format(app_to_stop))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_deployment_deploy_choice__middleware_deployment_disable', 5)
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_disable').click()
         self.ui_utils.sleep(2)
@@ -532,6 +538,7 @@ class servers():
     def enable_server_deployment(self, app_to_start=APPLICATION_WAR):
         self.web_session.logger.info("Starting App: {}".format(app_to_start))
         self.web_driver.find_element_by_xpath("//button[@title='Operations']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_deployment_deploy_choice__middleware_deployment_enable', 5)
         self.web_driver.find_element_by_id(
             'middleware_deployment_deploy_choice__middleware_deployment_enable').click()
         self.ui_utils.sleep(2)
@@ -596,6 +603,7 @@ class servers():
         self.web_session.logger.info("Adding MySQL JDBC Driver: {}".format(app))
 
         self.web_driver.find_element_by_xpath("//button[@title='JDBC Drivers']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_jdbc_drivers_choice__middleware_jdbc_driver_add', 5)
         self.web_driver.find_element_by_id('middleware_server_jdbc_drivers_choice__middleware_jdbc_driver_add').click()
         assert self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
 
@@ -643,6 +651,7 @@ class servers():
         self.web_session.logger.info("Adding MySQL datasource")
 
         self.web_driver.find_element_by_xpath("//button[@title='Datasources']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_datasources_choice__middleware_datasource_add', 5)
         self.web_driver.find_element_by_id(
             'middleware_server_datasources_choice__middleware_datasource_add').click()
         self.ui_utils.sleep(2)
@@ -650,6 +659,7 @@ class servers():
 
         self.web_driver.find_element_by_id("chooose_datasource_input")
         self.web_driver.find_element_by_xpath("//option[@label='H2']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//button[@ng-click='addDatasourceChooseNext()']", 5)
         self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceChooseNext()']").click()
         # self.ui_utils.sleep(2)
         self.web_driver.find_element_by_id("ds_name_input").clear()

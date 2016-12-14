@@ -1,6 +1,7 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from views.servers import servers
+from selenium.webdriver.common.by import By
 
 class timelines():
     web_session = None
@@ -65,6 +66,7 @@ class timelines():
 
         assert self.ui_utils.waitForTextOnPage("Options", 15)
         self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_category_management')]").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]", 5)
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group)).click()
         ui_utils(self.web_session).sleep(5)
         return True
@@ -80,6 +82,7 @@ class timelines():
         # Select the 'starting' week
 
         self.web_driver.find_element_by_xpath("//button[@data-id='tl_timepivot']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//span[contains(.,'starting')]", 5)
         self.web_driver.find_element_by_xpath("//span[contains(.,'starting')]").click()
 
     def apply(self):
@@ -92,6 +95,7 @@ class timelines():
         self.web_session.web_driver.get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(@id,'timeline')]", 5)
         self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]").click()
         ui_utils(self.web_session).sleep(30)
 
