@@ -99,9 +99,7 @@ class servers():
             except:
                 el[1].click()
 
-        # To-Do: Need a better polling/wait mechanism
-        self.ui_utils.sleep(3)
-
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//*[contains(text(), '{}')]".format('Save'), 5)
         el = self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format('Save'))
         el[0].click()
 
