@@ -96,7 +96,7 @@ class session(properties):
 
         self.web_driver.set_window_size(self.BROWSER_WIDTH, self.BROWSER_HEIGHT)
         self.logger.info("MIQ URL: %s", self.MIQ_URL)
-        self.logger.info("Hawkular URL: {}", self.HAWKULAR_URL)
+        self.logger.info("Hawkular URL: %s", self.HAWKULAR_URL)
         self.web_driver.get(self.MIQ_URL)
 
         ''' Get Appliance Version - MIQ will be 'master', CFME will be 5.x '''
