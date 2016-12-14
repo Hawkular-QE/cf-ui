@@ -316,7 +316,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]", 5)
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]".format(power.get('action')), 5)
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(power.get('action'))).click()
         self.ui_utils.accept_alert(10, alert_button_name)
         assert self.ui_utils.waitForTextOnPage(power.get('wait_for'), 15)
