@@ -66,7 +66,7 @@ class timelines():
 
         assert self.ui_utils.waitForTextOnPage("Options", 15)
         self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_category_management')]").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]", 5)
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]".format(group), 5)
         self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group)).click()
         ui_utils(self.web_session).sleep(5)
         return True

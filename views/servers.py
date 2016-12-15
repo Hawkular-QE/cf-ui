@@ -68,7 +68,7 @@ class servers():
 
         # Feed is unique ID for this server
         self.ui_utils.click_on_row_containing_text(server.get('Feed'))
-        self.ui_utils.waitForTextOnPage('Relationships')
+        self.ui_utils.waitForTextOnPage('Relationships', 10)
         server_details = self.ui_utils.get_generic_table_as_dict()
         assert server_details, "No server details found for {}.".format(self.web_session.PROVIDER)
 
