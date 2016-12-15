@@ -84,7 +84,7 @@ class datasources():
             # Select checkbox
             datasource[0].click()
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
-            self.ui_utils.waitForElementOnPage(By.ID,
+            assert self.ui_utils.waitForElementOnPage(By.ID,
                                             'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
             self.ui_utils.web_driver.find_element_by_id(
                 'middleware_datasource_operations_choice__middleware_datasource_remove').click()
@@ -138,7 +138,7 @@ class datasources():
             # Operations will not be present for a Datasource on a Provider
             try:
                 self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
-                self.ui_utils.waitForElementOnPage(By.ID,
+                assert self.ui_utils.waitForElementOnPage(By.ID,
                                         'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
                 self.ui_utils.web_driver.find_element_by_id(
                     'middleware_datasource_operations_choice__middleware_datasource_remove').click()
