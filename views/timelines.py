@@ -66,8 +66,9 @@ class timelines():
 
         assert self.ui_utils.waitForTextOnPage("Options", 15)
         self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_category_management')]").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]".format(group), 5)
-        self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group)).click()
+        el = self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group))
+        self.ui_utils.waitForElementOnPage(el.format(group), 5)
+        el.click()
         ui_utils(self.web_session).sleep(5)
         return True
 
@@ -82,8 +83,9 @@ class timelines():
         # Select the 'starting' week
 
         self.web_driver.find_element_by_xpath("//button[@data-id='tl_timepivot']").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//span[contains(.,'starting')]", 5)
-        self.web_driver.find_element_by_xpath("//span[contains(.,'starting')]").click()
+        el = self.web_driver.find_element_by_xpath("//span[contains(.,'starting')]")
+        self.ui_utils.waitForElementOnPage(Bl, 5)
+        el.click()
 
     def apply(self):
 
@@ -94,9 +96,11 @@ class timelines():
 
         self.web_session.web_driver.get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+        ui_utils(self.web_session).waitForTextOnPage('Relationships', 10)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(@id,'timeline')]", 5)
-        self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]").click()
+        el = self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]")
+        self.ui_utils.waitForElementOnPage(el, 5)
+        self.el.click()
         ui_utils(self.web_session).sleep(30)
 
     def verify_event(self, event_type):
