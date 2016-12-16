@@ -99,9 +99,10 @@ class servers():
             except:
                 el[1].click()
 
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//*[contains(text(), '{}')]".format('Save'), 5)
-        el = self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format('Save'))
-        el[0].click()
+        els =  self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format('Save'))
+        el = els[0]
+        assert  self.ui_utils.wait_util_element_displayed(el, 10)
+        el.click()
 
         assert self.ui_utils.waitForTextOnPage("My Company Tags", 15)
 
