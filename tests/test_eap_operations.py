@@ -12,7 +12,6 @@ def web_session(request):
         web_session.close_web_driver()
 
     request.addfinalizer(closeSession)
-    
     return web_session
 
 def test_eap_stop(web_session):
@@ -38,3 +37,4 @@ def test_eap_suspend(web_session):
 def test_eap_resume(web_session):
     web_session.logger.info("Begin eap Reume Test")
     assert eap_operations(web_session).resume_eap()
+
