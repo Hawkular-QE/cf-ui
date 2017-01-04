@@ -112,6 +112,7 @@ class datasources():
 
         servers(self.web_session).add_datasource("H2-datasource")
         index = 0
+        datasource_to_delete = 'H2-datasource'
 
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         datasources = self.ui_utils.get_list_table_as_elements()
@@ -122,7 +123,7 @@ class datasources():
             return True
 
         for row in datasources:
-            datasource = datasources[index]
+            datasource = self.ui_utils.find_row_in_element_table_by_text(datasources, datasource_to_delete)
             datasource_name = datasource[2].text
             server = datasource[3].text
             host_name = datasource[4].text
@@ -132,8 +133,7 @@ class datasources():
 
             # Click on Datasource to get to Detail view
 
-            if self.ui_utils.get_elements_containing_text("H2-datasource"):
-                datasource[2].click()
+            datasource[2].click()
 
             # Operations will not be present for a Datasource on a Provider
             try:
@@ -150,7 +150,7 @@ class datasources():
                 self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
                 datasources = self.ui_utils.get_list_table_as_elements()
                 index += 1
-                continue;
+                continue
 
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         assert self.wait_for_datasource_to_be_deleted(currrent_datasource_count, (60 * 5))
