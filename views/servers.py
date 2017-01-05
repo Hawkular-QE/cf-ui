@@ -102,7 +102,7 @@ class servers():
 
         els =  self.web_driver.find_elements_by_xpath("//*[contains(text(), '{}')]".format('Save'))
         el = els[0]
-        assert  self.ui_utils.wait_util_element_displayed(el, 10)
+        assert  self.ui_utils.wait_until_element_displayed(el, 10)
         el.click()
 
         assert self.ui_utils.waitForTextOnPage("My Company Tags", 15)

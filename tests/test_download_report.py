@@ -117,6 +117,10 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     domains = utils.get_list_table()
+    if not domains:
+        web_session.logger.warning("No Domains found.")
+        pytest.skip("Skip test - No Domains found.")
+
     utils.click_on_row_containing_text(domains[0].get('Feed'))
 
     assert download_report(web_session, '').pdf_format()
@@ -174,7 +178,7 @@ def test_cfui_server_groups(web_session, delete_files):
     nav_to_server_groups(web_session)
     utils.web_driver.find_element_by_xpath('.//*[@title="Download"]').click()
     el = web_session.web_driver.find_element_by_id("download_choice__download_pdf")
-    assert utils.wait_util_element_displayed(el, 10)
+    assert utils.wait_until_element_displayed(el, 10)
     el.click()
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server Groups*.pdf'))
 
@@ -212,8 +216,8 @@ def nav_to_server_groups(web_session):
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     domains_ui = utils.get_list_table()
     if not domains_ui:
-        web_session.logger.warning("No Domains found")
-        pass
-
-    domains(web_session).nav_to_all_middleware_server_groups(domains_ui[0].get('Domain Name'))
+        web_session.logger.warning("No Domains found.")
+        pytest.skip("Skip test - No Domains found.")
+    else:
+        domains(web_session).nav_to_all_middleware_server_groups(domains_ui[0].get('Domain Name'))
 
