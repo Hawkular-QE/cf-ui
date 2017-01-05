@@ -1,6 +1,7 @@
 import time
 from selenium.common.exceptions import NoSuchElementException
 from random import sample
+from common.timeout import timeout
 
 class ui_utils():
 
@@ -62,14 +63,10 @@ class ui_utils():
 
         return True
 
-    def wait_util_element_displayed(self, element, waitTime):
-        currentTime = time.time()
+    def wait_until_element_displayed(self, element, waitTime):
 
-        while True:
-            if time.time() - currentTime >= waitTime:
-                self.web_session.logger.error("Timed out waiting for element to be displayed.")
-                return False
-            else:
+        with timeout(waitTime, error_message="Timed out waiting for element to be displayed."):
+            while True:
                 if element.is_displayed():
                     break;
                 time.sleep(1)

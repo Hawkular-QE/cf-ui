@@ -99,7 +99,7 @@ class timelines():
         ui_utils(self.web_session).waitForTextOnPage('Relationships', 10)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
         el = self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]")
-        self.ui_utils.wait_util_element_displayed(el, 5)
+        self.ui_utils.wait_until_element_displayed(el, 5)
         self.el.click()
         ui_utils(self.web_session).sleep(30)
 

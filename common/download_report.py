@@ -21,24 +21,24 @@ class download_report():
 
     def text_format(self):
         el = self.web_driver.find_element_by_xpath('.//*[@title="Download"]')
-        assert self.ui_utils.wait_util_element_displayed(el, 15)
+        assert self.ui_utils.wait_until_element_displayed(el, 15)
         el.click()
         el = self.web_driver.find_element_by_id("download_choice__download_text")
-        assert self.ui_utils.wait_util_element_displayed(el, 10)
+        assert self.ui_utils.wait_until_element_displayed(el, 10)
         el.click()
         return True
 
     def csv_format(self):
         el = self.web_driver.find_element_by_xpath('.//*[@title="Download"]')
-        assert self.ui_utils.wait_util_element_displayed(el, 15)
+        assert self.ui_utils.wait_until_element_displayed(el, 15)
         el.click()
         el = self.web_driver.find_element_by_id("download_choice__download_csv")
-        assert self.ui_utils.wait_util_element_displayed(el, 10)
+        assert self.ui_utils.wait_until_element_displayed(el, 10)
         el.click()
         return True
 
     def pdf_format(self):
         el = self.web_driver.find_element_by_id('download_view')
-        assert self.ui_utils.wait_util_element_displayed(el, 15)
+        assert self.ui_utils.wait_until_element_displayed(el, 15)
         el.click()
         return True

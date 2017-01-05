@@ -7,6 +7,7 @@ import fnmatch
 from common.ui_utils import ui_utils
 from common.view import view
 from views.domains import domains
+from common.timeout import timeout
 import time
 
 @pytest.fixture (scope='session')
@@ -42,8 +43,8 @@ def test_cfui_providers_download_txt(web_session, delete_files):
     web_session.logger.info("Begin provider file assert")
 
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Provider*')
-    assert assert_download_exist("{}.txt".format(file))
-    assert assert_download_exist("{}.csv".format(file))
+    assert_download_exist("{}.txt".format(file))
+    assert_download_exist("{}.csv".format(file))
 
 def test_cfui_domain_download_txt(web_session, delete_files):
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
@@ -55,8 +56,8 @@ def test_cfui_domain_download_txt(web_session, delete_files):
 
     web_session.logger.info("Begin provider file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Domain*')
-    assert assert_download_exist("{}.txt".format(file))
-    assert assert_download_exist("{}.csv".format(file))
+    assert_download_exist("{}.txt".format(file))
+    assert_download_exist("{}.csv".format(file))
 
 def test_cfui_server_download_txt(web_session, delete_files):
     web_session.web_driver.get("{}//middleware_server/show_list".format(web_session.MIQ_URL))
@@ -68,8 +69,8 @@ def test_cfui_server_download_txt(web_session, delete_files):
 
     web_session.logger.info("Begin server file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Servers*')
-    assert assert_download_exist("{}.txt".format(file))
-    assert assert_download_exist("{}.csv".format(file))
+    assert_download_exist("{}.txt".format(file))
+    assert_download_exist("{}.csv".format(file))
 
 
 def test_cfui_datasource_download_txt(web_session, delete_files):
@@ -82,8 +83,8 @@ def test_cfui_datasource_download_txt(web_session, delete_files):
 
     web_session.logger.info("Begin datasource file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Datasources*')
-    assert assert_download_exist("{}.txt".format(file))
-    assert assert_download_exist("{}.csv".format(file))
+    assert_download_exist("{}.txt".format(file))
+    assert_download_exist("{}.csv".format(file))
 
 
 def test_cfui_deployment_download_txt(web_session, delete_files):
@@ -96,8 +97,8 @@ def test_cfui_deployment_download_txt(web_session, delete_files):
 
     web_session.logger.info("Begin deployment file assert")
     file = "{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Deployments*')
-    assert assert_download_exist("{}.txt".format(file))
-    assert assert_download_exist("{}.csv".format(file))
+    assert_download_exist("{}.txt".format(file))
+    assert_download_exist("{}.csv".format(file))
 
 def test_cfui_provider_detail_pdf(web_session, delete_files):
     web_session.logger.info("Begin download provider detail PDF text")
@@ -117,6 +118,10 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     domains = utils.get_list_table()
+    if not domains:
+        web_session.logger.warning("No Domains found.")
+        pytest.skip("Skip test - No Domains found.")
+
     utils.click_on_row_containing_text(domains[0].get('Feed'))
 
     assert download_report(web_session, '').pdf_format()
@@ -174,7 +179,7 @@ def test_cfui_server_groups(web_session, delete_files):
     nav_to_server_groups(web_session)
     utils.web_driver.find_element_by_xpath('.//*[@title="Download"]').click()
     el = web_session.web_driver.find_element_by_id("download_choice__download_pdf")
-    assert utils.wait_util_element_displayed(el, 10)
+    assert utils.wait_until_element_displayed(el, 10)
     el.click()
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server Groups*.pdf'))
 
@@ -193,27 +198,21 @@ def test_cfui_server_groups_detail(web_session, delete_files):
 
 
 def assert_download_exist(file, waitTime = 15):
-    currentTime = time.time()
-
-    while True:
-        if time.time() - currentTime >= waitTime:
-            assert False, "Timed out waiting for Download file: {}".format(file)
-
-        else:
+    with timeout(waitTime, error_message="Timed out waiting for Download file: {}".format(file)):
+        while True:
             r = glob.glob(file)
             if fnmatch.filter(r, file):
                 break;
-            time.sleep(1)
 
-    return True
+            time.sleep(1)
 
 def nav_to_server_groups(web_session):
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     domains_ui = utils.get_list_table()
     if not domains_ui:
-        web_session.logger.warning("No Domains found")
-        pass
+        web_session.logger.warning("No Domains found.")
+        pytest.skip("Skip test - No Domains found.")
 
     domains(web_session).nav_to_all_middleware_server_groups(domains_ui[0].get('Domain Name'))
 
