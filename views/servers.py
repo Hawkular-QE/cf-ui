@@ -507,22 +507,26 @@ class servers():
         if cancel:
             self.web_driver.find_element_by_xpath(".//*[@id='deploy_div']//button[1]").click()
 
-        if runtime_name:
+        elif runtime_name:
             self.web_driver.find_element_by_id('runtime_name_input').clear()
             self.web_driver.find_element_by_id('runtime_name_input').send_keys(runtime_name)
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(runtime_name), 15)
 
-        if overwrite:
+        elif overwrite:
             self.web_driver.find_element_by_xpath(
                 "//*[contains(@class,'bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-off bootstrap-switch-id-force_deployment_cb bootstrap-switch-animate')]").click()
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
 
-        if not enable_deploy:
+        elif not enable_deploy:
             self.web_driver.find_element_by_xpath("//span[contains(.,'Yes')]").click()
+            self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
+            assert self.ui_utils.waitForTextOnPage(
+                'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+        else:
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
