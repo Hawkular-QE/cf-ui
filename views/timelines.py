@@ -66,9 +66,8 @@ class timelines():
 
         assert self.ui_utils.waitForTextOnPage("Options", 15)
         self.web_driver.find_element_by_xpath("//button[contains(@data-id,'tl_category_management')]").click()
-        el = self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group))
-        self.ui_utils.waitForElementOnPage(el.format(group), 5)
-        el.click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'{}')]".format(group), 5)
+        self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(group)).click()
         ui_utils(self.web_session).sleep(5)
         return True
 
@@ -83,9 +82,8 @@ class timelines():
         # Select the 'starting' week
 
         self.web_driver.find_element_by_xpath("//button[@data-id='tl_timepivot']").click()
-        el = self.web_driver.find_element_by_xpath("//span[contains(.,'starting')]")
-        self.ui_utils.waitForElementOnPage(Bl, 5)
-        el.click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//span[contains(.,'starting')]", 5)
+        self.web_driver.find_element_by_xpath("//span[contains(.,'starting')]").click()
 
     def apply(self):
 
@@ -100,14 +98,14 @@ class timelines():
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
         el = self.web_driver.find_element_by_xpath("//a[contains(@id,'timeline')]")
         self.ui_utils.wait_until_element_displayed(el, 5)
-        self.el.click()
-        ui_utils(self.web_session).sleep(30)
+        el.click()
+        ui_utils(self.web_session).sleep(60)
+        self.ui_utils.waitForTextOnPage('Options', 120)
 
     def verify_event(self, event_type):
 
         # Verify event where type for successful event is 'ok' and for unsuccessful event is 'error'
-
         self.web_driver.find_element_by_xpath(
-            "//*[@id = 'chart_placeholder']/div[1]/*[name() = 'svg']/*[name() = 'g'][4]/*[name() = 'g'][1]/* [name() = 'text']").click()
+            "//*[@id = 'chart_placeholder']//*[name() = 'svg']//*[name() = 'text']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 120)
         return True
