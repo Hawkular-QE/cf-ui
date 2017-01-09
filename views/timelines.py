@@ -105,9 +105,5 @@ class timelines():
     def verify_event(self, event_type):
 
         # Verify event where type for successful event is 'ok' and for unsuccessful event is 'error'
-
-        self.web_driver.find_element_by_xpath(
-            "//*[@id = 'chart_placeholder']/div[1]/*[name() = 'svg']/*[name() = 'g'][4]/*[name() = 'g'][1]/* [name() = 'text'][2]").click()
-        #self.web_driver.find_element_by_xpath("//text[contains(@class,'timeline-pf-drop timeline-pf-event-group')]").click()
         assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 120)
         return True
