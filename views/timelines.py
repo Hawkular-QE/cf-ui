@@ -104,8 +104,11 @@ class timelines():
 
     def verify_event(self, event_type):
 
+        el = self.web_driver.find_element_by_xpath(
+                "//*[@id = 'chart_placeholder']//*[name() = 'svg']//*[name() = 'text']")
+
         # Verify event where type for successful event is 'ok' and for unsuccessful event is 'error'
-        self.web_driver.find_element_by_xpath(
-            "//*[@id = 'chart_placeholder']//*[name() = 'svg']//*[name() = 'text']").click()
+        self.ui_utils.wait_until_element_displayed(el, 60)
+        el.click()
         assert ui_utils(self.web_session).waitForTextOnPage("hawkular_deployment.{}".format(event_type), 120)
         return True
