@@ -30,5 +30,6 @@ def test_edit_mw_alert(web_session):
 
 def test_delete_mw_alert(web_session):
     web_session.logger.info("Begin delete alert test")
-    assert eap_alerts(web_session).delete_alert()
+    assert eap_alerts(web_session).delete_alert(eap_alerts.editalert_desc)
+    assert eap_alerts(web_session).delete_alert(eap_alerts.copyalert_desc)
 
