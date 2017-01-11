@@ -96,27 +96,20 @@ class eap_alerts():
 
         return True
 
-    def delete_alert(self):
+    def delete_alert(self, alertdesc):
 
         self.navigate_to_all_alerts()
         ui_utils(self.web_session).get_list_table_as_elements()
 
-        if ui_utils(self.web_session).get_elements_containing_text(self.editalert_desc):
-            ui_utils(self.web_session).click_on_row_containing_text(self.editalert_desc)
+        if ui_utils(self.web_session).get_elements_containing_text(alertdesc):
+            ui_utils(self.web_session).click_on_row_containing_text(alertdesc)
             assert ui_utils(self.web_session).waitForTextOnPage("Info", 90)
             self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
             self.web_session.web_driver.find_element_by_xpath(".//*[@id='miq_alert_vmdb_choice__alert_delete']").click()
             ui_utils(self.web_session).accept_alert(20)
-            assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}": Delete successful'.format(self.editalert_desc), 50)
-            return True
+            assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}": Delete successful'.format(alertdesc), 50)
+            self.web_session.logger.info("The alert {} is removed successfully.".format(alertdesc))
 
-        if ui_utils(self.web_session).get_elements_containing_text(self.copyalert_desc):
-            ui_utils(self.web_session).click_on_row_containing_text(self.copyalert_desc)
-            assert ui_utils(self.web_session).waitForTextOnPage("Info", 90)
-            self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-            self.web_session.web_driver.find_element_by_xpath(".//*[@id='miq_alert_vmdb_choice__alert_delete']").click()
-            ui_utils(self.web_session).accept_alert(20)
-            assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}": Delete successful'.format(self.copyalert_desc), 50)
             return True
 
     def navigate_to_all_alerts(self):
