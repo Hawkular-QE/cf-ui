@@ -73,7 +73,8 @@ class ssh():
 
         ssh_result = self.execute_command(cmd)
         if ssh_result['result'] == 0:
-            pid = re.sub('[^0-9]+', "", ssh_result["output"])
+            pid = ssh_result["output"].replace('\n', ' ')
+
             if len(pid) == 0: pid = None
         else:
             self.web_session.logger.info("Unable to get pid for process: {}  on ip: {}".format(process_name, self.ip))

@@ -3,6 +3,8 @@ from hawkular.hawkular_api import hawkular_api
 from views.providers import providers
 from selenium.webdriver.common.by import By
 from common.view import view
+from common.ssh import ssh
+from common.timeout import timeout
 import os
 import time
 import datetime
@@ -225,17 +227,22 @@ class servers():
         eap_app = "{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk))
 
         eap_hostname = eap_hawk.get("details").get("Hostname")
-        # ssh_ = ssh(self.web_session, eap_hostname)
+        ssh_ = ssh(self.web_session, eap_hostname)
         # assert ssh_.get_pid(eap_app) != None, "No EAP pid found."
 
         self.eap_power_action(power, eap_hawk)
-        self.ui_utils.sleep(3)
-        # assert ssh_.get_pid(eap_app) == None, "EAP pid unexpectedly found."
+        with timeout(15, error_message="Timeout waiting for EAP Standalone server to Stop on host: {}".format(eap_hostname)):
+            while True:
+                if ssh_.get_pid('standalone.sh') == None:
+                    break
 
-        #start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "bin/standalone.sh")
-        #self.web_session.logger.debug("About to start EAP: {}".format(start_str))
-        # ssh_.execute_command(start_str)
-        #assert ssh_.get_pid(eap_app) != None, "EAP pid not found."
+        # Start EAP Standalone server back up, as to leave the EAP server in the starting state
+        assert self.start_eap_standalone_server(eap_hawk)
+
+        with timeout(15, error_message="Timeout waiting for EAP Standalone server to Start on host: {}".format(eap_hostname)):
+            while True:
+                if ssh_.get_pid('standalone.sh') != None:
+                    break
 
         return True
 
@@ -778,6 +785,26 @@ class servers():
 
         return True
 
+    def start_eap_standalone_server(self, eap_hawk):
+        # Assumption is that the EAP is not running in a container.
 
+        pid = None
 
+        ssh_ = ssh(self.web_session, eap_hawk.get("details").get("Hostname"))
+        start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "/bin/standalone.sh")
 
+        self.web_session.logger.debug("About to start EAP: {}".format(start_str))
+        result = ssh_.execute_command(start_str).get('result')
+        self.web_session.logger.debug("Result: {}".format(result))
+        if result == 0:
+            pid = ssh_.get_pid('standalone.sh')
+
+        return pid
+
+    def stop_eap_standalone_server(self, eap_hawk):
+        # Assumption is that the EAP is not running in a container.
+
+        ssh_ = ssh(self.web_session, eap_hawk.get("details").get("Hostname"))
+        result = ssh_.execute_command("kill -9 {}".format(ssh_.get_pid('standalone')))
+
+        return result.get('result')
