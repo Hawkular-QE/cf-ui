@@ -8,6 +8,7 @@ from common.timeout import timeout
 import os
 import time
 import datetime
+import socket
 from common.db import db
 
 class servers():
@@ -236,7 +237,7 @@ class servers():
                 if ssh_.get_pid('standalone.sh') == None:
                     break
 
-        # Start EAP Standalone server back up, as to leave the EAP server in the starting state
+        # Start EAP Standalone server, as to leave the EAP server in the starting state
         assert self.start_eap_standalone_server(eap_hawk)
 
         with timeout(15, error_message="Timeout waiting for EAP Standalone server to Start on host: {}".format(eap_hostname)):
@@ -471,13 +472,6 @@ class servers():
 
         return True
 
-    def find_eap_in_state(self, state):
-        for row in self.hawkular_api.get_hawkular_servers():
-            if row.get("Product Name") != 'Hawkular' and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
-                return row
-
-        return None
-
     # EAPs that are running in a container will NOT have a resolvable Hostname (Hostname will be either POD or Container ID)
     def find_non_container_eap_in_state(self, state):
         rows = self.hawkular_api.get_hawkular_servers()
@@ -493,7 +487,13 @@ class servers():
                     and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()) \
                     and "domain" not in row.get("Feed").lower():
 
-                return row
+                hostname = row.get("details").get("Hostname")
+                try:
+                    socket.gethostbyname(hostname)
+                    self.web_session.logger.debug("Have resolvable Hostname/IP: {}".format(hostname))
+                    return row
+                except:
+                    self.web_session.logger.debug("Note a resolvable Hostname/IP: {}".format(hostname))
 
         return None
 
