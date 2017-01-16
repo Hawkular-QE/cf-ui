@@ -9,16 +9,18 @@ class ssh():
     port = None
     username = None
     password = None
+    keyfile = None
     ssh = None
 
     # IP is a required param, while port/username/password will default to properties.properties
-    def __init__(self, web_session, ip, port = None, username = None, password = None):
+    def __init__(self, web_session, ip, port = None, username = None, password = None, keyfile = None):
 
         self.web_session = web_session
         self.ip = ip
         self.port = self.web_session.SSH_PORT if port == None else port
         self.username = self.web_session.SSH_USERNAME if username == None else username
         self.password = self.web_session.SSH_PASSWORD if password == None else password
+        self.keyfile = self.web_session.SSH_KEY_FILE if keyfile == None else keyfile
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -28,7 +30,7 @@ class ssh():
             .format(self.ip, self.port, self.username, self.password))
 
         try:
-            self.ssh.connect(self.ip, int(self.port), self.username, self.password, allow_agent=True, timeout=60)
+            self.ssh.connect(self.ip, int(self.port), self.username, self.password, allow_agent=True, timeout=60, key_filename=self.keyfile)
         except paramiko.AuthenticationException:
             raise Exception('Authentication failure.')
         except paramiko.SSHException:
