@@ -3,9 +3,13 @@ from hawkular.hawkular_api import hawkular_api
 from views.providers import providers
 from selenium.webdriver.common.by import By
 from common.view import view
+from common.ssh import ssh
+from common.timeout import timeout
 import os
 import time
 import datetime
+import socket
+import pytest
 from common.db import db
 
 class servers():
@@ -14,7 +18,6 @@ class servers():
     ui_utils = None
     hawkular_api = None
     db = None
-    EAP_PROCESS = 'standalone.sh'
 
     power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':None}
     power_restart = {'action': 'Restart Server', 'wait_for': 'Restart initiated for selected server', 'start_state': 'running', 'end_state': 'running'}
@@ -182,13 +185,13 @@ class servers():
         # Restart EAP
         # Validate that pid changed
 
-        if self.find_non_container_eap_in_state("reload-required"):
+        if self.find_eap_in_state("reload-required"):
             self.force_reload_eap()
             self.navigate_and_refresh_provider()
 
         power = self.power_restart
 
-        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        eap_hawk = self.find_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
         # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
@@ -218,24 +221,26 @@ class servers():
         # Stop EAP
         # Validate that no pid (EAP has stopped)
 
-        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
-        assert eap_hawk
-
-        # Example format: Djboss.server.base.dir=/root/wildfly-10.0.0.Final/standalone
-        eap_app = "{}{}".format("Djboss.server.base.dir=", self.__get_eap_app_path(eap_hawk))
+        eap_hawk = self.find_eap_in_state(power.get('start_state'), check_if_resolvable_hostname=True)
+        pytest.skip("No EAP with Resolvable Hostname found.")
 
         eap_hostname = eap_hawk.get("details").get("Hostname")
-        # ssh_ = ssh(self.web_session, eap_hostname)
+        ssh_ = ssh(self.web_session, eap_hostname)
         # assert ssh_.get_pid(eap_app) != None, "No EAP pid found."
 
         self.eap_power_action(power, eap_hawk)
-        self.ui_utils.sleep(3)
-        # assert ssh_.get_pid(eap_app) == None, "EAP pid unexpectedly found."
+        with timeout(15, error_message="Timeout waiting for EAP Standalone server to Stop on host: {}".format(eap_hostname)):
+            while True:
+                if ssh_.get_pid('standalone.sh') == None:
+                    break
 
-        #start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "bin/standalone.sh")
-        #self.web_session.logger.debug("About to start EAP: {}".format(start_str))
-        # ssh_.execute_command(start_str)
-        #assert ssh_.get_pid(eap_app) != None, "EAP pid not found."
+        # Start EAP Standalone server, as to leave the EAP server in the starting state
+        assert self.start_eap_standalone_server(eap_hawk)
+
+        with timeout(15, error_message="Timeout waiting for EAP Standalone server to Start on host: {}".format(eap_hostname)):
+            while True:
+                if ssh_.get_pid('standalone.sh') != None:
+                    break
 
         return True
 
@@ -246,7 +251,7 @@ class servers():
         # Reload EAP
         # Validate - TO-DO
 
-        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        eap_hawk = self.find_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
         self.eap_power_action(power, eap_hawk)
@@ -262,7 +267,7 @@ class servers():
         # Suspend EAP
         # Validate - TO-DO
 
-        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        eap_hawk = self.find_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
         self.eap_power_action(power, eap_hawk, alert_button_name='Suspend')
@@ -278,7 +283,7 @@ class servers():
         # Resume EAP
         # Validate - TO-DO
 
-        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        eap_hawk = self.find_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
         self.eap_power_action(power, eap_hawk)
@@ -294,7 +299,7 @@ class servers():
         # Graceful-Shutdown EAP
         # Validate - TO-DO
 
-        eap_hawk = self.find_non_container_eap_in_state(power.get('start_state'))
+        eap_hawk = self.find_eap_in_state(power.get('start_state'))
         assert eap_hawk
 
         self.eap_power_action(power, eap_hawk)
@@ -330,7 +335,7 @@ class servers():
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find EAP on which to deploy
-        eap = self.find_non_container_eap_in_state("running")
+        eap = self.find_eap_in_state("running")
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
@@ -464,15 +469,8 @@ class servers():
 
         return True
 
-    def find_eap_in_state(self, state):
-        for row in self.hawkular_api.get_hawkular_servers():
-            if row.get("Product Name") != 'Hawkular' and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()):
-                return row
-
-        return None
-
     # EAPs that are running in a container will NOT have a resolvable Hostname (Hostname will be either POD or Container ID)
-    def find_non_container_eap_in_state(self, state):
+    def find_eap_in_state(self, state, check_if_resolvable_hostname = False):
         rows = self.hawkular_api.get_hawkular_servers()
         for row in rows:
             self.web_session.logger.info("Product: {}  Feed: {}   State: {}".
@@ -486,7 +484,16 @@ class servers():
                     and (state.lower() == "any" or row.get("details").get("Server State") == state.lower()) \
                     and "domain" not in row.get("Feed").lower():
 
-                return row
+                if check_if_resolvable_hostname:
+                    hostname = row.get("details").get("Hostname")
+                    try:
+                        socket.gethostbyname(hostname)
+                        self.web_session.logger.debug("Found resolvable Hostname: {}".format(hostname))
+                        return row
+                    except:
+                        self.web_session.logger.debug("Note a resolvable Hostname: {}".format(hostname))
+                else:
+                    return row
 
         return None
 
@@ -609,7 +616,7 @@ class servers():
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find running EAP server
-        eap = self.find_non_container_eap_in_state("any")
+        eap = self.find_eap_in_state("any")
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
@@ -654,7 +661,7 @@ class servers():
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find running EAP server
-        eap = self.find_non_container_eap_in_state("any")
+        eap = self.find_eap_in_state("any")
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
@@ -705,7 +712,7 @@ class servers():
     def force_reload_eap(self):
         self.web_session.logger.info("Reloading non-container EAP standalone")
         power = self.power_force_reload
-        eap_hawk = self.find_non_container_eap_in_state('reload-required')
+        eap_hawk = self.find_eap_in_state('reload-required')
         assert eap_hawk
         self.eap_power_action(power, eap_hawk)
         return True
@@ -714,7 +721,7 @@ class servers():
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find EAP on which to deploy
-        eap = self.find_non_container_eap_in_state("running")
+        eap = self.find_eap_in_state("running")
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
@@ -734,7 +741,7 @@ class servers():
     def add_deployment_overwrite(self, app_to_deploy=APPLICATION_JAR):
 
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
-        eap = self.find_non_container_eap_in_state("running")
+        eap = self.find_eap_in_state("running")
         assert eap, "No EAP found in desired state."
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
@@ -753,7 +760,7 @@ class servers():
             self.undeploy_application_archive(self.APPLICATION_JAR)
 
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
-        eap = self.find_non_container_eap_in_state("running")
+        eap = self.find_eap_in_state("running")
         assert eap, "No EAP found in desired state."
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
@@ -769,7 +776,7 @@ class servers():
 
     def add_deployment_cancel(self, app_to_deploy=APPLICATION_JAR):
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
-        eap = self.find_non_container_eap_in_state("running")
+        eap = self.find_eap_in_state("running")
         assert eap, "No EAP found in desired state."
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
@@ -778,6 +785,26 @@ class servers():
 
         return True
 
+    def start_eap_standalone_server(self, eap_hawk):
+        # Assumption is that the EAP is not running in a container.
 
+        pid = None
 
+        ssh_ = ssh(self.web_session, eap_hawk.get("details").get("Hostname"))
+        start_str = 'nohup {}{} -Djboss.service.binding.set=ports-01 -b=0.0.0.0 -bmanagement=0.0.0.0  > /dev/null 2>&1 &\n'.format(self.__get_eap_app_path(eap_hawk), "/bin/standalone.sh")
 
+        self.web_session.logger.debug("About to start EAP: {}".format(start_str))
+        result = ssh_.execute_command(start_str).get('result')
+        self.web_session.logger.debug("Result: {}".format(result))
+        if result == 0:
+            pid = ssh_.get_pid('standalone.sh')
+
+        return pid
+
+    def stop_eap_standalone_server(self, eap_hawk):
+        # Assumption is that the EAP is not running in a container.
+
+        ssh_ = ssh(self.web_session, eap_hawk.get("details").get("Hostname"))
+        result = ssh_.execute_command("kill -9 {}".format(ssh_.get_pid('standalone')))
+
+        return result.get('result')
