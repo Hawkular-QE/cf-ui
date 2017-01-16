@@ -13,14 +13,13 @@ class ssh():
     ssh = None
 
     # IP is a required param, while port/username/password will default to properties.properties
-    def __init__(self, web_session, ip, port = None, username = None, password = None, keyfile = None):
+    def __init__(self, web_session, ip, port = None, username = None, password = None):
 
         self.web_session = web_session
         self.ip = ip
         self.port = self.web_session.SSH_PORT if port == None else port
         self.username = self.web_session.SSH_USERNAME if username == None else username
         self.password = self.web_session.SSH_PASSWORD if password == None else password
-        self.keyfile = self.web_session.SSH_KEY_FILE if keyfile == None else keyfile
 
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
