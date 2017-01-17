@@ -1,6 +1,7 @@
 import pytest
 from common.session import session
 from views.servers import servers
+from views.datasource import datasources
 
 
 @pytest.fixture (scope='session')
@@ -84,7 +85,8 @@ def test_cfui_add_jdbc_driver(web_session):
 # Add datasource
 def test_cfui_add_datasource(web_session):
     web_session.logger.info("Begin Add datasource test (OPR-035a)")
-    assert servers(web_session).add_datasource("H2-DS")
+    assert servers(web_session).add_datasource("H2-Test")
+    assert datasources(web_session).delete_datasource_list_view()
 
 # More Archive Tests:
 
