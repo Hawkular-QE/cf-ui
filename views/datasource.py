@@ -2,11 +2,13 @@ from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 import time
+import re
 from views.servers import servers
 from selenium.webdriver.common.by import By
 
 class datasources():
     web_session = None
+    datasource_desc = "H2-Test"
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -19,7 +21,7 @@ class datasources():
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         datasource_api = self.hawkular_api.get_hawkular_datasources()
-        datasource_ui = self.ui_utils.get_list_table();
+        datasource_ui = self.ui_utils.get_list_table()
         datasource_db = db(self.web_session).get_datasources()
         assert len(datasource_db) == len(datasource_ui) == len(datasource_api), "Datasource length match"
 
@@ -39,7 +41,7 @@ class datasources():
     def validate_datasource_detail(self):
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
-        datasource_ui = self.ui_utils.get_list_table();
+        datasource_ui = self.ui_utils.get_list_table()
         datasource_api = self.hawkular_api.get_hawkular_datasources()
 
         for dat in self.ui_utils.get_random_list(datasource_ui, 3):
@@ -61,8 +63,7 @@ class datasources():
         return True
 
     def delete_datasource_list_view(self):
-        servers(self.web_session).add_datasource("H2-Test")
-        datasource_to_delete = 'H2-Test'
+        datasource_to_delete = self.datasource_desc
 
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         datasources = self.ui_utils.get_list_table_as_elements()
@@ -110,9 +111,8 @@ class datasources():
 
     def delete_datasource_detail_view(self, list_view=True):
 
-        servers(self.web_session).add_datasource("H2-datasource")
         index = 0
-        datasource_to_delete = 'H2-datasource'
+        datasource_to_delete = self.datasource_desc
 
         self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         datasources = self.ui_utils.get_list_table_as_elements()

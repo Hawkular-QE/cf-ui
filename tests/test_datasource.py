@@ -1,6 +1,7 @@
 import pytest
 from common.session import session
 from views.datasource import datasources
+from views.servers import servers
 
 
 @pytest.fixture (scope='session')
@@ -24,8 +25,10 @@ def test_cfui_datasource_detail(web_session):
 
 def test_cfui_delete_datasource_list_view(web_session):
     web_session.logger.info("Begin List view delete datasource test (OPR-036a)")
+    assert servers(web_session).add_datasource("H2-Test")
     assert datasources(web_session).delete_datasource_list_view()
 
 def test_cfui_delete_datasource_detail_view(web_session):
     web_session.logger.info("Begin Detail view delete datasource test (OPR-036a)")
+    assert servers(web_session).add_datasource("H2-Test")
     assert datasources(web_session).delete_datasource_detail_view()
