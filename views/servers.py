@@ -710,11 +710,14 @@ class servers():
             'Datasource "{}" has been installed on this server.'.format(datasourceName), 15)
 
     def force_reload_eap(self):
-        self.web_session.logger.info("Reloading non-container EAP standalone")
-        power = self.power_force_reload
-        eap_hawk = self.find_eap_in_state('reload-required')
-        assert eap_hawk
-        self.eap_power_action(power, eap_hawk)
+        if self.find_eap_in_state('reload-required'):
+            self.web_session.logger.info("Reloading non-container EAP standalone")
+            power = self.power_force_reload
+            eap_hawk = self.find_eap_in_state('reload-required')
+            assert eap_hawk
+            self.eap_power_action(power, eap_hawk)
+        else:
+            self.web_session.logger.info("No Eap server in 'reload-required' state")
         return True
 
     def add_deployment_disable(self, app_to_deploy=APPLICATION_JAR):
