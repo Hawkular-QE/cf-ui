@@ -40,11 +40,11 @@ class eap_alerts():
 
         self.web_session.web_driver.find_element_by_xpath("//a[@title='Add a New Alert']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("Adding a new Alert", 90)
-        self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").send_keys(self.alert_desc)
         self.web_session.web_driver.find_element_by_xpath("//button[@data-original-title='VM and Instance']").click()
         self.web_session.web_driver.find_element_by_xpath("//span[contains(.,'Middleware Server')]").click()
         ui_utils(self.web_session).sleep(10)
         assert ui_utils(self.web_session).waitForTextOnPage("Nothing", 90)
+        self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").send_keys(self.alert_desc)
         self.web_session.web_driver.find_element_by_xpath("//button[@data-original-title='Nothing']").click()
         self.web_session.web_driver.find_element_by_xpath("//span[contains(.,'JVM Heap Used')]").click()
         assert ui_utils(self.web_session).waitForTextOnPage("> Heap Max (%)", 90)
