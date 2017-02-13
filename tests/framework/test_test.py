@@ -1,6 +1,6 @@
 import pytest
 from common.session import session
-
+from common.ui_utils import ui_utils
 
 @pytest.fixture
 def web_session(request):
@@ -18,3 +18,6 @@ def test_cfui_test(web_session):
     assert True, "Sanity Login Test"
 
 
+def test_cfui_log_sleep(web_session):
+    web_session.logger.info("Begin Long Wait")
+    ui_utils(web_session).sleep(10000)
