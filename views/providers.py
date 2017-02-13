@@ -332,7 +332,7 @@ class providers():
     def verify_add_provider_success(self):
 
         assert ui_utils(self.web_session).waitForTextOnPage(
-            'Middleware Providers "{}" was saved'.format(self.provider_name), 30)
+            'Middleware Providers "{}" was saved'.format(self.provider_name), 90)
 
         if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
                 self.provider_name)):
