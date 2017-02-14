@@ -87,6 +87,7 @@ def test_cfui_add_datasource(web_session):
     web_session.logger.info("Begin Add datasource test (OPR-035a)")
     assert servers(web_session).add_datasource("H2-Test")
     assert datasources(web_session).delete_datasource_list_view()
+    assert servers(web_session).force_reload_eap()
 
 # More Archive Tests:
 
