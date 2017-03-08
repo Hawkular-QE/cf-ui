@@ -6,6 +6,7 @@ from hawkular.hawkular_api import hawkular_api
 from common.view import view
 from common.db import db
 import time
+from common.timeout import timeout
 
 class providers():
     web_session = None
@@ -355,9 +356,20 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
 
     def save_provider(self):
-        save = WebDriverWait(self.web_driver, 10).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[@ng-click='addClicked($event, true)']")))
-        save.click()
+        xpath = "//button[contains(text(),'Add')]"
+        with timeout(15, error_message="Timed out waiting for Save."):
+            while True:
+                try:
+                    self.web_driver.find_element_by_xpath(xpath).click()
+                    if (self.ui_utils.isTextOnPage(" was saved")):
+                        self.web_session.logger.info("Provider saved.")
+                        break;
+                    else:
+                        self.web_session.logger.info("No Provider save message.")
+                except:
+                    self.web_session.logger.info("Provider not saved.")
+
+                time.sleep(1)
 
     def wait_for_provider_refresh_status(self, expected_status, waitTime):
         currentTime = time.time()
