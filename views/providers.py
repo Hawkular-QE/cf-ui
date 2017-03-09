@@ -357,17 +357,14 @@ class providers():
 
     def save_provider(self):
         xpath = "//button[contains(text(),'Add')]"
-        with timeout(15, error_message="Timed out waiting for Save."):
+        with timeout(seconds=15, error_message="Timed out waiting for Save."):
             while True:
-                try:
-                    self.web_driver.find_element_by_xpath(xpath).click()
-                    if (self.ui_utils.isTextOnPage(" was saved")):
-                        self.web_session.logger.info("Provider saved.")
-                        break;
-                    else:
-                        self.web_session.logger.info("No Provider save message.")
-                except:
-                    self.web_session.logger.info("Provider not saved.")
+                self.web_driver.find_element_by_xpath(xpath).click()
+                if (self.ui_utils.isTextOnPage(" was saved")):
+                    self.web_session.logger.info("Provider saved.")
+                    break;
+                else:
+                    self.web_session.logger.info("No Provider save message.")
 
                 time.sleep(1)
 
@@ -403,7 +400,7 @@ class providers():
             self.delete_provider(delete_all_providers=True)
 
         try:
-            self.add_provider(port="1234", validate_provider=False)
+            self.add_provider(port="1234")
             raise Exception('Add Provider Unexpectedly passed.')
         except:
             # Expected timeout waiting for form Add button to be clickable, since button should not be clickable.
