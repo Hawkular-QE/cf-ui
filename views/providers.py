@@ -363,9 +363,10 @@ class providers():
                     self.web_driver.find_element_by_xpath(xpath).click()
                     if (self.ui_utils.isTextOnPage(" was saved")):
                         self.web_session.logger.info("Provider saved.")
-                        break;
+                        break
                     else:
                         self.web_session.logger.info("No Provider save message.")
+                        break
                 except:
                     self.web_session.logger.info("Provider not saved.")
 
@@ -409,4 +410,4 @@ class providers():
             # Expected timeout waiting for form Add button to be clickable, since button should not be clickable.
             pass
 
-        return True;
+        return True
