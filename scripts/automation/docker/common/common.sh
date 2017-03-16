@@ -17,7 +17,7 @@ local time=0
 # takes some time
 echo "sleep 30s"
 sleep 30s
-local CFME_CONTAINER_ID=`docker ps | grep "cloudforms/cfme-middleware" | awk '{print $1}'`
+local CFME_CONTAINER_ID=`docker ps | grep "cloudforms" | awk '{print $1}'`
 echo "CFME_CONTAINER_ID: $CFME_CONTAINER_ID"
 local log=$1
 echo "log: $log"
@@ -106,6 +106,32 @@ function dockerStopAndRm(){
       echo "No ${image} container found to be running."
   fi
 }
+
+function dockerStopAndStart(){
+ # Stop image if running and then start it again
+  local image=$1
+  CONTAINER_ID=`docker ps -a | grep ${image} | awk '{print $1}'`
+
+  echo "dockerStopAndstart: Container id: $CONTAINER_ID"
+  if [ ${#CONTAINER_ID} -gt 0 ] ; then
+      echo "Stopping Container ${CONTAINER_ID}"
+      docker stop ${CONTAINER_ID}
+      docker start ${CONTAINER_ID}
+  else
+      echo "No ${image} container found to be running."
+  fi
+}
+
+
+function checkURL(){
+# Check if URL exist else wait while it loads
+    local URL=https://10.8.187.112
+    while ! ($(curl -k "$URL" | grep 'title="Login"'));
+    do
+        echo "Waiting to load the '$URL'"
+        sleep 5
+    done
+
 
 function stopEAP(){
   # Stop EAP7 if running
