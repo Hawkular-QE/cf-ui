@@ -119,6 +119,8 @@ function dockerStopAndStart(){
       docker start ${CONTAINER_ID}
   else
       echo "No ${image} container found to be running."
+      echo "Creating and starting CFME container."
+      ${CFME_START_CMD}
   fi
 }
 
