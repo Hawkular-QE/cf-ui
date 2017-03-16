@@ -127,7 +127,7 @@ function dockerStopAndStart(){
 
 function checkURL(){
 # Check if URL exist else wait while it loads
-    local URL=https://10.8.187.112
+    local URL=https://`hostname`
     while ! ($(curl -k "$URL" | grep 'title="Login"'));
     do
         echo "Waiting to load the '$URL'"
