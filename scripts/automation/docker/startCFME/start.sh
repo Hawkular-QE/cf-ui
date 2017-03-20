@@ -15,7 +15,7 @@ else
 fi
 
 # Stop and Start CFME
-dockerStopAndStart "cloudforms/cfme-middleware"
+dockerStopRemoveAndStart "cloudforms" "cloudforms"
 
 #Wait while URL is loaded.
 checkURL
