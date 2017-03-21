@@ -136,8 +136,8 @@ function checkURL(){
     local URL=https://`hostname`
     while (!(curl -k "$URL" | grep "Login"));
     do
-        echo "Waiting to load 'URL'"
-        sleep 5
+        echo "Waiting to load '$URL'"
+        sleep 10
     done
 }
 
