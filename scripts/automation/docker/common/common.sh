@@ -111,14 +111,14 @@ function dockerStopRemoveAndStart(){
  # Stop image if running and then start it again
   local image=$1
   local imageName=$2
-  CONTAINER_ID="docker ps -a | grep ${image} | awk '{print $1}'"
+  CONTAINER_ID=`docker ps -a | grep ${image} | awk '{print $1}'`
 
   echo "dockerStopAndstart: Container id: $CONTAINER_ID"
   if [ ${#CONTAINER_ID} -gt 0 ] ; then
       echo "Stopping Container ${CONTAINER_ID}"
       docker stop ${CONTAINER_ID}
       docker rm ${CONTAINER_ID}
-      IMAGE_ID="docker images | grep "$imageName" | awk '{print $3}'"
+      IMAGE_ID=`docker images | grep "$imageName" | awk '{print $3}'`
       echo "Removing Image ${image}   ID: ${IMAGE_ID}"
       docker rmi -f ${IMAGE_ID}
       echo "Creating and starting CFME container."
@@ -136,7 +136,7 @@ function checkURL(){
     local URL=https://"$hostname"
     while (!(curl -k "$URL" | grep "Login"));
     do
-        echo "Waiting to load "URL"
+        echo "Waiting to load 'URL'"
         sleep 5
     done
 }
