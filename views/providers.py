@@ -356,9 +356,13 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
 
     def save_provider(self):
-        xpath = "//button[contains(text(),'Add')]"
+        #xpath = "//button[contains(text(),'Add')]"
+        xpath = "//button[contains(@ng-click,'addClicked($event, true)')]"
+
         with timeout(seconds=15, error_message="Timed out waiting for Save."):
             while True:
+                WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
+                    (By.XPATH, xpath)))
                 self.web_driver.find_element_by_xpath(xpath).click()
                 if (self.ui_utils.isTextOnPage(" was saved")):
                     self.web_session.logger.info("Provider saved.")
