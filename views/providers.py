@@ -66,6 +66,11 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.provider_name)
         self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys(self.host_name)
         self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.port)
+
+        self.web_driver.find_element_by_xpath("//button[@data-id='default_security_protocol']").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Non-SSL", 30)
+        self.web_driver.find_element_by_xpath("//span[contains(.,'Non-SSL')]").click()
+
         self.web_driver.find_element_by_xpath("//input[@id='default_userid']").send_keys(self.hawkular_user)
         self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(
             self.hawkular_password)
@@ -356,8 +361,11 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
 
     def save_provider(self):
-        #xpath = "//button[contains(text(),'Add')]"
-        xpath = "//button[contains(@ng-click,'addClicked($event, true)')]"
+
+        if str(self.web_session.appliance_version) != '5.7*':
+            xpath = "//button[contains(text(),'Add')]"
+        else:
+            xpath = "//button[contains(@ng-click,'addClicked($event, true)')]"
 
         with timeout(seconds=15, error_message="Timed out waiting for Save."):
             while True:
