@@ -133,10 +133,10 @@ function dockerStopRemoveAndStart(){
 
 function checkURL(){
 # Check if URL exist else wait while it loads
-    local URL=https://`hostname`
+    #local URL=https://`hostname`
     while (!(curl -k "$URL" | grep "Login"));
     do
-        echo "Waiting to load '$URL'"
+        echo "Waiting to load the URL"
         sleep 10
     done
 }
