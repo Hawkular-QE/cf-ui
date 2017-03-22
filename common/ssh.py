@@ -98,7 +98,7 @@ class ssh():
 
             if ssh_result['result'] != 0:
                 if 'No such file or directory' in ssh_result['output']:
-                    command = "docker cp `docker ps | grep cfme |  awk {}`:{} ./VERSION_CFUI ; \
+                    command = "docker cp `docker ps | egrep \"manageiq|cfme\" |  awk {}`:{} ./VERSION_CFUI ; \
                                cat ./VERSION_CFUI ; rm -f ./VERSION_CFUI".format("'{ print $1 }'", version_file)
                     ssh_result = self.execute_command(command)
                     if ssh_result['result'] == 0:
