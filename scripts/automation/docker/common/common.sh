@@ -17,7 +17,7 @@ local time=0
 # takes some time
 echo "sleep 30s"
 sleep 30s
-local CFME_CONTAINER_ID=`docker ps | grep "cloudforms/cfme-middleware" | awk '{print $1}'`
+local CFME_CONTAINER_ID=`docker ps | grep "cloudforms" | awk '{print $1}'`
 echo "CFME_CONTAINER_ID: $CFME_CONTAINER_ID"
 local log=$1
 echo "log: $log"
@@ -107,6 +107,41 @@ function dockerStopAndRm(){
   fi
 }
 
+function dockerStopRemoveAndStart(){
+ # Stop image if running and then start it again
+  local image=$1
+  local imageName=$2
+  CONTAINER_ID=`docker ps -a | grep ${image} | awk '{print $1}'`
+
+  echo "dockerStopAndstart: Container id: $CONTAINER_ID"
+  if [ ${#CONTAINER_ID} -gt 0 ] ; then
+      echo "Stopping Container ${CONTAINER_ID}"
+      docker stop ${CONTAINER_ID}
+      docker rm ${CONTAINER_ID}
+      IMAGE_ID=`docker images | grep "$imageName" | awk '{print $3}'`
+      echo "Removing Image ${image}   ID: ${IMAGE_ID}"
+      docker rmi -f ${IMAGE_ID}
+      echo "Creating and starting CFME container."
+      ${CFME_START_CMD}
+  else
+      echo "No ${image} container found to be running."
+      echo "Creating and starting CFME container."
+      ${CFME_START_CMD}
+  fi
+}
+
+
+function checkURL(){
+# Check if URL exist else wait while it loads
+    local URL=https://`hostname`
+    while (!(curl -k "$URL" | grep "Login"));
+    do
+        echo "Waiting to load the URL"
+        sleep 10
+    done
+}
+
+
 function stopEAP(){
   # Stop EAP7 if running
   local EAP7_IMAGE=$1
@@ -131,7 +166,7 @@ function changeRegister(){
     if ! grep -q "$DOCKER_HOST_BREW" /etc/docker/daemon.json ; then
       echo "Adding ${INSECURE_REGISTER_STRING} to /etc/docker/daemon.json and restarting docker daemon"
       touch /etc/docker/daemon.json
-      echo '{ "insecure-registries":["brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888"] }' >> /etc/docker/daemon.json
+      echo "{ "insecure-registries":["brew-pulp-docker01.web.prod.ext.phx2.redhat.com:8888"] }" >> /etc/docker/daemon.json
       service docker restart
     fi
   fi
