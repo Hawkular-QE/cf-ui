@@ -16,7 +16,7 @@ cat /etc/os-release | grep -q "Red Hat Enterprise Linux"
 if [ $? -eq "0" ]
 then
     echo -e "\nInstalling RHEL dependencies..."
-    pip install setuptools --upgrade
+#    pip install setuptools --upgrade
 fi
 
 pip uninstall --yes pycurl
@@ -26,6 +26,11 @@ pip install pycurl
 pip install mgmtsystem==1.4.20
 
 ## End - Install mgmtsystem
+
+# Install Chromdriver - PATH must include "."
+rm -f chromedriver
+wget https://chromedriver.storage.googleapis.com/2.28/chromedriver_linux64.zip
+unzip chromedriver_linux64.zip
 
 # setup test recorder
 pip install http://pypi.python.org/packages/source/v/vnc2flv/vnc2flv-20100207.tar.gz
