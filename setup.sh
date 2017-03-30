@@ -16,7 +16,7 @@ cat /etc/os-release | grep -q "Red Hat Enterprise Linux"
 if [ $? -eq "0" ]
 then
     echo -e "\nInstalling RHEL dependencies..."
-#    pip install setuptools --upgrade
+    pip install setuptools --upgrade
 fi
 
 pip uninstall --yes pycurl
