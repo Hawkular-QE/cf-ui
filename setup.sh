@@ -34,7 +34,7 @@ unzip chromedriver_linux64.zip
 
 # setup test recorder
 pip install http://pypi.python.org/packages/source/v/vnc2flv/vnc2flv-20100207.tar.gz
-mkdir records
+mkdir -p records
 
 # setup flv2gif converter
 pip install moviepy
