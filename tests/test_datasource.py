@@ -23,7 +23,7 @@ def test_cfui_datasource_detail(web_session):
     web_session.logger.info("Begin datasource detail page test (INV-011b)")
     assert datasources(web_session).validate_datasource_detail()
 
-def test_cfui_delete_datasource_list_view(web_session):
+def _test_cfui_delete_datasource_list_view(web_session):
     web_session.logger.info("Begin List view delete datasource test (OPR-036a)")
     assert servers(web_session).add_datasource("H2-Test")
     assert datasources(web_session).delete_datasource_list_view()
