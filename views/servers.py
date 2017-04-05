@@ -689,23 +689,22 @@ class servers():
         self.ui_utils.sleep(2)
         assert self.ui_utils.waitForTextOnPage('Create Datasource', 15)
 
-        self.web_driver.find_element_by_id("chooose_datasource_input")
-        self.web_driver.find_element_by_xpath("//option[@label='H2']").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH, "//button[@ng-click='addDatasourceChooseNext()']", 5)
-        self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceChooseNext()']").click()
+        self.web_driver.find_element_by_xpath("//select/option[@value='H2']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//button[@ng-click='vm.addDatasourceChooseNext()']", 5)
+        self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceChooseNext()']").click()
         # self.ui_utils.sleep(2)
         self.web_driver.find_element_by_id("ds_name_input").clear()
         self.web_driver.find_element_by_id("ds_name_input").send_keys(datasourceName + str(now.second))
         self.web_driver.find_element_by_id("jndi_name_input").clear()
         self.web_driver.find_element_by_id("jndi_name_input").send_keys("java:/H2DS" + datasourceName + str(now.second))
 
-        self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceStep1Next()']").click()
-        self.web_driver.find_element_by_xpath("//button[@ng-click='addDatasourceStep2Next()']").click()
+        self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep1Next()']").click()
+        self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep2Next()']").click()
 
         self.web_driver.find_element_by_id("user_name_input").send_keys(self.DatasourceUsernamePasswd)
         self.web_driver.find_element_by_id("password_input").send_keys(self.DatasourceUsernamePasswd)
 
-        self.web_driver.find_element_by_xpath("//button[@ng-click='finishAddDatasource()']").click()
+        self.web_driver.find_element_by_xpath("//button[@ng-click='vm.finishAddDatasource()']").click()
         self.ui_utils.waitForTextOnPage(
             'Datasource "{}" has been installed on this server.'.format(datasourceName), 15)
 

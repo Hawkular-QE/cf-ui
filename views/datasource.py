@@ -82,8 +82,7 @@ class datasources():
             self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
                                           format(datasource_name, server, host_name))
 
-            # Select checkbox
-            datasource[0].click()
+            self.ui_utils.click_on_row_containing_text(datasource_name)
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
             assert self.ui_utils.waitForElementOnPage(By.ID,
                                             'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
