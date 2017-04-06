@@ -104,7 +104,7 @@ class providers():
         elem_editprovider_link = self.web_driver.find_element_by_xpath(
             "//a[contains(.,'Edit Selected Middleware Provider')]")
         elem_editprovider_link.click()
-        ui_utils(self.web_session).sleep(5)
+        ui_utils(self.web_session).sleep(10)
         assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
 
         self.edit_provider_form_cfme_newvalues()
@@ -163,7 +163,7 @@ class providers():
         # Wait till Save button is enabled before click
 
         edit_save_cfme = WebDriverWait(self.web_driver, 30).until(
-            EC.element_to_be_clickable((By.XPATH, "//button[@ng-click='saveClicked($event, true)']")))
+            EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Save')]")))
         edit_save_cfme.click()
         assert ui_utils(self.web_session).waitForTextOnPage('saved', 15)
 
