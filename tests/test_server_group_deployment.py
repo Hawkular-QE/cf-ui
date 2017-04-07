@@ -11,5 +11,6 @@ def web_session(request):
     return web_session
 
 def test_server_deployment(web_session):
+    APPLICATION_WAR = "cfui_test_war.war"
     web_session.logger.info("Begin server group deployment test")
-    assert server_group_deploymnt(web_session).add_deployment()
+    assert server_group_deploymnt(web_session).add_deployment(APPLICATION_WAR)
