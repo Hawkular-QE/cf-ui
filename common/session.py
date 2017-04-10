@@ -9,6 +9,8 @@ import logging
 import logging.config
 from selenium.webdriver.chrome.options import Options
 from common.ssh import ssh
+from common.ui_utils import ui_utils
+from common.timeout import timeout
 
 class session(properties):
 
@@ -110,6 +112,13 @@ class session(properties):
         self.appliance_version = ssh_session.get_appliance_version()
         assert self.appliance_version, "Appliance version not found"
         self.logger.info("MIQ/CFME Version: %s", self.appliance_version)
+
+        with timeout(15, error_message="Timed out with \"We're sorry, but something went wrong\"."):
+             while True:
+                if not ui_utils(self).isTextOnPage('re sorry, but something went wrong'):
+                    break;
+                ui_utils(self).sleep(2)
+                self.web_driver.refresh()
 
         if (self.login):
             miq_login(self).login(self.MIQ_USERNAME, self.MIQ_PASSWORD)
