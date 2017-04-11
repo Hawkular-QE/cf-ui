@@ -43,8 +43,8 @@ class timelines():
 
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
-        # Find EAP on which to deploy
-        eap = servers(self.web_session).find_non_container_eap_in_state("running")
+        # Find non-container EAP on which to deploy
+        eap = servers(self.web_session).find_eap_in_state("Running", check_if_resolvable_hostname=True)
         assert eap, "No EAP found in desired state."
 
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
