@@ -43,11 +43,10 @@ for node in errors:
     node.text = ''
     node.set('type', 'error')
 
-#Remove skipped texts
-errors = root.findall('testcase/skipped')
-for node in errors:
-    node.text = ''
-    node.set('type', 'skipped')
+#Remove skipped testcases
+skips = root.findall('testcase/skipped')
+for node in skips:
+    node.getparent().getparent().remove(node.getparent())
 
 # Remove Node Attributes
 for e in root.iter():
