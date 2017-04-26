@@ -24,7 +24,10 @@ class messagings():
         db_messagings = self.db.get_messagings()
         assert db_messagings , "No DB Messagings."
 
-        assert len(ui_messagings) == len(hawk_messagings) == len(db_messagings), "Messagings size mismatch."
+        self.web_session.logger.debug("UI Messagings length {}  Hawk Messagings length {}  DB Messagings length {}."
+                                      .format(len(ui_messagings), len(hawk_messagings), len(db_messagings)))
+
+        assert len(ui_messagings) == len(db_messagings), "Messagings size mismatch."
 
         return True
 
