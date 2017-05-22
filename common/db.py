@@ -14,7 +14,8 @@ class db():
     dict_cursor = None
 
     # To-Do: return only needed columns (aka add filters)
-    sql_providers = 'select * from endpoints, ext_management_systems where endpoints.id=ext_management_systems.id;'
+    #sql_providers = 'select * from endpoints, ext_management_systems where endpoints.id=ext_management_systems.id;'
+    sql_providers = 'select * from ext_management_systems;'
     sql_servers = 'select * from middleware_servers'
     sql_datasources = 'select * from middleware_datasources'
     sql_deployments = 'select * from middleware_deployments'

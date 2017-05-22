@@ -120,6 +120,8 @@ class servers():
 
 
     def validate_server_details(self):
+        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Middleware Servers', 10)
 
         servers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
