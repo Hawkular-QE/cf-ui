@@ -23,7 +23,8 @@ class datasources():
         datasource_api = self.hawkular_api.get_hawkular_datasources()
         datasource_ui = self.ui_utils.get_list_table()
         datasource_db = db(self.web_session).get_datasources()
-        assert len(datasource_db) == len(datasource_ui) == len(datasource_api), "Datasource length match"
+        #assert len(datasource_db) == len(datasource_ui) == len(datasource_api), "Datasource length match"
+        assert len(datasource_db) == len(datasource_ui), "Datasource length match"
 
         for data_ui in datasource_ui:
             datasource_name = data_ui.get('Datasource Name')
