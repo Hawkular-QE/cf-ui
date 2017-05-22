@@ -507,7 +507,7 @@ class servers():
 
         self.web_session.logger.info("Deploying App: {}".format(app))
 
-        self.web_driver.find_element_by_xpath("//button[@title='Deployments']").click()
+        self.web_driver.find_element_by_xpath("//*[contains(text(),'Middleware Deployments')]").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_deployments_choice__middleware_deployment_add', 5)
         self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
         assert self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
