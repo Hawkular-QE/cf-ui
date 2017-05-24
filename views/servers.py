@@ -533,9 +533,9 @@ class servers():
 
         elif overwrite:
             self.ui_utils.waitForTextOnPage("Add Middleware Deployment", 15)
-            self.web_driver.find_element_by_xpath(
-                "//*[contains(@class,'bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-off bootstrap-switch-id-force_deployment_cb bootstrap-switch-animate')]").click()
+            self.web_driver.find_element_by_xpath("//label[contains(.,'Overwrite (if exists)')]").click()
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
+
             assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)

@@ -66,7 +66,19 @@ class datasources():
     def delete_datasource_list_view(self):
         datasource_to_delete = self.datasource_desc
 
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        #self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        # Find running EAP server
+        eap = servers(self.web_session).find_eap_in_state("any", check_if_resolvable_hostname=True)
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Datasources')]").click()
+        assert self.ui_utils.waitForTextOnPage('All Middleware Datasources', 15)
+
         datasources = self.ui_utils.get_list_table_as_elements()
         currrent_datasource_count = len(datasources)
 
@@ -83,7 +95,9 @@ class datasources():
             self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
                                           format(datasource_name, server, host_name))
 
-            self.ui_utils.click_on_row_containing_text(datasource_name)
+            self.web_session.web_driver.find_element_by_xpath(
+                "//*[contains(text(),'XA Datasource [H2-Test43]')]/preceding::*/input[@type='checkbox']").click()
+            self.ui_utils.sleep(20)
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
             assert self.ui_utils.waitForElementOnPage(By.ID,
                                             'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
