@@ -115,8 +115,10 @@ class session(properties):
 
         with timeout(15, error_message="Timed out with \"We're sorry, but something went wrong\"."):
              while True:
-                if not ui_utils(self).isTextOnPage('re sorry, but something went wrong'):
+                if not ui_utils(self).isTextOnPage('sorry, but something went'):
                     break;
+
+                self.logger.info('Encountered "Sorry" message.')
                 ui_utils(self).sleep(2)
                 self.web_driver.refresh()
 
