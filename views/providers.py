@@ -247,7 +247,7 @@ class providers():
 
         # Refresh the page till till the table value for Last Refresh shows the value - Success
 
-        assert self.wait_for_provider_refresh_status(refresh_value_success, 300)
+        assert self.wait_for_provider_refresh_status(refresh_value_success, 600)
         provider_details = ui_utils(self.web_session).get_generic_table_as_dict()
 
         # Verify if the 'Last Refresh' value from table contains 'Success:

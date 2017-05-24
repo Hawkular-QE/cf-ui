@@ -506,8 +506,11 @@ class servers():
         app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
 
         self.web_session.logger.info("Deploying App: {}".format(app))
+        try:
+            self.web_driver.find_element_by_xpath("//button[@title='Deployments']").click()
+        except:
+            self.web_driver.find_element_by_xpath("//*[contains(text(),'Middleware Deployments')]").click()
 
-        self.web_driver.find_element_by_xpath("//button[@title='Deployments']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_deployments_choice__middleware_deployment_add', 5)
         self.web_driver.find_element_by_id('middleware_server_deployments_choice__middleware_deployment_add').click()
         assert self.ui_utils.waitForTextOnPage('Select the file to deploy', 15)
@@ -529,6 +532,7 @@ class servers():
 
 
         elif overwrite:
+            self.ui_utils.waitForTextOnPage("Add Middleware Deployment", 15)
             self.web_driver.find_element_by_xpath(
                 "//*[contains(@class,'bootstrap-switch bootstrap-switch-wrapper bootstrap-switch-off bootstrap-switch-id-force_deployment_cb bootstrap-switch-animate')]").click()
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
