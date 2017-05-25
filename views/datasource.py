@@ -64,9 +64,9 @@ class datasources():
         return True
 
     def delete_datasource_list_view(self):
-        datasource_to_delete = self.datasource_desc
 
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        datasource_to_delete = self.datasource_desc
+        self.navigate_to_non_container_eap()
         datasources = self.ui_utils.get_list_table_as_elements()
         currrent_datasource_count = len(datasources)
 
@@ -83,7 +83,9 @@ class datasources():
             self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
                                           format(datasource_name, server, host_name))
 
-            self.ui_utils.click_on_row_containing_text(datasource_name)
+            self.web_session.web_driver.find_element_by_xpath(
+                "//td[contains(text(),'{}')]/preceding-sibling::td/input[@type='checkbox']".format(datasource_name)).click()
+
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
             assert self.ui_utils.waitForElementOnPage(By.ID,
                                             'middleware_datasource_operations_choice__middleware_datasource_remove', 5)
@@ -94,7 +96,7 @@ class datasources():
             # Hawkular Datasources can not be deleted
             try:
                 if not self.ui_utils.waitForTextOnPage('datasources were removed', 5):
-                    self.web_session.logger.warn("Datasource Note Removed: Name: {}  Server: {}  Host Name: {}".
+                    self.web_session.logger.warn("Datasource Not Removed: Name: {}  Server: {}  Host Name: {}".
                                                   format(datasource_name, server, host_name))
                     # Deselect checkbox
                     datasource[0].click()
@@ -160,7 +162,7 @@ class datasources():
     def wait_for_datasource_to_be_deleted(self, starting_count, time_to_wait):
 
         servers(self.web_session).navigate_and_refresh_provider()
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        self.navigate_to_non_container_eap()
 
         currentTime = time.time()
 
@@ -176,3 +178,20 @@ class datasources():
             self.web_driver.refresh()
 
         return True
+
+    def navigate_to_non_container_eap(self):
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        eap = servers(self.web_session).find_eap_in_state("any", check_if_resolvable_hostname=True)
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Datasources')]").click()
+        assert self.ui_utils.waitForTextOnPage('All Middleware Datasources', 15)
+
+        return True
+
+
