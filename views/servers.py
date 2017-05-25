@@ -699,7 +699,7 @@ class servers():
 
     def add_datasource_eap(self, datasourceName):
         now = datetime.datetime.now()
-        self.web_session.logger.info("Adding MySQL datasource")
+        self.web_session.logger.info("Adding H2 datasource")
 
         self.web_driver.find_element_by_xpath("//button[@title='Datasources']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_datasources_choice__middleware_datasource_add', 5)
@@ -713,9 +713,9 @@ class servers():
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceChooseNext()']").click()
         # self.ui_utils.sleep(2)
         self.web_driver.find_element_by_id("ds_name_input").clear()
-        self.web_driver.find_element_by_id("ds_name_input").send_keys(datasourceName + str(now.second))
+        self.web_driver.find_element_by_id("ds_name_input").send_keys(datasourceName + str(now.hour) + str(now.minute) + str(now.second))
         self.web_driver.find_element_by_id("jndi_name_input").clear()
-        self.web_driver.find_element_by_id("jndi_name_input").send_keys("java:/H2DS" + datasourceName + str(now.second))
+        self.web_driver.find_element_by_id("jndi_name_input").send_keys("java:/H2DS" + datasourceName + str(now.hour) + str(now.minute) + str(now.second))
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep1Next()']").click()
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep2Next()']").click()
