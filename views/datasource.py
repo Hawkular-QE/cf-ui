@@ -69,7 +69,6 @@ class datasources():
         self.navigate_to_non_container_eap()
         datasources = self.ui_utils.get_list_table_as_elements()
         currrent_datasource_count = len(datasources)
-        print currrent_datasource_count
 
         if not datasources:
             self.web_session.logger.warn("No Datasource found.")
@@ -109,7 +108,6 @@ class datasources():
                 datasources.remove(datasource)
 
         assert self.wait_for_datasource_to_be_deleted(currrent_datasource_count, (60 * 5))
-        print currrent_datasource_count
 
         return True
 
