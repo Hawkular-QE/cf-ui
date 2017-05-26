@@ -1,9 +1,11 @@
 from common.ui_utils import ui_utils
 from common.view import view
+from views.servers import servers
 from selenium.webdriver.common.by import By
 
 class monitoring():
     web_session = None
+    datasource_desc = "H2-Test"
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -29,8 +31,7 @@ class monitoring():
     def validate_eap_servers_monitoring_utilization(self):
         self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
 
-        self.ui_utils.click_on_row_containing_text('server-one')
-        assert self.ui_utils.waitForTextOnPage("Summary", 10)
+        servers(self.web_session).navigate_to_non_container_eap()
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_monitoring_choice__middleware_server_perf', 5)
@@ -57,7 +58,10 @@ class monitoring():
         return True
 
     def validate_messagings_monitoring_utilization_jms_queues(self):
-        self.web_session.web_driver.get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+
+        servers(self.web_session).navigate_to_non_container_eap()
+        self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Messagings')]").click()
+        assert self.ui_utils.waitForTextOnPage('All Middleware Messagings', 15)
 
         self.ui_utils.click_on_row_containing_text('JMS Queue')
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
@@ -93,11 +97,14 @@ class monitoring():
         return True
 
     def validate_datasources_monitoring_utilization(self):
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
-        # 'server' will be an EAP Domain server
-        self.ui_utils.click_on_row_containing_text('server-one')
-        assert self.ui_utils.waitForTextOnPage("Summary", 10)
+        servers(self.web_session).navigate_to_non_container_eap()
+        servers(self.web_session).navigate_to_non_container_eap()
+        self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Datasources')]").click()
+        assert self.ui_utils.waitForTextOnPage('All Middleware Datasources', 15)
+
+        self.web_driver.find_element_by_xpath("//td[contains(.,'ExampleDS')]").click()
+        self.ui_utils.waitForTextOnPage("Nativeid", 15)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_datasource_monitoring_choice__middleware_datasource_perf', 5)
