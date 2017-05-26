@@ -5,7 +5,6 @@ from selenium.webdriver.common.by import By
 
 class monitoring():
     web_session = None
-    datasource_desc = "H2-Test"
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -98,7 +97,6 @@ class monitoring():
 
     def validate_datasources_monitoring_utilization(self):
 
-        servers(self.web_session).navigate_to_non_container_eap()
         servers(self.web_session).navigate_to_non_container_eap()
         self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Datasources')]").click()
         assert self.ui_utils.waitForTextOnPage('All Middleware Datasources', 15)
