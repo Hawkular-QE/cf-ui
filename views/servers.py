@@ -725,7 +725,7 @@ class servers():
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.finishAddDatasource()']").click()
         self.ui_utils.waitForTextOnPage(
-            'Datasource "{}" has been installed on this server.'.format(datasourceName), 15)
+            'installation has started on this server.'.format(datasourceName), 15)
 
     def force_reload_eap(self):
         if self.find_eap_in_state('reload-required'):
@@ -834,3 +834,15 @@ class servers():
         result = ssh_.execute_command("kill -9 {}".format(ssh_.get_pid('standalone')))
 
         return result.get('result')
+
+    def navigate_to_non_container_eap(self):
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        eap = servers(self.web_session).find_eap_in_state("any", check_if_resolvable_hostname=True)
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+
+        return True
