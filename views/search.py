@@ -26,17 +26,6 @@ class search():
         self.provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
         self.hostname = self.web_session.HAWKULAR_HOSTNAME
 
-    def simple_search(self):
-
-        self.simple_search_provider()
-        self.simple_search_domain()
-        self.simple_search_server()
-        self.simple_search_deployments()
-        self.simple_search_datasources()
-        self.simple_search_messagings()
-
-        return True
-
     def verify_search_exist(self):
 
         if (self.web_driver.find_element_by_id("search_text") and self.web_driver.find_element_by_xpath("//button[@id='adv_search']")):
@@ -53,6 +42,7 @@ class search():
         self.web_driver.find_element_by_id("search_text").send_keys(self.provider_name)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.hostname, 15)
+        return True
 
     def simple_search_domain(self):
 
@@ -62,6 +52,7 @@ class search():
         self.web_driver.find_element_by_id("search_text").send_keys(self.domain_name)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.provider_name, 15)
+        return True
 
     def simple_search_server(self):
 
@@ -72,6 +63,7 @@ class search():
         self.web_driver.find_element_by_id("search_text").send_keys(self.server_name)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.provider_name, 15)
+        return True
 
     def simple_search_deployments(self):
 
@@ -82,6 +74,7 @@ class search():
         self.web_driver.find_element_by_id("search_text").send_keys(self.deploymentname)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.server_name, 15)
+        return True
 
     def simple_search_datasources(self):
 
@@ -92,6 +85,7 @@ class search():
         self.web_driver.find_element_by_id("search_text").send_keys(self.datasourcename)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.server_name, 15)
+        return True
 
     def simple_search_messagings(self):
 
@@ -102,3 +96,4 @@ class search():
         self.web_driver.find_element_by_id("search_text").send_keys(self.jmstopicname)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.server_name, 15)
+        return True
