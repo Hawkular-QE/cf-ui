@@ -38,3 +38,14 @@ def test_cfui_simple_search_messagings(web_session):
     web_session.logger.info("Begin test - search by name on messagings list page")
     assert search(web_session).simple_search_messagings()
 
+def test_cfui_save_advanced_search(web_session):
+    web_session.logger.info("Begin deployment list test")
+    assert search(web_session).save_advanced_search()
+
+def test_cfui_apply_advanced_search(web_session):
+    web_session.logger.info("Begin deployment list test")
+    assert search(web_session).apply_advanced_search()
+
+def test_cfui_delete_saved_search(web_session):
+    web_session.logger.info("Begin deployment list test")
+    assert search(web_session).delete_saved_search()
