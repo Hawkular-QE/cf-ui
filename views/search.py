@@ -105,7 +105,53 @@ class search():
         assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
         view(self.web_session).list_View()
         self.verify_search_exist()
+        self.select_advanced_search_condition()
+        self.provide_search_name()
+        self.verify_saved_filter()
+
+        return True
+
+    def verify_saved_filter(self):
+
+        self.navigate_to_saved_filter()
+        assert self.ui_utils.waitForTextOnPage(self.search_provider_name, 15)
+
+        return True
+
+    def apply_advanced_search(self):
+
+        self.navigate_to_saved_filter()
+        self.ui_utils.waitForTextOnPage(self.search_provider_name, 15)
+        self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(self.search_provider_name)).click()
+        self.ui_utils.sleep(10)
+        assert self.web_driver.find_element_by_xpath("//a[contains(@href,'clear')]")
+        assert self.ui_utils.waitForTextOnPage(self.provider_name, 15)
+        return True
+
+    def clear_advanced_search(self):
+        self.apply_advanced_search()
+        assert self.web_driver.find_element_by_xpath("//a[contains(@href,'clear')]")
+        self.web_driver.find_element_by_xpath("//a[contains(@href,'clear')]").click()
+        return True
+
+    def delete_saved_search(self):
+
+        self.navigate_to_saved_filter()
+        self.ui_utils.waitForTextOnPage(self.search_provider_name, 15)
+        self.web_driver.find_element_by_xpath("//a[contains(.,'{}')]".format(self.search_provider_name)).click()
+        self.ui_utils.sleep(10)
         self.web_driver.find_element_by_xpath("//button[@id='adv_search']").click()
+        assert self.ui_utils.waitForTextOnPage("Advanced Search", 15)
+        self.web_driver.find_element_by_xpath("//a[contains(.,'Delete')]").click()
+        ui_utils(self.web_session).accept_alert(10)
+        assert self.ui_utils.waitForTextOnPage("Delete successful", 15)
+
+        return True
+
+    def select_advanced_search_condition(self):
+
+        self.web_driver.find_element_by_xpath("//button[@id='adv_search']").click()
+        self.ui_utils.sleep(15)
         assert self.ui_utils.waitForTextOnPage("Advanced Search", 15)
         self.web_driver.find_element_by_xpath("//button[@data-id='chosen_typ']").click()
         assert self.ui_utils.waitForTextOnPage("Field", 15)
@@ -118,62 +164,27 @@ class search():
         el_textbox = self.web_driver.find_element_by_xpath("//input[@id='chosen_value']")
         self.ui_utils.wait_until_element_displayed(el_textbox, 5)
         self.web_driver.find_element_by_xpath("//input[@id='chosen_value']").send_keys(self.provider_name)
-        window_before = self.web_driver.window_handles[0]
-        #print window_before
         self.web_driver.find_element_by_xpath("//button[@title='Commit expression element changes']").click()
         self.ui_utils.sleep(10)
         self.ui_utils.waitForElementOnPage(By.XPATH, "//h4[@id='adv_search_label']", 5)
         assert self.ui_utils.waitForTextOnPage("Save", 15)
+        self.web_driver.find_element_by_xpath("//button[@title='Save the current filter']").click()
+        self.ui_utils.sleep(10)
 
-        #To do work on clicking save button inside modal window by switching window
-        #self.web_driver.find_element_by_xpath("/html/body/div[3]/div/div/div[4]/div/button[3]").click()
+    def provide_search_name(self):
 
         el_searchname = self.web_driver.find_element_by_xpath("//input[@id='search_name']")
         self.ui_utils.wait_until_element_displayed(el_searchname, 15)
         self.web_driver.find_element_by_xpath("//input[@id='search_name']").send_keys(self.search_provider_name)
         self.web_driver.find_element_by_xpath("//button[@title='Save the current search']").click()
-        assert self.ui_utils.waitForTextOnPage("Middleware Provider search '{}' was saved".format(self.search_provider_name), 15)
-        self.web_driver.find_element_by_xpath("//button[@title='Apply the current filter']").click()
-        self.verify_saved_filter()
+        assert self.ui_utils.waitForTextOnPage("was saved", 15)
 
-        return True
-
-    def verify_saved_filter(self):
-
+    def navigate_to_saved_filter(self):
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
-        self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]")
-        assert self.ui_utils.waitForTextOnPage(self.search_provider_name, 15)
-
-        return True
-
-    def apply_advanced_search(self):
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
-        if self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]"):
-            self.delete_saved_search()
-            self.save_advanced_search()
-        else:
-            self.save_advanced_search()
-            self.web_driver.find_element_by_xpath("//button[@id='adv_search']").click()
-            assert self.ui_utils.waitForTextOnPage("Advanced Search", 15)
-            self.web_driver.find_element_by_xpath("//a[@title='Apply this filter']").click()
-            assert self.web_driver.find_element_by_xpath("//a[contains(@href,'clear')]")
-            assert self.ui_utils.waitForTextOnPage(self.provider_name, 15)
-
-    def delete_saved_search(self):
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
-        self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]")
-        self.ui_utils.waitForTextOnPage(self.search_provider_name, 15).click()
-        self.web_driver.find_element_by_xpath("//button[@id='adv_search']").click()
-        assert self.ui_utils.waitForTextOnPage("Advanced Search", 15)
-        self.web_driver.find_element_by_xpath("//a[@class='btn btn-danger']").click()
-        ui_utils(self.web_session).accept_alert(10)
-        assert self.ui_utils.waitForTextOnPage("Delete successful", 15)
-        self.web_driver.find_element_by_xpath("//button[@class='close']")
-
-        return True
+        assert self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]")
+        self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]").click()
+        self.ui_utils.sleep(5)
 
 
 
