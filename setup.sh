@@ -8,6 +8,7 @@ source .cf-ui/bin/activate
 
 # Install base requirements
 pip install -r requirements.txt
+pip install -U pip
 
 ## Begin - Install mgmtsystem
 
