@@ -1,3 +1,4 @@
+import pytest
 from common.ui_utils import ui_utils
 from common.view import view
 from hawkular.hawkular_api import hawkular_api
@@ -50,6 +51,13 @@ class search():
         self.web_session.web_driver.get("{}//middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
         self.verify_search_exist()
+        utils = ui_utils(self.web_session)
+        domain_list = utils.get_list_table()
+
+        if not domain_list:
+            self.web_session.logger.warning("Domain does not exist.")
+            pytest.skip("skip Test - Domain not found")
+
         self.web_driver.find_element_by_id("search_text").send_keys(self.domain_name)
         self.web_driver.find_element_by_xpath("//button[@class='btn btn-default']").click()
         assert self.ui_utils.waitForTextOnPage(self.provider_name, 15)
