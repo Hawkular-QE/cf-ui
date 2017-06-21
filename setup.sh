@@ -24,7 +24,7 @@ pip uninstall --yes pycurl
 export PYCURL_SSL_LIBRARY=nss
 pip install pycurl
 
-pip install mgmtsystem-1.6.1
+pip install mgmtsystem==1.6.1
 
 ## End - Install mgmtsystem
 
