@@ -8,6 +8,7 @@ class topology():
     web_driver = None
     ui_utils = None
     hawkular_api = None
+    MIQ_BASE_VERSION = "master"
 
     LEGENDS = '//kubernetes-topology-icon'
 
@@ -21,6 +22,7 @@ class topology():
         self.ui_utils = ui_utils(self.web_session)
         self.hawkular_api = hawkular_api(self.web_session)
         self.db = db(self.web_session)
+        self.appliance_version = self.web_session.appliance_version
 
     def validate_display_names_checkbox(self, select = True):
 
@@ -225,7 +227,11 @@ class topology():
         return re.match(r"[^[]*\[([^]]*)\]", text).groups()[0]
 
     def __display_names__(self, select = True):
-        el = self.web_session.web_driver.find_element_by_xpath('//*[@id="box"]')
+
+        if not self.MIQ_BASE_VERSION == self.appliance_version:
+            el = self.web_session.web_driver.find_element_by_xpath('//*[@id="box"]')
+        else:
+            el = self.web_session.web_driver.find_element_by_xpath('//*[@id="box_display_names"]')
 
         if select and not el.is_selected():
             el.click()
