@@ -25,6 +25,7 @@ class providers():
         self.port = self.web_session.HAWKULAR_PORT if port == None else port
         self.hawkular_user = self.web_session.HAWKULAR_USERNAME
         self.hawkular_password = self.web_session.HAWKULAR_PASSWORD
+        self.appliance_version = self.web_session.appliance_version
 
         # Check if any provider already exist. If exist, first delete all the providers and then add a provider.
 
@@ -65,6 +66,7 @@ class providers():
 
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.provider_name)
         self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys(self.host_name)
+        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.port)
 
         self.web_driver.find_element_by_xpath("//button[@data-id='default_security_protocol']").click()
@@ -74,7 +76,9 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='default_userid']").send_keys(self.hawkular_user)
         self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(
             self.hawkular_password)
-        self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
+
+        if not self.MIQ_BASE_VERSION == self.appliance_version:
+            self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
 
         if validate_provider:
             self.validate_provider()
@@ -84,6 +88,7 @@ class providers():
 
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
+        #self.ui_utils.sleep(15)
 
         # Delete the provider
         if delete_all_providers:
@@ -226,7 +231,14 @@ class providers():
 
     def clear_all_providers(self):
         self.web_session.logger.info("Deleting all the providers from providers list.")
-        self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
+        view(self.web_session).list_View()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
+        else:
+            self.ui_utils.waitForElementOnPage(By.XPATH, "//input[@ng-click='tableCtrl.onCheckAll(isChecked)']", 5)
+            self.web_driver.find_element_by_xpath("//input[@ng-click='tableCtrl.onCheckAll(isChecked)']").click()
+
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         assert self.ui_utils.waitForElementOnPage(By.XPATH,
                                          "//a[@title='Remove selected Middleware Providers']", 5)
@@ -236,8 +248,7 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage(
             "Delete initiated", 15)
 
-        assert ui_utils(self.web_session).refresh_until_text_appears("No Records Found", 300)
-        self.web_session.logger.info("All the middleware providers are deleted successfully.")
+        self.verify_all_providers_deleted()
 
     def verify_refresh_status_success(self):
 
@@ -419,3 +430,15 @@ class providers():
             pass
 
         return True;
+
+    def verify_all_providers_deleted(self):
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
+        while True:
+            if self.web_driver.find_element_by_xpath("//strong[contains(.,'No Records Found.')]").is_displayed():
+                self.web_session.logger.info("All the middleware providers are deleted successfully.")
+                break
+            else:
+                self.web_driver.refresh()
+                ui_utils(self.web_session).sleep(5)
+        return True
