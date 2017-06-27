@@ -248,8 +248,7 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage(
             "Delete initiated", 15)
 
-        assert ui_utils(self.web_session).refresh_until_text_appears("No Records Found", 300)
-        self.web_session.logger.info("All the middleware providers are deleted successfully.")
+        self.verify_all_providers_deleted()
 
     def verify_refresh_status_success(self):
 
@@ -431,3 +430,15 @@ class providers():
             pass
 
         return True;
+
+    def verify_all_providers_deleted(self):
+        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
+        while True:
+            if self.web_driver.find_element_by_xpath("//strong[contains(.,'No Records Found.')]").is_displayed():
+                self.web_session.logger.info("All the middleware providers are deleted successfully.")
+                break
+            else:
+                self.web_driver.refresh()
+                ui_utils(self.web_session).sleep(5)
+        return True
