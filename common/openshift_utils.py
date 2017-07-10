@@ -23,7 +23,7 @@ class openshift_utils():
         output = p.stdout.read()
         self.web_session.logger.debug("Openshift login output: {}".format(output))
         if (not "You have access" in output):
-            raise Exception("Login failed.")
+            raise Exception("Openshift Login failed.")
 
 
     def get_token(self):
