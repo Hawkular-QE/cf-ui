@@ -33,6 +33,9 @@ rm -f chromedriver
 wget https://chromedriver.storage.googleapis.com/2.28/chromedriver_linux64.zip
 unzip chromedriver_linux64.zip
 
+# Unpack 'oc'
+./install_oc.sh
+
 # setup test recorder
 pip install http://pypi.python.org/packages/source/v/vnc2flv/vnc2flv-20100207.tar.gz
 mkdir -p records
