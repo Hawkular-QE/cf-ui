@@ -14,16 +14,24 @@ class openshift_utils():
 
 
     def __exec_cmd__(self, cmd):
-        return Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT, close_fds=True)
+        self.web_session.logger.info("OC cmd: {}".format(cmd))
+        return Popen(cmd, shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, close_fds=True)
 
 
     def cli_login(self):
         p = self.__exec_cmd__("{} login {} -u {} -p {}"
                 .format(self.oc, self.os_url, self.web_session.OPENSHIFT_USERNAME, self.web_session.OPENSHIFT_PASSWORD))
-        output = p.stdout.read()
-        self.web_session.logger.debug("Openshift login output: {}".format(output))
-        if (not "You have access" in output):
-            raise Exception("Openshift Login failed.")
+
+        stdout = p.stdout.read()
+        stderror = p.stderr.read()
+
+        if stderror:
+            raise Exception("Openshift command failed: {}").format(stderror)
+        else:
+            if not "Login successful" in stdout:
+                raise Exception("Openshift Login failed: {}".format(stdout))
+            else:
+                self.web_session.logger.debug("Openshift login output: {}".format(stdout))
 
 
     def get_token(self):
