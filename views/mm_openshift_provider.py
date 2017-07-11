@@ -154,8 +154,6 @@ class mm_openshift_providers():
 
         assert ui_utils(self.web_session).waitForTextOnPage("Status", 30)
 
-        assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
-
     def validate_provider(self):
         validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
             (By.XPATH, "//button[@title='Validate the credentials by logging into the Server']")))
@@ -182,30 +180,6 @@ class mm_openshift_providers():
 
                 time.sleep(1)
 
-    def wait_for_provider_refresh_status(self, expected_status, waitTime):
-        currentTime = time.time()
-
-        while True:
-            last_refresh = self.ui_utils.get_generic_table_as_dict().get('Last Refresh')
-
-            if expected_status in last_refresh:
-                self.web_session.logger.info("Provider Last Refresh Status found: {}".format(last_refresh))
-                return True
-
-            if 'Error' in last_refresh and 'Success' in expected_status:
-                self.web_session.logger.error("Provider Last Refresh Status contains Error: {}   but expected: {}".
-                                              format(last_refresh, expected_status))
-                return False
-
-            if time.time() - currentTime >= waitTime:
-                self.web_session.logger.error("Timed out waiting for provider Refresh Status: {}   Actual Status: {}".
-                                              format(expected_status, last_refresh))
-                return False
-            else:
-                self.web_driver.refresh()
-                time.sleep(1)
-
-        return True
 
     def add_provider_invalid_port(self):
 
