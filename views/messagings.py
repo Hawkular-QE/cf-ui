@@ -109,4 +109,4 @@ class messagings():
 
     def __navigate_to_messagings_view(self):
         self.web_session.web_driver.get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage("Middleware Messagings", 15)
+        assert self.ui_utils.waitForTextOnPage("Messaging Name", 15)
