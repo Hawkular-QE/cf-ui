@@ -1,6 +1,7 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
+import re
 
 class deployments():
     web_session = None
@@ -16,6 +17,7 @@ class deployments():
 
     def validate_deployment_details(self):
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.waitForTextOnPage("Deployment Name", 15)
         deployments_ui = self.ui_utils.get_list_table()
         assert deployments_ui, "No UI Deployments found."
 
@@ -31,7 +33,7 @@ class deployments():
             self.web_session.logger.info("Validate Deployment {}.".format(deployment_name))
 
             self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-            assert self.ui_utils.waitForTextOnPage("Middleware Deployments", 15)
+            assert self.ui_utils.waitForTextOnPage("Deployment Name", 15)
 
             self.ui_utils.click_on_row_containing_text(deployment_name)
             self.ui_utils.waitForTextOnPage("Nativeid", 15)
@@ -59,6 +61,7 @@ class deployments():
 
     def validate_deployments_list(self):
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.waitForTextOnPage("Deployment Name", 15)
         deployments_ui = self.ui_utils.get_list_table()
         assert deployments_ui, "No UI Deployments found."
         deployments_hawk = self.hawkular_api.get_hawkular_deployments()
