@@ -84,8 +84,8 @@ class db():
     def get_messagings(self):
         return self.execute(self.sql_messagings)
 
-    # Openshift Provider
-    def get_openshift_providers(self):
+    # Container Provider
+    def get_container_providers(self):
         providers = []
         rows = self.execute(self.sql_providers)
 
@@ -95,11 +95,11 @@ class db():
 
         return providers
 
-    def is_openshift_provider_present(self, name):
+    def is_container_provider_present(self, name):
         rows = self.execute(self.sql_providers)
 
         for row in rows:
             if name in row.get('name'):
                 return True
-        
+
         return False
