@@ -83,3 +83,23 @@ class db():
 
     def get_messagings(self):
         return self.execute(self.sql_messagings)
+
+    # Openshift Provider
+    def get_openshift_providers(self):
+        providers = []
+        rows = self.execute(self.sql_providers)
+
+        for row in rows:
+            if 'ContainerManager' in row.get('type'):
+                providers.append(row)
+
+        return providers
+
+    def is_openshift_provider_present(self, name):
+        rows = self.execute(self.sql_providers)
+
+        for row in rows:
+            if name in row.get('name'):
+                return True
+        
+        return False
