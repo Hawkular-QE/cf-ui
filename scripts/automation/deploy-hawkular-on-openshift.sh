@@ -75,6 +75,6 @@ fi
 echo "App deployed"
 
 ROUTE=`${OC} get routes | grep ${OS_HAWKULAR_PROJECT} | awk '{print $2}'`
-URL="http://${ROUTE}
+URL="http://${ROUTE}"
 echo "App URL: ${URL}"
 
