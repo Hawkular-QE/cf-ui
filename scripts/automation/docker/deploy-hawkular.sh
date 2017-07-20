@@ -10,7 +10,7 @@ HAWKULAR_IMAGE_='hawkular/hawkular-services:latest'
 HAWKULAR_USERNAME_="jdoe"
 HAWKULAR_PASSWORD_="password"
 
-OC_="./oc"
+OC_="/usr/bin/oc"
 
 # Note: May want to set these vars via Jenkins job parameters
 
@@ -77,28 +77,28 @@ elif [ -z $OC_ ]; then
     exit 1
 fi
 
+echo "OC: ${OC_}"
 echo "OS_SERVER: ${OS_SERVER_}, OS_USERNAME: ${OS_USERNAME_}, OS_PASSWORD: ${OS_PASSWORD_}, OS_PROJECT: ${OS_PROJECT_}"
 echo "HAWKULAR_APP: ${HAWKULAR_APP_}"
 echo "HAWKULAR_IMAGE: ${HAWKULAR_IMAGE_}, HAWKULAR_USERNAME: ${HAWKULAR_USERNAME_}, HAWKULAR_PASSWORD: ${HAWKULAR_PASSWORD_}"
-echo "OC: ${OC_}"
 
 ${OC_} login ${OS_SERVER_} -u=${OS_USERNAME_} -p=${OS_PASSWORD_} --insecure-skip-tls-verify
 if [ $? -ne 0 ]; then
-    echo "Failed to login Server:${OS_SERVER_} Username:${HAWKULAR_USERNAME_} Password:${HAWKULAR_PASSWORD_}"
+    echo "Failed to login Server:${OS_SERVER_} Username:${OS_USERNAME_} Password:${OS_PASSWORD_}"
     exit 1
 fi
 
-${OC} get projects | grep ${OS_PROJECT_}
+${OC_} get projects | grep ${OS_PROJECT_}
 if [ $? -eq 0 ]; then
     echo "Deleting project:${OS_PROJECT_}"
-    ${OC} delete project ${OS_PROJECT_}
+    ${OC_} delete project ${OS_PROJECT_}
     if [ $? -ne 0 ]; then
         echo "Failed to delete project: ${OS_PROJECT_}"
         exit 1
     fi
 
     while true; do
-        ${OC} get projects | grep ${OS_PROJECT_}
+        ${OC_} get projects | grep ${OS_PROJECT_}
         if [ $? -ne 0 ]; then
             break
         fi
@@ -107,16 +107,16 @@ if [ $? -eq 0 ]; then
 fi
 
 echo "Creating project:${OS_PROJECT_}"
-${OC} new-project ${OS_PROJECT_} --description="Hawkular Services" --display-name=${OS_PROJECT_}
+${OC_} new-project ${OS_PROJECT_} --description="Hawkular Services" --display-name=${OS_PROJECT_}
 if [ $? -ne 0 ]; then
     echo "Failed to create project:${OS_PROJECT_}"
     exit 1
 fi
 
 echo "Deploy App"
-${OC} process -f ${HAWKULAR_APP_} -v "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_},HAWKULAR_USER=${HAWKULAR_USERNAME_},HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC} create -f -
+${OC_} process -f ${HAWKULAR_APP_} -v "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_},HAWKULAR_USER=${HAWKULAR_USERNAME_},HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
 if [ $? -ne 0 ]; then
-    echo "Failed to delete project: ${OS_PROJECT_}"
+    echo "Failed to deploy app: ${OS_PROJECT_}"
     exit 1
 fi
 
