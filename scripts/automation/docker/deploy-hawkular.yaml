@@ -11,9 +11,10 @@
     OC: "/usr/bin/oc"
 
     HAWKULAR_APP: "https://raw.githubusercontent.com/hawkular/hawkular-services/master/openshift/hawkular-services-ephemeral.yaml"
-    HAWKULAR_IMAGE: 'hawkular/hawkular-services:latest'
+    HAWKULAR_IMAGE: 'jboss-mm-7-tech-preview/middleware-manager'
     HAWKULAR_USERNAME: "jdoe"
     HAWKULAR_PASSWORD: "password"
+    HAWKULAR_TEST_MODE: "true"
     HAWKULAR_ROUTE_FILE: "./hawkular-route.txt"
 
   tasks:
@@ -60,8 +61,8 @@
         failed_when: (new_project.stdout.find("Now using project") == -1)
 
     - block:
-      - name: Deploy App
-        shell: '{{OC}} process -f {{HAWKULAR_APP}} -v "HAWKULAR_SERVICES_IMAGE={{HAWKULAR_IMAGE}},HAWKULAR_USER={{HAWKULAR_USERNAME}},HAWKULAR_PASSWORD={{HAWKULAR_PASSWORD}}" | {{OC}} create -f -'
+      - name: Deploy App "{{HAWKULAR_APP}}"
+        shell: '{{OC}} process -f {{HAWKULAR_APP}} -v "HAWKULAR_SERVICES_IMAGE={{HAWKULAR_IMAGE}},HAWKULAR_USER={{HAWKULAR_USERNAME}},HAWKULAR_PASSWORD={{HAWKULAR_PASSWORD}},TEST_MODE={{HAWKULAR_TEST_MODE}}" | {{OC}} create -f -'
 
     - block:
       - name: Wait for deploy complete
