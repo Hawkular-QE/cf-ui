@@ -4,6 +4,7 @@
 
   vars:
     OS_URL:
+
     OS_USERNAME:
     OS_PASSWORD:
     OS_PROJECT:
@@ -12,12 +13,12 @@
 
     OC: "/usr/bin/oc"
 
-    EAP_APP:
+    EAP_APP: 
     EAP_IMAGE: "jboss-eap-7/eap70-openshift"
 
-    AB_HAWKULAR_REST_URL:
-    AB_HAWKULAR_REST_USER: "jdoe"
-    AB_HAWKULAR_REST_PASSWORD: "password"
+    HAWKULAR_REST_URL:
+    HAWKULAR_REST_USER: "jdoe"
+    HAWKULAR_REST_PASSWORD: "password"
 
   tasks:
     - block:
@@ -34,8 +35,8 @@
       - name: Check OS_PROJECT
         shell: "echo {{OS_PROJECT}}"
         failed_when: (echo.stdout|length == 0)
-      - name: Check AB_HAWKULAR_REST_URL
-        shell: "echo {{AB_HAWKULAR_REST_URL}}"
+      - name: Check HAWKULAR_REST_URL
+        shell: "echo {{HAWKULAR_REST_URL}}"
         failed_when: (echo.stdout|length == 0)
 
     - block:
@@ -48,14 +49,14 @@
       - name: Detete Project "{{OS_PROJECT}}"
         shell: "{{OC}} delete project {{OS_PROJECT}}"
         register: delete_project
-        when: OS_DELETE_PROJECT == 'yes'
+        when: OS_DELETE_PROJECT != 'yes'
         failed_when: "('Now using project' not in delete_project.stdout) and ('not found' in delete_project.stdout)"
 
     - block:
       - name: Wait for Project "{{OS_PROJECT}}" to be deleted
         shell: "{{OC}} get project {{OS_PROJECT}}"
         register: get_project
-        when: OS_DELETE_PROJECT == 'yes'
+        when: OS_DELETE_PROJECT != 'yes'
         failed_when: (get_project.stderr.find("Error from server") == -1) and (get_project.stdout.find("Terminating") == -1)
         until: ("Error from server" in get_project.stderr)
         retries: 100
@@ -74,8 +75,8 @@
         failed_when: "('Now using project' not in oc_project.stdout) or ('does not exist on' in oc_project.stdout)"
 
     - block:
-      - name: Deploy App
-        shell: '{{OC}} process -f {{EAP_APP}} -v "AB_HAWKULAR_REST_URL={{AB_HAWKULAR_REST_URL}},AB_HAWKULAR_REST_USER={{AB_HAWKULAR_REST_USER}},AB_HAWKULAR_REST_PASSWORD={{AB_HAWKULAR_REST_PASSWORD}},IMAGE={{EAP_IMAGE}}" | {{OC}} create -f -'
+      - name: Deploy App {{EAP_APP}}
+        shell: '{{OC}} process -f {{EAP_APP}} -v "AB_HAWKULAR_REST_URL={{HAWKULAR_REST_URL}},AB_HAWKULAR_REST_USER={{HAWKULAR_REST_USER}},AB_HAWKULAR_REST_PASSWORD={{HAWKULAR_REST_PASSWORD}},IMAGE={{EAP_IMAGE}}" | {{OC}} create -f -'
 
     - block:
       - name: Wait for deploy complete
