@@ -672,7 +672,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage(
             'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 90)
 
-    def add_datasource(self, datasourceName):
+    def add_datasource(self, datasourceName, xa=False):
 
         # Adds H2 datasource to EAP server, validates success message
         # verifies if the added datasource is listed in datasource list page
@@ -687,7 +687,14 @@ class servers():
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
 
-        self.add_datasource_eap(datasourceName)
+        if xa:
+            self.web_session.logger.info("Adding H2-XA datasource")
+            self.add_datasource_eap(datasourceName,xa=True)
+        else:
+            self.web_session.logger.info("Adding H2 datasource")
+            self.add_datasource_eap(datasourceName)
+
+
         self.navigate_and_refresh_provider()
 
         # Validate UI if added datasource is available in the datasource list
@@ -698,9 +705,8 @@ class servers():
 
         return True
 
-    def add_datasource_eap(self, datasourceName):
+    def add_datasource_eap(self, datasourceName, xa=False):
         now = datetime.datetime.now()
-        self.web_session.logger.info("Adding H2 datasource")
 
         self.web_driver.find_element_by_xpath("//button[@title='Datasources']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_datasources_choice__middleware_datasource_add', 5)
@@ -709,14 +715,27 @@ class servers():
         self.ui_utils.sleep(2)
         assert self.ui_utils.waitForTextOnPage('Create Datasource', 15)
 
-        self.web_driver.find_element_by_xpath("//select/option[@value='H2']").click()
+        self.web_driver.find_element_by_xpath("//select[@id='chooose_datasource_input']").click()
+
+        if xa:
+            self.web_driver.find_element_by_xpath("//option[@label='H2 XA']").click()
+        else:
+            self.web_driver.find_element_by_xpath("//label[contains(.,'XA Datasource:')]").click()
+            self.web_driver.find_element_by_xpath("//select/option[@value='H2']").click()
+
         self.ui_utils.waitForElementOnPage(By.XPATH, "//button[@ng-click='vm.addDatasourceChooseNext()']", 5)
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceChooseNext()']").click()
-        # self.ui_utils.sleep(2)
         self.web_driver.find_element_by_id("ds_name_input").clear()
         self.web_driver.find_element_by_id("ds_name_input").send_keys(datasourceName + str(now.hour) + str(now.minute) + str(now.second))
+
         self.web_driver.find_element_by_id("jndi_name_input").clear()
-        self.web_driver.find_element_by_id("jndi_name_input").send_keys("java:/H2DS" + datasourceName + str(now.hour) + str(now.minute) + str(now.second))
+
+        if xa:
+            self.web_driver.find_element_by_id("jndi_name_input").send_keys(
+                "java:/H2XADS" + datasourceName + str(now.hour) + str(now.minute) + str(now.second))
+        else:
+            self.web_driver.find_element_by_id("jndi_name_input").send_keys(
+                "java:jboss/datasources/H2DS" + datasourceName + str(now.hour) + str(now.minute) + str(now.second))
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep1Next()']").click()
         self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep2Next()']").click()
