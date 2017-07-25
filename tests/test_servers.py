@@ -89,6 +89,13 @@ def test_cfui_add_datasource(web_session):
     assert datasources(web_session).delete_datasource_list_view()
     assert servers(web_session).force_reload_eap()
 
+# Add XA datasource
+def test_cfui_add_xa_datasource(web_session):
+    web_session.logger.info("Begin Add datasource test (OPR-035a)")
+    assert servers(web_session).add_datasource("H2-Test-XA",xa=True)
+    assert datasources(web_session).delete_datasource_list_view()
+    assert servers(web_session).force_reload_eap()
+
 # More Archive Tests:
 
 def test_cfui_add_disabled_application_archive(web_session):
@@ -106,3 +113,4 @@ def test_cfui_add_application_archive_runtime_name(web_session):
 def test_cfui_add_application_archive_cancel(web_session):
     web_session.logger.info("Begin test to cancel the addition of Application Archive")
     assert servers(web_session).add_deployment_cancel()
+
