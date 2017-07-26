@@ -26,7 +26,7 @@ class openshift_utils():
         stderror = p.stderr.read()
 
         if stderror:
-            raise Exception("Openshift command failed: {}").format(stderror)
+            raise Exception("Openshift command failed: {}".format(stderror))
         else:
             if not "Login successful" in stdout:
                 raise Exception("Openshift Login failed: {}".format(stdout))
