@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from hawkular.hawkular_api import hawkular_api
 from common.view import view
 from common.db import db
+from common.openshift_utils import openshift_utils
 import time
 from common.timeout import timeout
 
@@ -12,20 +13,20 @@ class mm_openshift_providers():
     web_session = None
     MIQ_BASE_VERSION = "master"
     ui_utils = None
-    
+
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
-        self.hawkular_api = hawkular_api(self.web_session)
         self.ui_utils = ui_utils(self.web_session)
+        self.openshift_utils= openshift_utils(self.web_session)
 
     def add_mm_openshift_provider(self, delete_if_provider_present=True, port=None, validate_provider=True):
         self.provider_name = self.web_session.OPENSHIFT_PROVIDER_NAME
         self.host_name = self.web_session.OPENSHIFT_HOSTNAME
         self.port = self.web_session.OPENSHIFT_PORT if port == None else port
-        self.token = self.web_session.OPENSHIFT_TOKEN
         self.openshift_user = self.web_session.OPENSHIFT_USERNAME
-        self.openshift_token = self.web_session.OPENSHIFT_TOKEN
+        self.openshift_token= self.openshift_utils.get_token()
+        ui_utils(self.web_session).sleep(2)
 
         # Check if any provider already exist. If exist, first delete all the providers and then add a provider.
 
@@ -42,8 +43,8 @@ class mm_openshift_providers():
         assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH,"//a[@title='Add Existing Containers Provider']", 5)
-        elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add Existing Containers Provider']")
+        self.ui_utils.waitForElementOnPage(By.XPATH,"//a[@title='Add a new Containers Provider']", 5)
+        elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a new Containers Provider']")
         elem_add_new_provider.click()
         self.web_driver.implicitly_wait(15)
         assert ui_utils(self.web_session).waitForTextOnPage("Add New Containers Provider", 50)
@@ -56,32 +57,32 @@ class mm_openshift_providers():
 
 
     def submit_provider_form_cfme(self, validate_provider=True):
-
         # Enter the form details and submit if the appliance version is CFME Downstream
 
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.provider_name)
         self.web_driver.find_element_by_xpath("//button[contains(.,'<Choose>')]").click()
-        assert ui_utils(self.web_session).waitForTextOnPage("OpenShift Container Platform",15)
-        self.web_driver.find_element_by_xpath("//a[contains(.,'OpenShift Container Platform')]").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("OpenShift", 15)
+        self.web_driver.find_element_by_xpath("//a[contains(.,'OpenShift')]").click()
         self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys(self.host_name)
 
-        #self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.port)
+        # self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.port)
 
         self.web_driver.find_element_by_xpath("//button[@data-id='default_security_protocol']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("SSL without validation", 15)
         self.web_driver.find_element_by_xpath("//a[contains(.,'SSL without validation')]").click()
 
         self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(self.openshift_token)
-        self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.openshift_token)
+
 
         if validate_provider:
             self.validate_provider()
         self.save_provider()
 
+
     def does_provider_exist(self):
         self.web_session.logger.info("Checking if provider exists")
 
-        # For performance reasons, check if the provider is present via DB
+         # For performance reasons, check if the provider is present via DB
         providers = db(self.web_session).get_providers()
         provider = ui_utils(self.web_session).find_row_in_list(providers, 'name', self.web_session.OPENSHIFT_PROVIDER_NAME)
         if provider:
@@ -91,7 +92,6 @@ class mm_openshift_providers():
 
 
     def verify_refresh_status_success(self):
-
         refresh_value_success = "Success"
 
         self.refresh_provider()
@@ -109,6 +109,7 @@ class mm_openshift_providers():
             return True
         else:
             return False
+
 
     def refresh_provider(self):
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -130,33 +131,30 @@ class mm_openshift_providers():
         for prov_ui in providers_ui:
 
             if prov_ui.get('Name') == self.web_session.OPENSHIFT_PROVIDER_NAME:
-                assert (prov_ui.get('Hostname') == self.web_session.OPENSHIFT_HOSTNAME), "Hostname mismatch"
-                assert (prov_ui.get('Port') == self.web_session.OPENSHIFT_PORT), "Port Number mismatch"
+               assert (prov_ui.get('Hostname') == self.web_session.OPENSHIFT_HOSTNAME), "Hostname mismatch"
+               assert (prov_ui.get('Port') == self.web_session.OPENSHIFT_PORT), "Port Number mismatch"
 
-        return True
-
-
+            return True
 
     def verify_add_provider_success(self):
 
-        assert ui_utils(self.web_session).waitForTextOnPage(
-            'Containers Providers "{}" was saved'.format(self.provider_name), 90)
+            assert ui_utils(self.web_session).waitForTextOnPage(
+                'Containers Providers "{}" was saved'.format(self.provider_name), 90)
 
-        if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
-                self.provider_name)):
-            self.web_session.logger.info("Container Provider added successfully.")
+            if ui_utils(self.web_session).isElementPresent(By.XPATH, "//a[contains(@title,'Name: {}')]".format(
+                    self.provider_name)):
+                self.web_session.logger.info("Container Provider added successfully.")
 
-        # Navigate to the provider details page and check if the last refresh status is - Success.
+            # Navigate to the provider details page and check if the last refresh status is - Success.
 
-        view(self.web_session).list_View()
-        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.OPENSHIFT_PROVIDER_NAME, 30)
-        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.OPENSHIFT_PROVIDER_NAME)
+            view(self.web_session).list_View()
+            assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.OPENSHIFT_PROVIDER_NAME, 30)
+            ui_utils(self.web_session).click_on_row_containing_text(self.web_session.OPENSHIFT_PROVIDER_NAME)
 
-        assert ui_utils(self.web_session).waitForTextOnPage("Status", 30)
+            assert ui_utils(self.web_session).waitForTextOnPage("Status", 30)
 
     def validate_provider(self):
-        validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH, "//button[@title='Validate the credentials by logging into the Server']")))
+        validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[contains(.,'Validate')]")))
         validate.click()
         assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
 
@@ -165,12 +163,11 @@ class mm_openshift_providers():
         if str(self.web_session.appliance_version) != '5.7*':
             xpath = "//button[contains(text(),'Add')]"
         else:
-            xpath = "//button[contains(@ng-click,'addClicked($event, true)')]"
+             xpath = "//button[contains(@ng-click,'addClicked($event, true)')]"
 
         with timeout(seconds=15, error_message="Timed out waiting for Save."):
             while True:
-                WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
-                    (By.XPATH, xpath)))
+                WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
                 self.web_driver.find_element_by_xpath(xpath).click()
                 if (self.ui_utils.isTextOnPage(" was saved")):
                     self.web_session.logger.info("Provider saved.")
@@ -182,7 +179,6 @@ class mm_openshift_providers():
 
 
     def add_provider_invalid_port(self):
-
         if self.does_provider_exist():
             self.web_session.logger.info("Container Provider exist - Delete the provider.")
             self.delete_provider(delete_all_providers=True)
