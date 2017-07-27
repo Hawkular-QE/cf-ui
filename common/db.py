@@ -103,3 +103,7 @@ class db():
                 return True
 
         return False
+
+    def get_container_nodes(self):
+        return self.execute(self.sql_container_nodes)
+
