@@ -126,24 +126,16 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.web_session.PROVIDER)
 
-        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys("livingontheedge.hawkular.org")
-
-        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(80)
-
     def verify_edit_provider_success_newvalues(self):
 
-        # Verify if the provider name, hostname and port number is successfully updated and shown in UI
+        # Verify if the provider name, is successfully updated and shown in UI
 
         assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'{}')]".format(self.web_session.PROVIDER))
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(text(),'livingontheedge')]")
-        assert ui_utils(self.web_session).isElementPresent(By.XPATH, "//td[contains(.,'80')]")
         self.web_session.logger.info("The middleware provider is edited successfully.")
 
     def edit_provider_form_cfme_originalvalues(self):
 
-        # Edit and save the name, port and number to default value.( This will additionally check edit from the provider details page)
+        # Edit and save the name to default value.( This will additionally check edit from the provider details page)
 
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.PROVIDER)
@@ -151,17 +143,11 @@ class providers():
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.ui_utils.waitForElementOnPage(By.XPATH, "//a[@title='Edit this Middleware Provider']", 5)
         self.web_driver.find_element_by_xpath("//a[@title='Edit this Middleware Provider']").click()
-        ui_utils(self.web_session).sleep(5)
+        ui_utils(self.web_session).sleep(15)
         assert ui_utils(self.web_session).waitForTextOnPage("Name", 30)
 
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").clear()
         self.web_driver.find_element_by_xpath("//input[@id='ems_name']").send_keys(self.web_session.HAWKULAR_PROVIDER_NAME)
-
-        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='default_hostname']").send_keys(self.web_session.HAWKULAR_HOSTNAME)
-
-        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").clear()
-        self.web_driver.find_element_by_xpath("//input[@id='default_api_port']").send_keys(self.web_session.HAWKULAR_PORT)
 
     def edit_save_cfme(self):
 
