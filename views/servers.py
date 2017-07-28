@@ -18,6 +18,7 @@ class servers():
     ui_utils = None
     hawkular_api = None
     db = None
+    MIQ_BASE_VERSION = "master"
 
     power_stop = {'action':'Stop Server', 'wait_for':'Stop initiated for selected server', 'start_state':'running', 'end_state':None}
     power_restart = {'action': 'Restart Server', 'wait_for': 'Restart initiated for selected server', 'start_state': 'running', 'end_state': 'running'}
@@ -47,6 +48,7 @@ class servers():
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
         self.hawkular_api = hawkular_api(self.web_session)
+        self.appliance_version = self.web_session.appliance_version
 
         try:
             self.db = db(self.web_session)
@@ -212,6 +214,11 @@ class servers():
 
         # assert orig_pid != new_pid, "Orig Pid: {}  New Pid: {}".format(orig_pid, new_pid)
 
+        # Validate eap server state on Summary Page in MIQ UI
+
+        if self.appliance_version == self.MIQ_BASE_VERSION:
+            self.verify_eap_status_in_ui(eap_hawk, "Running")
+
         return True
 
     def eap_power_stop(self):
@@ -237,13 +244,25 @@ class servers():
                 if ssh_.get_pid('standalone.sh') == None:
                     break
 
+        # Validate eap server state on Summary Page in MIQ UI
+
+        if self.appliance_version == self.MIQ_BASE_VERSION:
+            self.web_session.logger.info("Verify IN UI")
+            self.verify_eap_status_in_ui(eap_hawk, "Down")
+
         # Start EAP Standalone server, as to leave the EAP server in the starting state
+
         assert self.start_eap_standalone_server(eap_hawk)
 
         with timeout(15, error_message="Timeout waiting for EAP Standalone server to Start on host: {}".format(eap_hostname)):
             while True:
                 if ssh_.get_pid('standalone.sh') != None:
                     break
+
+        # Validate eap server state on Summary Page in MIQ UI
+
+        if self.appliance_version == self.MIQ_BASE_VERSION:
+            self.verify_eap_status_in_ui(eap_hawk, "Running")
 
         return True
 
@@ -312,6 +331,10 @@ class servers():
 
         # TO-DO - Validate
 
+        # Validate eap server state on Summary Page in MIQ UI
+        if self.appliance_version == self.MIQ_BASE_VERSION:
+            self.verify_eap_status_in_ui(eap_hawk, "Down")
+
         return True
 
     def eap_power_action(self, power, eap_hawk, alert_button_name = None):
@@ -349,11 +372,17 @@ class servers():
 
         self.add_server_deployment(self.APPLICATION_WAR)
         self.navigate_and_refresh_provider()
+        self.web_session.logger.info("Waiting for the archive to appear")
 
         # Validate UI
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_WAR, 300)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be enabled")
+
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
 
@@ -405,7 +434,11 @@ class servers():
         # Redeploy
 
         self.restart_server_deployment(app_to_redeploy)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be enabled")
 
         # Validate that application status is enabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/9876, Issue#10138 )
@@ -424,7 +457,11 @@ class servers():
         # Stop the application archive
 
         self.disable_server_deployment(app_to_stop)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be disabled")
 
         # Validate that application status is Disabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
@@ -443,7 +480,11 @@ class servers():
         # Start the application archive
 
         self.enable_server_deployment(app_to_start)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be enabled")
 
         # Validate that application status is Enabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
@@ -771,11 +812,16 @@ class servers():
 
         self.add_server_deployment(self.APPLICATION_JAR, enable_deploy=False)
         self.navigate_and_refresh_provider()
+        self.web_session.logger.info("Waiting for the archive to appear")
 
         # Validate UI
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_JAR, 300)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be disabled")
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
 
@@ -792,7 +838,11 @@ class servers():
         self.navigate_and_refresh_provider()
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_JAR, 300)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be enabled")
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
 
@@ -813,7 +863,12 @@ class servers():
         self.navigate_and_refresh_provider()
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.runtime_name, 300)
-        self.navigate_and_refresh_provider()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+            self.navigate_and_refresh_provider()
+        else:
+            self.web_session.logger.info("Waiting for the archive to be enabled")
+
         self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         self.undeploy_application_archive(self.runtime_name)
@@ -866,3 +921,11 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Version', 15)
 
         return True
+
+    def verify_eap_status_in_ui(self, eap_hawk, expected_status):
+
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage("Properties", 15)
+        assert self.ui_utils.refresh_until_text_appears(expected_status, 300)
+
