@@ -95,11 +95,15 @@ class db():
 
         return providers
 
-    def is_container_provider_present(self, name):
+    def is_container_provider_present(self):
         rows = self.execute(self.sql_providers)
 
+        if len(rows) == 0:
+            self.get_container_module()
+
         for row in rows:
-            if name in row.get('name'):
+            if (self.web_session.OPENSHIFT_HOSTNAME in row.get('name')) \
+                    or (self.web_session.OPENSHIFT_PROVIDER_NAME in row.get('name')):
                 return True
 
         return False
