@@ -924,8 +924,13 @@ class servers():
 
     def verify_eap_status_in_ui(self, eap_hawk, expected_status):
 
+        feed = eap_hawk.get('Feed')
+
+        self.web_session.logger.info("Beginning UI verification")
+
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
-        self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage(feed, 15)
+        self.ui_utils.click_on_row_containing_text(feed)
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
         assert self.ui_utils.refresh_until_text_appears(expected_status, 300)
-
+        self.web_session.logger.info("EAP is in {} status".format(expected_status))
