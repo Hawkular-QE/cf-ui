@@ -2,7 +2,7 @@
 <IP of 'oc' host>
 
 [OpenShiftServers:vars]
-os_url="https://openshift.com:8443"
+os_url="https://changeme.openshift.ui.com:8443"
 os_username="username"
 os_password="password"
 os_project="openshift-project"
