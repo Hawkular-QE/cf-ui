@@ -14,7 +14,7 @@ class monitoring():
     def validate_provider_monitoring_timelines(self):
         self.web_session.web_driver.get("{}/ems_middleware/show_list".format(self.web_session.MIQ_URL))
         view(self.web_session).list_View()
-
+        assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         self.ui_utils.click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
@@ -29,7 +29,7 @@ class monitoring():
 
     def validate_eap_servers_monitoring_utilization(self):
         self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
-
+        assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         servers(self.web_session).navigate_to_non_container_eap()
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
@@ -79,13 +79,14 @@ class monitoring():
 
     def validate_messagings_monitoring_utilization_jms_topics(self):
         self.web_session.web_driver.get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
-
+        assert self.ui_utils.waitForTextOnPage("Messaging Type", 10)
         self.ui_utils.click_on_row_containing_text('JMS Topic')
         assert self.ui_utils.waitForTextOnPage("Summary", 10)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_messaging_monitoring_choice__middleware_messaging_perf', 5)
         self.web_driver.find_element_by_id('middleware_messaging_monitoring_choice__middleware_messaging_perf').click()
+
         assert self.ui_utils.waitForTextOnPage('Options', 30)
 
         # Validate that graphs are present
