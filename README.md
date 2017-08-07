@@ -5,6 +5,7 @@
 git clone https://github.com/Hawkular-QE/cf-ui.git
 cd cf-ui
 ./setup.sh
+alias activate='source .cf-ui/bin/activate'
 ```
 ## Configuration
 ```shell
