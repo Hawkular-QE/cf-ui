@@ -3,24 +3,23 @@
   remote_user: root
 
   vars:
-    OS_URL:
-
-    OS_USERNAME:
-    OS_PASSWORD:
-    OS_PROJECT:
-    # Set to "yes" to delete project or leave undefined to not delete project
-    OS_DELETE_PROJECT:
-
     OC: "/usr/bin/oc"
-
-    EAP_APP: 
     EAP_IMAGE: "jboss-eap-7/eap70-openshift"
 
-    HAWKULAR_REST_URL:
-    HAWKULAR_REST_USER: "jdoe"
-    HAWKULAR_REST_PASSWORD: "password"
-
   tasks:
+    - block:
+      - name: Set Facts
+        set_fact:
+          OS_URL: "{{os_url}}"
+          OS_USERNAME: "{{os_username}}"
+          OS_PASSWORD: "{{os_password}}"
+          OS_PROJECT: "{{os_project}}"
+          OS_DELETE_PROJECT: "{{os_delete_proeject}}"
+          EAP_APP: "{{eap_app}}"
+          HAWKULAR_REST_URL: "{{hawkular_rest_url}}"
+          HAWKULAR_REST_USERNAME: "{{hawkular_rest_username}}"
+          HAWKULAR_REST_PASSWORD: "{{hawkular_rest_password}}"
+
     - block:
       - name: Check OS_URL
         shell: "echo {{OS_URL}}"
@@ -40,6 +39,12 @@
         failed_when: (echo.stdout|length == 0)
 
     - block:
+      - name: Check 'oc' version is v3.5
+        shell: "{{OC}} version"
+        register: version
+        failed_when: "('v3.5' not in version.stdout)"
+
+    - block:
       - name: Login to "{{OS_URL}}"
         shell: "{{OC}} login {{OS_URL}} -u={{OS_USERNAME}} -p={{OS_PASSWORD}} --insecure-skip-tls-verify"
         register: oc_login
@@ -49,14 +54,14 @@
       - name: Detete Project "{{OS_PROJECT}}"
         shell: "{{OC}} delete project {{OS_PROJECT}}"
         register: delete_project
-        when: OS_DELETE_PROJECT != 'yes'
+        when: OS_DELETE_PROJECT == 'yes'
         failed_when: "('Now using project' not in delete_project.stdout) and ('not found' in delete_project.stdout)"
 
     - block:
       - name: Wait for Project "{{OS_PROJECT}}" to be deleted
         shell: "{{OC}} get project {{OS_PROJECT}}"
         register: get_project
-        when: OS_DELETE_PROJECT != 'yes'
+        when: OS_DELETE_PROJECT == 'yes'
         failed_when: (get_project.stderr.find("Error from server") == -1) and (get_project.stdout.find("Terminating") == -1)
         until: ("Error from server" in get_project.stderr)
         retries: 100
@@ -72,11 +77,11 @@
       - name: Oc Project "{{OS_PROJECT}}"
         shell: "{{OC}} project {{OS_PROJECT}}"
         register: oc_project
-        failed_when: "('Now using project' not in oc_project.stdout) or ('does not exist on' in oc_project.stdout)"
+        failed_when: "('Already on project' not in oc_project.stdout) and ('Now using project' not in oc_project.stdout)"
 
     - block:
       - name: Deploy App {{EAP_APP}}
-        shell: '{{OC}} process -f {{EAP_APP}} -v "AB_HAWKULAR_REST_URL={{HAWKULAR_REST_URL}},AB_HAWKULAR_REST_USER={{HAWKULAR_REST_USER}},AB_HAWKULAR_REST_PASSWORD={{HAWKULAR_REST_PASSWORD}},IMAGE={{EAP_IMAGE}}" | {{OC}} create -f -'
+        shell: '{{OC}} process -f {{EAP_APP}} -p AB_HAWKULAR_REST_URL={{HAWKULAR_REST_URL}} -p AB_HAWKULAR_REST_USER={{HAWKULAR_REST_USERNAME}} -p AB_HAWKULAR_REST_PASSWORD={{HAWKULAR_REST_PASSWORD}} -p IMAGE={{EAP_IMAGE}} | {{OC}} create -f -'
 
     - block:
       - name: Wait for deploy complete
