@@ -100,7 +100,8 @@ class monitoring():
 
         servers(self.web_session).navigate_to_non_container_eap()
         self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Datasources')]").click()
-        assert self.ui_utils.waitForTextOnPage('All Middleware Datasources', 15)
+        assert self.ui_utils.waitForTextOnPage('ExampleDS', 15)
+
 
         self.web_driver.find_element_by_xpath("//td[contains(.,'ExampleDS')]").click()
         self.ui_utils.waitForTextOnPage("Nativeid", 15)

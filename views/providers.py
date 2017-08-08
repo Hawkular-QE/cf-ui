@@ -88,7 +88,9 @@ class providers():
 
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
-        #self.ui_utils.sleep(15)
+        view(self.web_session).list_View()
+        assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 30)
+        self.ui_utils.sleep(15)
 
         # Delete the provider
         if delete_all_providers:
@@ -200,10 +202,20 @@ class providers():
         self.web_session.logger.info("Deleting the provider- {}".format(self.web_session.HAWKULAR_HOSTNAME))
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        assert self.ui_utils.waitForElementOnPage(By.XPATH,
-                                                  "//a[@title='Remove selected Middleware Providers']", 5)
-        self.web_driver.find_element_by_xpath(
-            "//a[@title='Remove selected Middleware Providers']").click()
+
+        if not self.appliance_version == self.MIQ_BASE_VERSION:
+
+            assert self.ui_utils.waitForElementOnPage(By.XPATH,
+                                                      "//a[@title='Remove selected Middleware Providers']", 5)
+            self.web_driver.find_element_by_xpath(
+                "//a[@title='Remove selected Middleware Providers']").click()
+        else:
+
+            assert self.ui_utils.waitForElementOnPage(By.XPATH,
+                                                      "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']", 5)
+            self.web_driver.find_element_by_xpath(
+                "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']").click()
+
         ui_utils(self.web_session).accept_alert(10)
         assert ui_utils(self.web_session).waitForTextOnPage("Delete initiated", 15)
 
@@ -217,19 +229,25 @@ class providers():
 
     def clear_all_providers(self):
         self.web_session.logger.info("Deleting all the providers from providers list.")
-        view(self.web_session).list_View()
+        #view(self.web_session).list_View()
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
             self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
+            self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+            assert self.ui_utils.waitForElementOnPage(By.XPATH,
+                                                      "//a[@title='Remove selected Middleware Providers']", 5)
+            self.web_driver.find_element_by_xpath(
+                "//a[@title='Remove selected Middleware Providers']").click()
         else:
-            self.ui_utils.waitForElementOnPage(By.XPATH, "//input[@ng-click='tableCtrl.onCheckAll(isChecked)']", 5)
-            self.web_driver.find_element_by_xpath("//input[@ng-click='tableCtrl.onCheckAll(isChecked)']").click()
+            self.ui_utils.waitForElementOnPage(By.XPATH, "//input[@ng-click='paginationCtrl.onSelectAll({isSelected: isChecked})']", 5)
+            self.web_driver.find_element_by_xpath("//input[@ng-click='paginationCtrl.onSelectAll({isSelected: isChecked})']").click()
+            self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+            assert self.ui_utils.waitForElementOnPage(By.XPATH,
+                                                      "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']", 5)
+            self.web_driver.find_element_by_xpath(
+                "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']").click()
 
-        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        assert self.ui_utils.waitForElementOnPage(By.XPATH,
-                                         "//a[@title='Remove selected Middleware Providers']", 5)
-        self.web_driver.find_element_by_xpath(
-            "//a[@title='Remove selected Middleware Providers']").click()
+
         ui_utils(self.web_session).accept_alert(10)
         assert ui_utils(self.web_session).waitForTextOnPage(
             "Delete initiated", 15)
