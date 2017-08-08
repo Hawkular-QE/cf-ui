@@ -12,9 +12,9 @@ class topology():
 
     LEGENDS = '//kubernetes-topology-icon'
 
-    entities = {'servers':'Middleware Servers','deployments':'Middleware Deployments',
-                'datasources':'Middleware Datasources','server_groups':'Middleware Server Groups',
-                'domains':'Middleware Domains','messagings':'Middleware Messaging'}
+    entities = {'servers': 'Servers', 'deployments': 'Deployments',
+                'datasources': 'Datasources', 'server_groups': 'Server Groups',
+                'domains': 'Domains', 'messagings': 'Messaging', 'containers': 'Containers'}
 
     def __init__(self, web_session):
         self.web_session = web_session
@@ -219,6 +219,36 @@ class topology():
         for queues_topics in messaging_list:
             name = self.__get_actual_name__(queues_topics.get('name'))
             assert self.ui_utils.waitForTextOnPage(name, 5), "Messaging not found in Topology: {}".format(name)
+
+        return True
+
+    def validate_middleware_container_entities(self):
+        self.web_session.logger.info("Validate that Topology View expected Containers")
+        self.__navigate_to_topology__()
+
+        self.__display_names__(select=True)
+
+        entity_name = self.entities.get('containers')
+        assert self.ui_utils.isTextOnPage(entity_name), "{} not found".format(self.entities.get('containers'))
+
+        # Select "Containers Entities"
+        self.__select_entities_view__(entity_name, 'hawkular-services')
+
+        ## Compair DB and UI until there is a way to determine Container list via Hawkular-API
+
+        containers_db = db(self.web_session).get_container_servers()
+        containers_el = self.web_driver.find_elements_by_class_name('Container')
+
+        assert len(containers_db) == len(containers_el)
+        for el in containers_el:
+            name = el.text.split()[1]
+            foundIt = False
+            for container in containers_db:
+                if name in container.get('feed'):
+                    foundIt = True
+                    break
+
+            assert foundIt, "Container {} not found in DB Container list.".format(name)
 
         return True
 
