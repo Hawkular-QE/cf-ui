@@ -114,7 +114,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Deploy App"
-${OC_} process -f ${HAWKULAR_APP_} -v "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_},HAWKULAR_USER=${HAWKULAR_USERNAME_},HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
+${OC_} process -f ${HAWKULAR_APP_} -p "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_}" -p "HAWKULAR_USER=${HAWKULAR_USERNAME_}" -p "HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
 if [ $? -ne 0 ]; then
     echo "Failed to deploy app: ${OS_PROJECT_}"
     exit 1
