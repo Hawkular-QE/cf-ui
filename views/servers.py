@@ -132,6 +132,8 @@ class servers():
         for serv_ui in servers_ui:
             feed = serv_ui.get('Feed')  # Unique Server identifier
             self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+            assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
+
 
             self.ui_utils.click_on_row_containing_text(serv_ui.get('Feed'))
             assert self.ui_utils.waitForTextOnPage("Properties", 15)
@@ -666,7 +668,9 @@ class servers():
 
     def navigate_and_refresh_provider(self):
         self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Middleware Providers', 15)
         view(self.web_session).list_View()
+        assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         providers(self.web_session).refresh_provider()
 

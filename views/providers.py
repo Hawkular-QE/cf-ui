@@ -18,6 +18,7 @@ class providers():
         self.web_driver = web_session.web_driver
         self.hawkular_api = hawkular_api(self.web_session)
         self.ui_utils = ui_utils(self.web_session)
+        self.appliance_version = self.web_session.appliance_version
 
     def add_provider(self, delete_if_provider_present=True, port=None, validate_provider=True):
         self.provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
@@ -25,7 +26,7 @@ class providers():
         self.port = self.web_session.HAWKULAR_PORT if port == None else port
         self.hawkular_user = self.web_session.HAWKULAR_USERNAME
         self.hawkular_password = self.web_session.HAWKULAR_PASSWORD
-        self.appliance_version = self.web_session.appliance_version
+
 
         # Check if any provider already exist. If exist, first delete all the providers and then add a provider.
 
@@ -229,7 +230,6 @@ class providers():
 
     def clear_all_providers(self):
         self.web_session.logger.info("Deleting all the providers from providers list.")
-        #view(self.web_session).list_View()
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
             self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
