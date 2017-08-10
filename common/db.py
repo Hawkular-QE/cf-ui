@@ -22,6 +22,7 @@ class db():
     sql_domains = 'select * from middleware_domains'
     sql_server_groups = 'select * from  middleware_server_groups'
     sql_messagings = 'select * from middleware_messagings'
+    sql_containers = "select * from middleware_servers where lives_on_type LIKE '%Container%'"
 
     def __init__(self, web_session, miq_ip = None, username = None, password = None, db_port = None):
 
@@ -85,29 +86,15 @@ class db():
         return self.execute(self.sql_messagings)
 
     # Container Provider
-    def get_container_providers(self):
-        providers = []
+
+    def is_container_provider_present(self, name):
         rows = self.execute(self.sql_providers)
 
         for row in rows:
-            if 'ContainerManager' in row.get('type'):
-                providers.append(row)
-
-        return providers
-
-    def is_container_provider_present(self):
-        rows = self.execute(self.sql_providers)
-
-        if len(rows) == 0:
-            self.get_container_module()
-
-        for row in rows:
-            if (self.web_session.OPENSHIFT_HOSTNAME in row.get('name')) \
-                    or (self.web_session.OPENSHIFT_PROVIDER_NAME in row.get('name')):
+            if name in row.get('name'):
                 return True
 
         return False
 
-    def get_container_nodes(self):
-        return self.execute(self.sql_container_nodes)
-
+    def get_container_servers(self):
+        return self.execute(self.sql_containers)
