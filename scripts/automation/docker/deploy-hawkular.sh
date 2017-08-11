@@ -114,7 +114,16 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Deploy App"
-${OC_} process -f ${HAWKULAR_APP_} -p "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_}" -p "HAWKULAR_USER=${HAWKULAR_USERNAME_}" -p "HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
+
+IFS='.' read -r -a OSCLI_VERSION <<< `${OC_} version | grep oc | sed 's/oc v//g'`
+if [ "${OSCLI_VERSION[0]}" -ge "3" ] && [ "${OSCLI_VERSION[1]}" -ge "5" ] ; then
+  echo "Using OC version >= 3.5"
+  ${OC_} process -f ${HAWKULAR_APP_} -p "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_}" -p "HAWKULAR_USER=${HAWKULAR_USERNAME_}" -p "HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
+else
+  echo "Using OC version < 3.5"
+  ${OC_} process -f ${HAWKULAR_APP_} -v "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_},HAWKULAR_USER=${HAWKULAR_USERNAME_},HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
+fi
+
 if [ $? -ne 0 ]; then
     echo "Failed to deploy app: ${OS_PROJECT_}"
     exit 1
@@ -125,5 +134,3 @@ echo "App deployed"
 ROUTE=`${OC_} get routes | grep ${OS_PROJECT_} | awk '{print $2}'`
 URL="http://${ROUTE}"
 echo "App URL: ${URL}"
-
-
