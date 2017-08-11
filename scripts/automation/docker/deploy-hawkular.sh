@@ -88,17 +88,23 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-${OC_} get projects | grep ${OS_PROJECT_}
+${OC_} get projects | grep "${OS_PROJECT_}[[:space:]]"
 if [ $? -eq 0 ]; then
     echo "Deleting project:${OS_PROJECT_}"
-    ${OC_} delete project ${OS_PROJECT_}
-    if [ $? -ne 0 ]; then
+    OC_RESULT=`${OC_} delete project ${OS_PROJECT_}`
+    if [ $? -ne 0 ] ; then
         echo "Failed to delete project: ${OS_PROJECT_}"
-        exit 1
+        echo ${OC_RESULT} | grep --quiet "The system is ensuring all content is removed from this namespace"
+        if [ $? = 1 ]
+        then
+          echo "Project ${OS_PROJECT_} is already terminating"
+        else
+          exit 1
+        fi
     fi
 
     while true; do
-        ${OC_} get projects | grep ${OS_PROJECT_}
+        ${OC_} get projects | grep "${OS_PROJECT_}[[:space:]]"
         if [ $? -ne 0 ]; then
             break
         fi
@@ -115,8 +121,8 @@ fi
 
 echo "Deploy App"
 
-IFS='.' read -r -a OSCLI_VERSION <<< `${OC_} version | grep oc | sed 's/oc v//g'`
-if [ "${OSCLI_VERSION[0]}" -ge "3" ] && [ "${OSCLI_VERSION[1]}" -ge "5" ] ; then
+IFS='.' read -r -a OC_VERSION <<< `${OC_} version | grep oc | sed 's/oc v//g'`
+if [ "${OC_VERSION[0]}" -ge "3" ] && [ "${OC_VERSION[1]}" -ge "5" ] ; then
   echo "Using OC version >= 3.5"
   ${OC_} process -f ${HAWKULAR_APP_} -p "HAWKULAR_SERVICES_IMAGE=${HAWKULAR_IMAGE_}" -p "HAWKULAR_USER=${HAWKULAR_USERNAME_}" -p "HAWKULAR_PASSWORD=${HAWKULAR_PASSWORD_}" |  ${OC_} create -f -
 else
