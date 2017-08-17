@@ -93,7 +93,7 @@ class datasources():
                     "//td[contains(text(),'{}')]/preceding-sibling::td/input[@type='checkbox']".format(
                         datasource_name)).click()
             else:
-                self.web_session.web_driver.find_element_by_xpath('/html/body/div[2]/div[2]/div[2]/div[1]/div[1]/div/div[2]/div/div/div/miq-data-table/div/table/tbody/tr[2]/td[1]/input').click()
+                self.web_session.web_driver.find_element_by_xpath("//tr[2]/td[1]/input").click()
 
 
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
