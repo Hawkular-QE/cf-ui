@@ -9,12 +9,14 @@ from selenium.webdriver.common.by import By
 class datasources():
     web_session = None
     datasource_desc = "H2-Test"
+    MIQ_BASE_VERSION = "master"
 
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
         self.ui_utils = ui_utils(self.web_session)
         self.hawkular_api = hawkular_api(self.web_session)
+        self.appliance_version = self.web_session.appliance_version
 
 
     def validate_datasource_list(self):
@@ -69,6 +71,7 @@ class datasources():
         servers(self.web_session).navigate_to_non_container_eap()
         self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Datasources')]").click()
         assert self.ui_utils.waitForTextOnPage('All Middleware Datasources', 15)
+        assert self.ui_utils.waitForTextOnPage('ExampleDS', 15)
         datasources = self.ui_utils.get_list_table_as_elements()
         currrent_datasource_count = len(datasources)
 
@@ -85,8 +88,13 @@ class datasources():
             self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
                                           format(datasource_name, server, host_name))
 
-            self.web_session.web_driver.find_element_by_xpath(
-                "//td[contains(text(),'{}')]/preceding-sibling::td/input[@type='checkbox']".format(datasource_name)).click()
+            if not self.appliance_version == self.MIQ_BASE_VERSION:
+                self.web_session.web_driver.find_element_by_xpath(
+                    "//td[contains(text(),'{}')]/preceding-sibling::td/input[@type='checkbox']".format(
+                        datasource_name)).click()
+            else:
+                self.web_session.web_driver.find_element_by_xpath("//tr[2]/td[1]/input").click()
+
 
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
             assert self.ui_utils.waitForElementOnPage(By.ID,
