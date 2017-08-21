@@ -53,15 +53,22 @@ class db():
 
         return rows
 
-    def get_providers(self):
+    def get_providers(self, type="Middleware"):
         providers = []
         rows = self.execute(self.sql_providers)
 
         for row in rows:
-            if self.web_session.PROVIDER in row.get('type'):
-                providers.append(row)
+            if type is not "Middleware":
+                if type in row.get('type'):
+                    providers.append(row)
+            else:
+                if self.web_session.PROVIDER in row.get('type'):
+                    providers.append(row)
 
         return providers
+
+
+
 
     def get_servers(self):
         rows = self.execute(self.sql_servers)
