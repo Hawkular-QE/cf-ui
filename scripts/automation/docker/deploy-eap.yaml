@@ -14,7 +14,7 @@
           OS_USERNAME: "{{os_username}}"
           OS_PASSWORD: "{{os_password}}"
           OS_PROJECT: "{{os_project}}"
-          OS_DELETE_PROJECT: "{{os_delete_proeject}}"
+          OS_DELETE_PROJECT: "{{os_delete_project}}"
           EAP_APP: "{{eap_app}}"
           HAWKULAR_REST_URL: "{{hawkular_rest_url}}"
           HAWKULAR_REST_USERNAME: "{{hawkular_rest_username}}"
