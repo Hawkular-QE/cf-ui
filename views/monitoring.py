@@ -60,10 +60,11 @@ class monitoring():
 
         servers(self.web_session).navigate_to_non_container_eap()
         self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Messagings')]").click()
-        assert self.ui_utils.waitForTextOnPage('All Middleware Messagings', 15)
+        assert self.ui_utils.waitForTextOnPage('JMS Queue', 30)
+
 
         self.ui_utils.click_on_row_containing_text('JMS Queue')
-        assert self.ui_utils.waitForTextOnPage("Summary", 10)
+        assert self.ui_utils.waitForTextOnPage("Summary", 30)
 
         self.web_driver.find_element_by_xpath("//*[@title='Monitoring']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_messaging_monitoring_choice__middleware_messaging_perf', 5)
