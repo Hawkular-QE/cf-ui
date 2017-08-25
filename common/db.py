@@ -53,12 +53,12 @@ class db():
 
         return rows
 
-    def get_providers(self):
+    def get_providers(self, type="Hawkular"):
         providers = []
         rows = self.execute(self.sql_providers)
 
         for row in rows:
-            if self.web_session.PROVIDER in row.get('type'):
+            if type in row.get('type'):
                 providers.append(row)
 
         return providers
