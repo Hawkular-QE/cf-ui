@@ -38,9 +38,8 @@ class settings():
         self.navigate_to_providers_view()
         assert self.is_view_list_selected()
 
+        # Middleware Prviders Tile View
         self.navigate_to_settings_default_view()
-
-        # Middleware Prviders List View
         try:
             self.web_driver.find_element_by_css_selector("a[href*='manageiq_providers_middlewaremanager&view=tile']").click()
             self.click_save_button()
@@ -49,6 +48,19 @@ class settings():
 
         self.navigate_to_providers_view()
         assert self.is_view_tile_selected()
+
+        # Middleware Prviders Grid View
+        self.navigate_to_settings_default_view()
+
+        try:
+            self.web_driver.find_element_by_css_selector(
+                "a[href*='manageiq_providers_middlewaremanager&view=grid']").click()
+            self.click_save_button()
+        except:
+            pass
+
+        self.navigate_to_providers_view()
+        assert self.is_view_grid_selected()
 
         return True
 
