@@ -36,7 +36,7 @@ class settings():
             pass
 
         self.navigate_to_providers_view()
-        assert self.is_view_list_selected()
+        assert self.is_list_view_selected()
 
         # Middleware Providers Tile View
         self.navigate_to_settings_default_view()
@@ -47,7 +47,7 @@ class settings():
             pass
 
         self.navigate_to_providers_view()
-        assert self.is_view_tile_selected()
+        assert self.is_tile_view_selected()
 
         # Middleware Providers Grid View
         self.navigate_to_settings_default_view()
@@ -60,7 +60,7 @@ class settings():
             pass
 
         self.navigate_to_providers_view()
-        assert self.is_view_grid_selected()
+        assert self.is_grid_view_selected()
 
         return True
 
@@ -76,7 +76,7 @@ class settings():
             pass
 
         self.navigate_to_servers_view()
-        assert self.is_view_list_selected()
+        assert self.is_list_view_selected()
 
         # Middleware Servers Tile View
         self.navigate_to_settings_default_view()
@@ -88,7 +88,7 @@ class settings():
             pass
 
         self.navigate_to_servers_view()
-        assert self.is_view_tile_selected()
+        assert self.is_tile_view_selected()
 
         # Middleware Servers Grid View
         self.navigate_to_settings_default_view()
@@ -100,7 +100,7 @@ class settings():
             pass
 
         self.navigate_to_servers_view()
-        assert self.is_view_grid_selected()
+        assert self.is_grid_view_selected()
 
         return True
 
@@ -116,7 +116,7 @@ class settings():
             pass
 
         self.navigate_to_deployments_view()
-        assert self.is_view_list_selected()
+        assert self.is_list_view_selected()
 
         # Middleware Deployments Tile View
         self.navigate_to_settings_default_view()
@@ -128,7 +128,7 @@ class settings():
             pass
 
         self.navigate_to_deployments_view()
-        assert self.is_view_tile_selected()
+        assert self.is_tile_view_selected()
 
         # Middleware Deployments Grid View
         self.navigate_to_settings_default_view()
@@ -140,7 +140,7 @@ class settings():
             pass
 
         self.navigate_to_deployments_view()
-        assert self.is_view_grid_selected()
+        assert self.is_grid_view_selected()
 
         return True
 
@@ -156,7 +156,7 @@ class settings():
             pass
 
         self.navigate_to_datasources_view()
-        assert self.is_view_list_selected()
+        assert self.is_list_view_selected()
 
         # Middleware Datasources Tile View
         self.navigate_to_settings_default_view()
@@ -168,7 +168,7 @@ class settings():
             pass
 
         self.navigate_to_datasources_view()
-        assert self.is_view_tile_selected()
+        assert self.is_tile_view_selected()
 
         # Middleware Datasources Grid View
         self.navigate_to_settings_default_view()
@@ -180,7 +180,7 @@ class settings():
             pass
 
         self.navigate_to_datasources_view()
-        assert self.is_view_grid_selected()
+        assert self.is_grid_view_selected()
 
         return True
 
@@ -196,7 +196,7 @@ class settings():
             pass
 
         self.navigate_to_messagings_view()
-        assert self.is_view_list_selected()
+        assert self.is_list_view_selected()
 
         # Middleware Messagings Tile View
         self.navigate_to_settings_default_view()
@@ -208,7 +208,7 @@ class settings():
             pass
 
         self.navigate_to_messagings_view()
-        assert self.is_view_tile_selected()
+        assert self.is_tile_view_selected()
 
         # Middleware Messagings Grid View
         self.navigate_to_settings_default_view()
@@ -220,7 +220,7 @@ class settings():
             pass
 
         self.navigate_to_messagings_view()
-        assert self.is_view_grid_selected()
+        assert self.is_grid_view_selected()
 
         return True
 
@@ -228,7 +228,7 @@ class settings():
     #   Selected icon color: blue(ish) = #0099d3 (hex)
     #   Non-selected icon color: black = #252525 (hex)
 
-    def is_view_grid_selected(self):
+    def is_grid_view_selected(self):
         self.wait_for_icon_present('view_grid')
 
         with timeout(seconds=15, error_message="Timed out waiting Grid View to be selected."):
@@ -244,7 +244,7 @@ class settings():
 
         return False
 
-    def is_view_tile_selected(self):
+    def is_tile_view_selected(self):
         self.wait_for_icon_present('view_tile')
 
         with timeout(seconds=15, error_message="Timed out waiting Tile View to be selected."):
@@ -260,7 +260,7 @@ class settings():
 
         return False
 
-    def is_view_list_selected(self):
+    def is_list_view_selected(self):
         self.wait_for_icon_present('view_list')
 
         with timeout(seconds=15, error_message="Timed out waiting List View to be selected."):
