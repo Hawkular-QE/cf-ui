@@ -21,4 +21,21 @@ def test_settings_default_view(web_session):
     assert settings(web_session).default_view()
 
 def test_providers_default_views(web_session):
+    web_session.logger.info("Begin Providers Settings Default View test")
     assert settings(web_session).validate_providers_default_views()
+
+def test_servers_default_views(web_session):
+    web_session.logger.info("Begin Servers Settings Default View test")
+    assert settings(web_session).validate_servers_default_views()
+
+def test_deployments_default_views(web_session):
+    web_session.logger.info("Begin Deployments Settings Default View test")
+    assert settings(web_session).validate_deployments_default_views()
+
+def test_datasources_default_views(web_session):
+    web_session.logger.info("Begin Datasources Settings Default View test")
+    assert settings(web_session).validate_datasources_default_views()
+
+def test_messagings_default_views(web_session):
+    web_session.logger.info("Begin Messagings Settings Default View test")
+    assert settings(web_session).validate_messagings_default_views()
