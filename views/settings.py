@@ -29,36 +29,22 @@ class settings():
         self.navigate_to_settings_default_view()
 
         # Middleware Providers List View
-        try:
-            self.web_driver.find_element_by_css_selector("a[href*='manageiq_providers_middlewaremanager&view=list']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='manageiq_providers_middlewaremanager&view=list']"
+        self.select_view(view)
         self.navigate_to_providers_view()
         assert self.is_list_view_selected()
 
         # Middleware Providers Tile View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector("a[href*='manageiq_providers_middlewaremanager&view=tile']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='manageiq_providers_middlewaremanager&view=tile']"
+        self.select_view(view)
         self.navigate_to_providers_view()
         assert self.is_tile_view_selected()
 
         # Middleware Providers Grid View
         self.navigate_to_settings_default_view()
-
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='manageiq_providers_middlewaremanager&view=grid']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='manageiq_providers_middlewaremanager&view=grid']"
+        self.select_view(view)
         self.navigate_to_providers_view()
         assert self.is_grid_view_selected()
 
@@ -68,37 +54,22 @@ class settings():
         self.navigate_to_settings_default_view()
 
         # Middleware Servers List View
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewareserver&view=list']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewareserver&view=list']"
+        self.select_view(view)
         self.navigate_to_servers_view()
         assert self.is_list_view_selected()
 
         # Middleware Servers Tile View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewareserver&view=tile']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewareserver&view=tile']"
+        self.select_view(view)
         self.navigate_to_servers_view()
         assert self.is_tile_view_selected()
 
         # Middleware Servers Grid View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewareserver&view=grid']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewareserver&view=grid']"
+        self.select_view(view)
         self.navigate_to_servers_view()
         assert self.is_grid_view_selected()
 
@@ -108,37 +79,22 @@ class settings():
         self.navigate_to_settings_default_view()
 
         # Middleware Deployments List View
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaredeployment&view=list']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaredeployment&view=list']"
+        self.select_view(view)
         self.navigate_to_deployments_view()
         assert self.is_list_view_selected()
 
         # Middleware Deployments Tile View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaredeployment&view=tile']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaredeployment&view=tile']"
+        self.select_view(view)
         self.navigate_to_deployments_view()
         assert self.is_tile_view_selected()
 
         # Middleware Deployments Grid View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaredeployment&view=grid']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaredeployment&view=grid']"
+        self.select_view(view)
         self.navigate_to_deployments_view()
         assert self.is_grid_view_selected()
 
@@ -148,37 +104,22 @@ class settings():
         self.navigate_to_settings_default_view()
 
         # Middleware Datasources List View
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaredatasource&view=list']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaredatasource&view=list']"
+        self.select_view(view)
         self.navigate_to_datasources_view()
         assert self.is_list_view_selected()
 
         # Middleware Datasources Tile View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaredatasource&view=tile']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaredatasource&view=tile']"
+        self.select_view(view)
         self.navigate_to_datasources_view()
         assert self.is_tile_view_selected()
 
         # Middleware Datasources Grid View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaredatasource&view=grid']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaredatasource&view=grid']"
+        self.select_view(view)
         self.navigate_to_datasources_view()
         assert self.is_grid_view_selected()
 
@@ -188,41 +129,34 @@ class settings():
         self.navigate_to_settings_default_view()
 
         # Middleware Messagings List View
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaremessaging&view=list']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaremessaging&view=list']"
+        self.select_view(view)
         self.navigate_to_messagings_view()
         assert self.is_list_view_selected()
 
         # Middleware Messagings Tile View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaremessaging&view=tile']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaremessaging&view=tile']"
+        self.select_view(view)
         self.navigate_to_messagings_view()
         assert self.is_tile_view_selected()
 
         # Middleware Messagings Grid View
         self.navigate_to_settings_default_view()
-        try:
-            self.web_driver.find_element_by_css_selector(
-                "a[href*='middlewaremessaging&view=grid']").click()
-            self.click_save_button()
-        except:
-            pass
-
+        view = "a[href*='middlewaremessaging&view=grid']"
+        self.select_view(view)
         self.navigate_to_messagings_view()
         assert self.is_grid_view_selected()
 
         return True
+
+
+    def select_view(self, view):
+        try:
+            self.web_driver.find_element_by_css_selector(view).click()
+            self.click_save_button()
+        except:
+            pass
 
     # Note:
     #   Selected icon color: blue(ish) = #0099d3 (hex)
