@@ -1,6 +1,7 @@
 from selenium.webdriver.support.color import Color
 from common.ui_utils import ui_utils
 from common.timeout import timeout
+from common.miq_login import miq_login
 
 class settings():
     web_session = None
@@ -150,6 +151,22 @@ class settings():
 
         return True
 
+    def validate_settings_after_relogin(self):
+        self.navigate_to_settings_default_view()
+        # Set Provider Tile View & Save
+        self.navigate_to_settings_default_view()
+        view = "a[href*='manageiq_providers_middlewaremanager&view=tile']"
+        self.select_view(view)
+
+        # Logout / Login
+        miq_login(self.web_session).logout()
+        miq_login(self.web_session).login(self.web_session.MIQ_USERNAME, self.web_session.MIQ_PASSWORD)
+
+        # Validate Provider Tile View still set correctly:
+        self.navigate_to_providers_view()
+        assert self.is_tile_view_selected()
+
+        return True
 
     def select_view(self, view):
         try:

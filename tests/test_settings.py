@@ -38,3 +38,7 @@ def test_datasources_default_views(web_session):
 def test_messagings_default_views(web_session):
     web_session.logger.info("Begin Messagings Settings Default View test")
     assert settings(web_session).validate_messagings_default_views()
+
+def test_settings_after_relogin(web_session):
+    web_session.logger.info("Begin Settings After Logout/Login")
+    assert settings(web_session).validate_settings_after_relogin()
