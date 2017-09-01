@@ -34,12 +34,12 @@ class servers():
     APPLICATION_WAR = "cfui_test_war.war"
     APPLICATION_JAR = "cfui_test_jar.jar"
     APPLICATION_EAR = "cfui_test_ear.ear"
-    JDBCDriver = "mysql-connector-java-5.1.36-bin.jar"
-    JDBCDriver_Name = "MySQLDriver"
-    JDBCDriver_Module_Name = "com.mysql.driver"
-    JDBCDriver_Class_Name = "com.mysql.jdbc.Driver"
-    JDBCDriver_Major_Version = "5"
-    JDBCDriver_Minor_Version = "1"
+    JDBCDriver = "postgresql-9.4.1207.jar"
+    JDBCDriver_Name = "mypostgres"
+    JDBCDriver_Module_Name = "org.postgresql"
+    JDBCDriver_Class_Name = "org.postgresql.Driver"
+    JDBCDriver_Major_Version = "9"
+    JDBCDriver_Minor_Version = "4"
     DatasourceUsernamePasswd = "admin"
     runtime_name = "TestDeployment.jar"
 
@@ -676,7 +676,7 @@ class servers():
 
     def add_jdbc_driver(self):
 
-        # Adds MySQL JDBC driver to EAP server and validates success message in UI
+        # Adds PostgreSQL JDBC driver to EAP server and validates success message in UI
 
         self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
@@ -693,11 +693,13 @@ class servers():
         # TODO : Validate if added JDBC driver is available while creating the datasource
         # Reference bug: https://bugzilla.redhat.com/show_bug.cgi?id=1383426
 
+        self.validate_jdbc_driver()
+
         return True
 
     def deploy_jdbc_driver(self, app_to_add=JDBCDriver):
         app = "{}/data/{}".format(os.getcwd(), app_to_add)
-        self.web_session.logger.info("Adding MySQL JDBC Driver: {}".format(app))
+        self.web_session.logger.info("Adding PostgreSQL JDBC Driver: {}".format(app))
 
         self.web_driver.find_element_by_xpath("//button[@title='JDBC Drivers']").click()
         self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_jdbc_drivers_choice__middleware_jdbc_driver_add', 5)
@@ -715,7 +717,7 @@ class servers():
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='addJdbcDriver()']").click()
         assert self.ui_utils.waitForTextOnPage(
-            'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 90)
+            'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 300)
 
     def add_datasource(self, datasourceName, xa=False):
 
@@ -938,3 +940,40 @@ class servers():
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
         assert self.ui_utils.refresh_until_text_appears(expected_status, 300)
         self.web_session.logger.info("EAP is in {} status".format(expected_status))
+
+    def validate_jdbc_driver(self):
+
+        self.web_session.logger.info("Verify if the jdbc driver is shown while adding datasource")
+        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+
+        # Find running EAP server
+        eap = self.find_eap_in_state("any", check_if_resolvable_hostname=True)
+        assert eap, "No EAP found in desired state."
+
+        self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
+        assert self.ui_utils.waitForTextOnPage('Version', 15)
+
+        self.web_driver.find_element_by_xpath("//button[@title='Datasources']").click()
+        self.ui_utils.waitForElementOnPage(By.ID, 'middleware_server_datasources_choice__middleware_datasource_add', 5)
+        self.web_driver.find_element_by_id(
+            'middleware_server_datasources_choice__middleware_datasource_add').click()
+        self.ui_utils.sleep(2)
+        assert self.ui_utils.waitForTextOnPage('Create Datasource', 15)
+
+        self.web_driver.find_element_by_xpath("//select[@id='chooose_datasource_input']").click()
+
+        self.web_driver.find_element_by_xpath("//label[contains(.,'XA Datasource:')]").click()
+        self.web_driver.find_element_by_xpath("//option[contains(.,'Postgres')]").click()
+
+        self.ui_utils.waitForElementOnPage(By.XPATH, "//button[@ng-click='vm.addDatasourceChooseNext()']", 5)
+        self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceChooseNext()']").click()
+        self.web_driver.find_element_by_xpath("//button[@ng-click='vm.addDatasourceStep1Next()']").click()
+        assert self.ui_utils.waitForTextOnPage('Existing Driver', 15)
+
+        # Verify if the existing Driver dropdown list shows the PostgreSQL driver:
+        self.web_driver.find_element_by_xpath("//a[contains(.,'Existing Driver')]").click()
+        assert self.ui_utils.waitForTextOnPage('Existing JDBC Driver', 15)
+        self.web_driver.find_element_by_xpath("//select[@id='existing_jdbc_driver_input']").click()
+        assert self.ui_utils.waitForTextOnPage(self.JDBCDriver_Name, 15)
+
+
