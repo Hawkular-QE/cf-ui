@@ -101,6 +101,10 @@ def test_cfui_deployment_download_txt(web_session, delete_files):
     assert_download_exist("{}.csv".format(file))
 
 def test_cfui_provider_detail_pdf(web_session, delete_files):
+    if web_session.appliance_version == 'master':
+        web_session.logger.debug("Download feature not supported for Provider Detail.")
+        pytest.skip("Skip test - Download feature not supported for Provider Detail - version: master.")
+
     web_session.logger.info("Begin download provider detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
@@ -129,6 +133,10 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Domain*.pdf'))
 
 def test_cfui_server_detail_download_pdf(web_session, delete_files):
+    if web_session.appliance_version == 'master':
+        web_session.logger.debug("Download feature not supported for Server Detail.")
+        pytest.skip("Skip test - Download feature not supported for Server Detail - version: master.")
+
     web_session.logger.info("Begin download Server detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_server/show_list".format(web_session.MIQ_URL))
@@ -140,6 +148,10 @@ def test_cfui_server_detail_download_pdf(web_session, delete_files):
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server*.pdf'))
 
 def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
+    if web_session.appliance_version == 'master':
+        web_session.logger.debug("Download feature not supported for Deloyment Detail.")
+        pytest.skip("Skip test - Download feature not supported for Deloyment Detail - version: master.")
+
     web_session.logger.info("Begin download Deployment detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
@@ -151,6 +163,10 @@ def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Deployment*.pdf'))
 
 def test_cfui_datasource_detail_download_pdf(web_session, delete_files):
+    if web_session.appliance_version == 'master':
+        web_session.logger.debug("Download feature not supported for Datasource Detail.")
+        pytest.skip("Skip test - Download feature not supported for Datasource Detail - version: master.")
+
     web_session.logger.info("Begin download Datasource detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
@@ -162,6 +178,10 @@ def test_cfui_datasource_detail_download_pdf(web_session, delete_files):
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Datasource*.pdf'))
 
 def test_cfui_messaging_detail_download_pdf(web_session, delete_files):
+    if web_session.appliance_version == 'master':
+        web_session.logger.debug("Download feature not supported for Messaging Detail.")
+        pytest.skip("Skip test - Download feature not supported for Messaging Detail - version: master")
+
     web_session.logger.info("Begin download Messaging detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_messaging/show_list".format(web_session.MIQ_URL))
