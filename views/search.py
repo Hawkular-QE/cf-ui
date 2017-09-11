@@ -5,6 +5,8 @@ from hawkular.hawkular_api import hawkular_api
 from views.servers import servers
 from views.providers import providers
 from selenium.webdriver.common.by import By
+from common.navigate import navigate
+
 
 class search():
     web_session = None
@@ -37,7 +39,7 @@ class search():
 
     def simple_search_provider(self):
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
         view(self.web_session).list_View()
         self.verify_search_exist()
@@ -48,7 +50,7 @@ class search():
 
     def simple_search_domain(self):
 
-        self.web_session.web_driver.get("{}//middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
         self.verify_search_exist()
         utils = ui_utils(self.web_session)
@@ -65,7 +67,7 @@ class search():
 
     def simple_search_server(self):
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Servers", 15)
         self.verify_search_exist()
 
@@ -76,7 +78,7 @@ class search():
 
     def simple_search_deployments(self):
 
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Deployments", 15)
         self.verify_search_exist()
 
@@ -87,7 +89,7 @@ class search():
 
     def simple_search_datasources(self):
 
-        self.web_session.web_driver.get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Datasources", 15)
         self.verify_search_exist()
 
@@ -98,7 +100,7 @@ class search():
 
     def simple_search_messagings(self):
 
-        self.web_session.web_driver.get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Messagings", 15)
         self.verify_search_exist()
 
@@ -109,7 +111,7 @@ class search():
 
     def save_advanced_search(self):
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
         view(self.web_session).list_View()
         self.verify_search_exist()
@@ -188,7 +190,7 @@ class search():
         assert self.ui_utils.waitForTextOnPage("was saved", 15)
 
     def navigate_to_saved_filter(self):
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
         assert self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]")
         self.web_driver.find_element_by_xpath("//a[contains(.,'My Filters')]").click()

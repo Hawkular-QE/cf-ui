@@ -1,7 +1,7 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
-import re
+from common.navigate import navigate
 
 class deployments():
     web_session = None
@@ -16,7 +16,7 @@ class deployments():
         self.db = db(self.web_session)
 
     def validate_deployment_details(self):
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Deployment Name", 15)
         deployments_ui = self.ui_utils.get_list_table()
         assert deployments_ui, "No UI Deployments found."
@@ -32,7 +32,7 @@ class deployments():
             deployment_name = dep.get('Deployment Name')
             self.web_session.logger.info("Validate Deployment {}.".format(deployment_name))
 
-            self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+            navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
             assert self.ui_utils.waitForTextOnPage("Deployment Name", 15)
 
             self.ui_utils.click_on_row_containing_text(deployment_name)
@@ -60,7 +60,7 @@ class deployments():
         return True
 
     def validate_deployments_list(self):
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Deployment Name", 15)
         deployments_ui = self.ui_utils.get_list_table()
         assert deployments_ui, "No UI Deployments found."

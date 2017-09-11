@@ -1,6 +1,7 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
+from common.navigate import navigate
 
 class messagings():
     web_session = None
@@ -67,7 +68,7 @@ class messagings():
     def validate_eap_jms_queues(self):
         server_to_test = 'server-one'
 
-        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Check that server to test is present
         if not self.ui_utils.isTextOnPage(server_to_test):
@@ -108,5 +109,5 @@ class messagings():
         return True
 
     def __navigate_to_messagings_view(self):
-        self.web_session.web_driver.get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Messaging Name", 15)
