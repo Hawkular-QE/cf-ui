@@ -2,6 +2,7 @@ from selenium.webdriver.support.color import Color
 from common.ui_utils import ui_utils
 from common.timeout import timeout
 from common.miq_login import miq_login
+from common.navigate import navigate
 
 class settings():
     web_session = None
@@ -27,13 +28,6 @@ class settings():
         return True;
 
     def validate_providers_default_views(self):
-        self.navigate_to_settings_default_view()
-
-        # Middleware Providers List View
-        view = "a[href*='manageiq_providers_middlewaremanager&view=list']"
-        self.select_view(view)
-        self.navigate_to_providers_view()
-        assert self.is_list_view_selected()
 
         # Middleware Providers Tile View
         self.navigate_to_settings_default_view()
@@ -49,16 +43,16 @@ class settings():
         self.navigate_to_providers_view()
         assert self.is_grid_view_selected()
 
+        # Middleware Providers List View
+        self.navigate_to_settings_default_view()
+        view = "a[href*='manageiq_providers_middlewaremanager&view=list']"
+        self.select_view(view)
+        self.navigate_to_providers_view()
+        assert self.is_list_view_selected()
+
         return True
 
     def validate_servers_default_views(self):
-        self.navigate_to_settings_default_view()
-
-        # Middleware Servers List View
-        view = "a[href*='middlewareserver&view=list']"
-        self.select_view(view)
-        self.navigate_to_servers_view()
-        assert self.is_list_view_selected()
 
         # Middleware Servers Tile View
         self.navigate_to_settings_default_view()
@@ -74,16 +68,15 @@ class settings():
         self.navigate_to_servers_view()
         assert self.is_grid_view_selected()
 
+        # Middleware Servers List View
+        self.navigate_to_settings_default_view()
+        view = "a[href*='middlewareserver&view=list']"
+        self.select_view(view)
+        self.navigate_to_servers_view()
+        assert self.is_list_view_selected()
         return True
 
     def validate_deployments_default_views(self):
-        self.navigate_to_settings_default_view()
-
-        # Middleware Deployments List View
-        view = "a[href*='middlewaredeployment&view=list']"
-        self.select_view(view)
-        self.navigate_to_deployments_view()
-        assert self.is_list_view_selected()
 
         # Middleware Deployments Tile View
         self.navigate_to_settings_default_view()
@@ -99,16 +92,16 @@ class settings():
         self.navigate_to_deployments_view()
         assert self.is_grid_view_selected()
 
+        # Middleware Deployments List View
+        self.navigate_to_settings_default_view()
+        view = "a[href*='middlewaredeployment&view=list']"
+        self.select_view(view)
+        self.navigate_to_deployments_view()
+        assert self.is_list_view_selected()
+
         return True
 
     def validate_datasources_default_views(self):
-        self.navigate_to_settings_default_view()
-
-        # Middleware Datasources List View
-        view = "a[href*='middlewaredatasource&view=list']"
-        self.select_view(view)
-        self.navigate_to_datasources_view()
-        assert self.is_list_view_selected()
 
         # Middleware Datasources Tile View
         self.navigate_to_settings_default_view()
@@ -124,16 +117,16 @@ class settings():
         self.navigate_to_datasources_view()
         assert self.is_grid_view_selected()
 
+        # Middleware Datasources List View
+        self.navigate_to_settings_default_view()
+        view = "a[href*='middlewaredatasource&view=list']"
+        self.select_view(view)
+        self.navigate_to_datasources_view()
+        assert self.is_list_view_selected()
+
         return True
 
     def validate_messagings_default_views(self):
-        self.navigate_to_settings_default_view()
-
-        # Middleware Messagings List View
-        view = "a[href*='middlewaremessaging&view=list']"
-        self.select_view(view)
-        self.navigate_to_messagings_view()
-        assert self.is_list_view_selected()
 
         # Middleware Messagings Tile View
         self.navigate_to_settings_default_view()
@@ -148,6 +141,13 @@ class settings():
         self.select_view(view)
         self.navigate_to_messagings_view()
         assert self.is_grid_view_selected()
+
+        # Middleware Messagings List View
+        self.navigate_to_settings_default_view()
+        view = "a[href*='middlewaremessaging&view=list']"
+        self.select_view(view)
+        self.navigate_to_messagings_view()
+        assert self.is_list_view_selected()
 
         return True
 
@@ -259,31 +259,31 @@ class settings():
                     pass
 
     def navigate_to_settings_default_view(self):
-        self.web_driver.get("{}/configuration/index".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/configuration/index".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Default Views", 15)
         self.web_driver.find_element_by_xpath("//*[contains(text(),'Default View')]").click()
         self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
 
     def navigate_to_providers_view(self):
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Middleware Providers", 15)
 
     def navigate_to_servers_view(self):
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Middleware Servers", 15)
 
     def navigate_to_deployments_view(self):
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Middleware Deployments", 15)
 
     def navigate_to_datasources_view(self):
-        self.web_session.web_driver.get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Middleware Datasources", 15)
 
     def navigate_to_domains_view(self):
-        self.web_session.web_driver.get("{}//middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_domain/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
     def navigate_to_messagings_view(self):
-        self.web_session.web_driver.get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_messaging/show_list".format(self.web_session.MIQ_URL))
         self.ui_utils.waitForTextOnPage("Middleware Messagings", 15)

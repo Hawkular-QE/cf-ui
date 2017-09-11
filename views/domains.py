@@ -1,7 +1,7 @@
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
-
+from common.navigate import navigate
 
 class domains():
     web_session = None
@@ -22,7 +22,7 @@ class domains():
             self.web_session.logger.warning("Unable to connecto to database. {}".format(e))
 
     def validate_domains_list(self):
-        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
         domains_ui = self.ui_utils.get_list_table()
@@ -41,7 +41,7 @@ class domains():
         return True
 
     def validate_domain_details(self):
-        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
         domains_ui = self.ui_utils.get_list_table()
@@ -49,7 +49,7 @@ class domains():
 
         for domain_ui in domains_ui:
             feed = domain_ui.get('Feed')  # Unique Server identifier
-            self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+            navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
             self.ui_utils.click_on_row_containing_text(domain_ui.get('Feed'))
             self.ui_utils.waitForTextOnPage("Nativeid", 15)
 
@@ -70,14 +70,14 @@ class domains():
 
     def validate_server_groups_list(self):
 
-        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
         domains_ui = self.ui_utils.get_list_table()
         server_groups_db = self.db.get_server_groups()
 
         for domain in domains_ui:
-            self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+            navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
             assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
             self.ui_utils.click_on_row_containing_text(domain.get('Domain Name'))
@@ -103,14 +103,14 @@ class domains():
         return True
 
     def validate_server_group_details(self):
-        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
         domains_ui = self.ui_utils.get_list_table()
         server_groups_db = self.db.get_server_groups()
 
         for domain in domains_ui:
-            self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+            navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
             assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
 
             self.nav_to_all_middleware_server_groups(domain.get('Domain Name'))

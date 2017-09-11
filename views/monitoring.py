@@ -2,6 +2,7 @@ from common.ui_utils import ui_utils
 from common.view import view
 from views.servers import servers
 from selenium.webdriver.common.by import By
+from common.navigate import navigate
 
 class monitoring():
     web_session = None
@@ -12,7 +13,7 @@ class monitoring():
         self.ui_utils = ui_utils(self.web_session)
 
     def validate_provider_monitoring_timelines(self):
-        self.web_session.web_driver.get("{}/ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/ems_middleware/show_list".format(self.web_session.MIQ_URL))
         view(self.web_session).list_View()
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         self.ui_utils.click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
@@ -28,7 +29,7 @@ class monitoring():
         return True
 
     def validate_eap_servers_monitoring_utilization(self):
-        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         servers(self.web_session).navigate_to_non_container_eap()
 
@@ -79,7 +80,7 @@ class monitoring():
         return True
 
     def validate_messagings_monitoring_utilization_jms_topics(self):
-        self.web_session.web_driver.get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Messaging Type", 10)
         self.ui_utils.click_on_row_containing_text('JMS Topic')
         assert self.ui_utils.waitForTextOnPage("Summary", 10)

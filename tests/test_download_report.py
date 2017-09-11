@@ -8,6 +8,7 @@ from common.ui_utils import ui_utils
 from common.view import view
 from views.domains import domains
 from common.timeout import timeout
+from common.navigate import navigate
 import time
 
 @pytest.fixture (scope='session')
@@ -33,7 +34,7 @@ def delete_files():
     return
 
 def test_cfui_providers_download_txt(web_session, delete_files):
-    web_session.web_driver.get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download provider report as text test")
     assert download_report(web_session,"ems_middleware").text_format()
 
@@ -47,7 +48,7 @@ def test_cfui_providers_download_txt(web_session, delete_files):
     assert_download_exist("{}.csv".format(file))
 
 def test_cfui_domain_download_txt(web_session, delete_files):
-    web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download domain report as text test")
     assert download_report(web_session,"middleware_domain").text_format()
 
@@ -60,7 +61,7 @@ def test_cfui_domain_download_txt(web_session, delete_files):
     assert_download_exist("{}.csv".format(file))
 
 def test_cfui_server_download_txt(web_session, delete_files):
-    web_session.web_driver.get("{}//middleware_server/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}//middleware_server/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download server report as text test")
     assert download_report(web_session,"middleware_server").text_format()
 
@@ -74,7 +75,7 @@ def test_cfui_server_download_txt(web_session, delete_files):
 
 
 def test_cfui_datasource_download_txt(web_session, delete_files):
-    web_session.web_driver.get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download datasource report as text test")
     assert download_report(web_session,"middleware_datasource").text_format()
 
@@ -88,7 +89,7 @@ def test_cfui_datasource_download_txt(web_session, delete_files):
 
 
 def test_cfui_deployment_download_txt(web_session, delete_files):
-    web_session.web_driver.get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download deployment report as text test")
     assert download_report(web_session,"middleware_deployment").text_format()
 
@@ -107,7 +108,7 @@ def test_cfui_provider_detail_pdf(web_session, delete_files):
 
     web_session.logger.info("Begin download provider detail PDF text")
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
     view(web_session).list_View()
     utils.sleep(2)
     utils.click_on_row_containing_text(web_session.HAWKULAR_PROVIDER_NAME)
@@ -120,7 +121,7 @@ def test_cfui_provider_detail_pdf(web_session, delete_files):
 def test_cfui_domain_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Domain detail PDF text")
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     domains = utils.get_list_table()
     if not domains:
         web_session.logger.warning("No Domains found.")
@@ -139,7 +140,7 @@ def test_cfui_server_detail_download_pdf(web_session, delete_files):
 
     web_session.logger.info("Begin download Server detail PDF text")
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}/middleware_server/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_server/show_list".format(web_session.MIQ_URL))
     servers = utils.get_list_table()
     utils.click_on_row_containing_text(servers[0].get('Feed'))
 
@@ -154,7 +155,7 @@ def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
 
     web_session.logger.info("Begin download Deployment detail PDF text")
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
     servers = utils.get_list_table()
     utils.click_on_row_containing_text(servers[0].get('Deployment Name'))
 
@@ -169,7 +170,7 @@ def test_cfui_datasource_detail_download_pdf(web_session, delete_files):
 
     web_session.logger.info("Begin download Datasource detail PDF text")
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
     servers = utils.get_list_table()
     utils.click_on_row_containing_text(servers[0].get('Datasource Name'))
 
@@ -184,7 +185,7 @@ def test_cfui_messaging_detail_download_pdf(web_session, delete_files):
 
     web_session.logger.info("Begin download Messaging detail PDF text")
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}/middleware_messaging/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_messaging/show_list".format(web_session.MIQ_URL))
     servers = utils.get_list_table()
     utils.click_on_row_containing_text(servers[0].get('Messaging Name'))
 
@@ -228,7 +229,7 @@ def assert_download_exist(file, waitTime = 15):
 
 def nav_to_server_groups(web_session):
     utils = ui_utils(web_session)
-    web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
+    navigate(web_session).get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
     domains_ui = utils.get_list_table()
     if not domains_ui:
         web_session.logger.warning("No Domains found.")

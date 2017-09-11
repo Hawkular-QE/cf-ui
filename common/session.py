@@ -113,7 +113,7 @@ class session(properties):
         assert self.appliance_version, "Appliance version not found"
         self.logger.info("MIQ/CFME Version: %s", self.appliance_version)
 
-        with timeout(15, error_message="Timed out with \"We're sorry, but something went wrong\"."):
+        with timeout(60, error_message="Timed out with \"We're sorry, but something went wrong\"."):
              while True:
                 if not ui_utils(self).isTextOnPage('sorry, but something went'):
                     break;

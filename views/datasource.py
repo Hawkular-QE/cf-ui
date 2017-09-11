@@ -2,7 +2,7 @@ from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 import time
-import re
+from common.navigate import navigate
 from views.servers import servers
 from selenium.webdriver.common.by import By
 
@@ -20,7 +20,7 @@ class datasources():
 
 
     def validate_datasource_list(self):
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         datasource_api = self.hawkular_api.get_hawkular_datasources()
         datasource_ui = self.ui_utils.get_list_table()
@@ -42,7 +42,7 @@ class datasources():
         return True
 
     def validate_datasource_detail(self):
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
 
         datasource_ui = self.ui_utils.get_list_table()
         datasource_api = self.hawkular_api.get_hawkular_datasources()
@@ -51,7 +51,7 @@ class datasources():
             datasource_name = dat.get('Datasource Name')
             self.web_session.logger.info("Validate Datasource {}.".format(datasource_name))
 
-            self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+            navigate(self.web_session).get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
             assert self.ui_utils.waitForTextOnPage("Middleware Datasources", 15)
 
             self.ui_utils.click_on_row_containing_text(datasource_name)
@@ -126,7 +126,7 @@ class datasources():
         index = 0
         datasource_to_delete = self.datasource_desc
 
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         datasources = self.ui_utils.get_list_table_as_elements()
         currrent_datasource_count = len(datasources)
 
@@ -159,12 +159,12 @@ class datasources():
                 assert self.ui_utils.waitForTextOnPage('datasources were removed', 5)
                 break
             except:
-                self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+                navigate(self.web_session).get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
                 datasources = self.ui_utils.get_list_table_as_elements()
                 index += 1
                 continue
 
-        self.web_session.web_driver.get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         assert self.wait_for_datasource_to_be_deleted(currrent_datasource_count, (60 * 5))
 
         return True
