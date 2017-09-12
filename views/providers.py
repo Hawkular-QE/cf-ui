@@ -7,6 +7,7 @@ from common.view import view
 from common.db import db
 import time
 from common.timeout import timeout
+from common.navigate import navigate
 
 class providers():
     web_session = None
@@ -39,7 +40,7 @@ class providers():
         else:
             self.web_session.logger.info("Adding Middleware Provider to ManageIQ instance")
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -87,7 +88,7 @@ class providers():
 
     def delete_provider(self, delete_all_providers=True):
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         view(self.web_session).list_View()
         assert ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 30)
@@ -104,7 +105,7 @@ class providers():
         if add_provider:
             self.add_provider(delete_if_provider_present=False)
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -140,7 +141,7 @@ class providers():
 
         # Edit and save the name to default value.( This will additionally check edit from the provider details page)
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.PROVIDER)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -198,7 +199,7 @@ class providers():
             self.web_session.logger.warning("Provider {} not present.".format(self.web_session.HAWKULAR_HOSTNAME))
             return True
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
         self.web_session.logger.info("Deleting the provider- {}".format(self.web_session.HAWKULAR_HOSTNAME))
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
@@ -287,7 +288,7 @@ class providers():
         # Test to validate provider list page in UI and validate matching providers hostname, port number
 
         self.web_session.logger.info("Begin providers list test.")
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         providers_ui = self.ui_utils.get_list_table()
         assert len(providers_ui) > 0, "Providers list is empty."
 
@@ -305,7 +306,7 @@ class providers():
         # and to validate number of middleware servers, deployments and datasources in releationships section.
 
         self.web_session.logger.info("Begin providers details test.")
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         view(self.web_session).list_View()
         providers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
@@ -336,7 +337,7 @@ class providers():
         # Test for Authentication->Recheck Authentication' on hawkular provider
 
         self.web_session.logger.info("Begin test for Authentication->Recheck Authentication.")
-        self.web_session.web_driver.get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
 
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         self.web_driver.find_element_by_xpath("//h1[contains(.,'Hawkular-Provider (Summary)')]")
@@ -436,7 +437,7 @@ class providers():
         return True;
 
     def verify_all_providers_deleted(self):
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
         while True:
             if self.web_driver.find_element_by_xpath("//strong[contains(.,'No Records Found.')]").is_displayed():

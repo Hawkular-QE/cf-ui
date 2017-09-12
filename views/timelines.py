@@ -2,6 +2,7 @@ from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
 from views.servers import servers
 from selenium.webdriver.common.by import By
+from common.navigate import navigate
 
 class timelines():
     web_session = None
@@ -20,7 +21,7 @@ class timelines():
         self.hawkular_api = hawkular_api(self.web_session)
 
     def test_event_for_successful_deployment(self):
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage("Middleware Deployments", 15)
 
         if self.ui_utils.get_elements_containing_text(self.APPLICATION_WAR):
@@ -41,7 +42,7 @@ class timelines():
 
         # Existing issue: https://bugzilla.redhat.com/show_bug.cgi?id=1388040
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         # Find non-container EAP on which to deploy
         eap = servers(self.web_session).find_eap_in_state("Running", check_if_resolvable_hostname=True)
@@ -92,7 +93,7 @@ class timelines():
 
     def navigate_to_timeline(self):
 
-        self.web_session.web_driver.get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         ui_utils(self.web_session).waitForTextOnPage('Relationships', 10)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()

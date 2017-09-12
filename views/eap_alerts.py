@@ -4,6 +4,8 @@ from selenium.webdriver.common.by import By
 from time import sleep
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from common.navigate import navigate
+
 '''
 
 Created on September 22, 2016
@@ -27,7 +29,7 @@ class eap_alerts():
 
     def add_alert(self):
 
-        self.web_session.web_driver.get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("All Policy Profiles", 15)
         self.web_session.web_driver.find_element_by_xpath("//a[contains(.,'Alerts')]").click()
         assert ui_utils(self.web_session).waitForTextOnPage("All Alerts", 80)
@@ -113,7 +115,7 @@ class eap_alerts():
             return True
 
     def navigate_to_all_alerts(self):
-        self.web_session.web_driver.get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("All Alerts", 15)
         self.web_session.web_driver.find_element_by_xpath("//li[@title='All Alerts']").click()
         ui_utils(self.web_session).sleep(20)
