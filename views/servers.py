@@ -47,7 +47,7 @@ class servers():
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
-        self.ui_utils = ui_utils(self.web_session)
+        self.ui_utils = ui_utils(web_session)
         self.hawkular_api = hawkular_api(self.web_session)
         self.appliance_version = self.web_session.appliance_version
 
@@ -349,7 +349,7 @@ class servers():
         feed = eap_hawk.get('Feed') # Unique server id
 
         navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Feed')
+        self.ui_utils.waitForTextOnPage('Feed', 15)
 
         self.ui_utils.click_on_row_containing_text(feed)
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
@@ -419,8 +419,7 @@ class servers():
 
         # Validate that application is "Removed from the deployments list"
         navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH,
-                                                               "//td[contains(.,'{}')]".format(app_to_undeploy), 120,
+        assert self.ui_utils.waitForElementOnPage(By.XPATH, "//td[contains(.,'{}')]".format(app_to_undeploy), 120,
                                                                exist=False)
         if not self.ui_utils.get_elements_containing_text(app_to_undeploy):
             self.web_session.logger.info("The archive is removed successfully.")
@@ -679,7 +678,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Middleware Providers', 15)
         view(self.web_session).list_View()
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
-        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+        self.ui_utils.click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         providers(self.web_session).refresh_provider()
 
     def add_jdbc_driver(self):
