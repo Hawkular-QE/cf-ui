@@ -3,12 +3,14 @@ from common.timeout import timeout
 
 class navigate():
     web_driver = None
+    web_session = None
     ui_utils = None
 
     minutes_to_wait = (10 * 60)
 
     def __init__(self, web_session):
         self.web_driver = web_session.web_driver
+        self.web_session = web_session
         self.ui_utils = ui_utils(web_session)
 
     def get(self, url):
@@ -18,6 +20,6 @@ class navigate():
                 if not self.ui_utils.isTextOnPage("sorry, but something went wrong"):
                     break
                 else:
-                    self.logger.info('Encountered "Sorry" message.')
-                    self.ui_utils(self).sleep(3)
+                    self.web_session.logger.info('Encountered "Sorry" message.')
+                    self.ui_utils(self.web_session).sleep(5)
                     self.web_driver.refresh()
