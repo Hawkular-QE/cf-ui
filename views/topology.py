@@ -344,4 +344,4 @@ class topology():
 
     def __navigate_to_topology__(self):
         navigate(self.web_session).get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Server Groups', 10)
+        self.ui_utils.wait_until_element_displayed(self.web_driver.find_element_by_class_name('btn-default'), 10)
