@@ -7,6 +7,7 @@ class navigate():
     ui_utils = None
 
     minutes_to_wait = (10 * 60)
+    wait_for_text = 'Middleware'
 
     def __init__(self, web_session):
         self.web_driver = web_session.web_driver
@@ -17,9 +18,15 @@ class navigate():
         with timeout(seconds=self.minutes_to_wait, error_message="Timed out with \"We're sorry, but something went wrong\"."):
             while True:
                 self.web_driver.get(url)
-                if not self.ui_utils.isTextOnPage("sorry, but something went wrong"):
+                try:
+                    assert self.ui_utils.waitForTextOnPage(self.wait_for_text, 15), "Failed to find text '{}'".format(self.wait_for_text)
                     break
-                else:
-                    self.web_session.logger.info('Encountered "Sorry" message.')
-                    self.ui_utils(self.web_session).sleep(5)
-                    self.web_driver.refresh()
+                except:
+                    if self.ui_utils.isTextOnPage("sorry, but something went wrong"):
+                        self.web_session.logger.info('Encountered "Sorry" message.')
+                        self.ui_utils.sleep(5)
+                        pass
+                    else:
+                        self.web_session.logger.error('Failed URL navigation')
+                        raise
+ 
