@@ -15,10 +15,11 @@ class navigate():
         self.ui_utils = ui_utils(web_session)
 
     def get(self, url):
-        with timeout(seconds=self.minutes_to_wait, error_message="Timed out with \"We're sorry, but something went wrong\"."):
+        self.web_sesssion.logger.debug("Navigate to URL {}".format(url))
+        with timeout(seconds=self.minutes_to_wait, error_message="Timed Navigating \"{}\"".format(url)):
             while True:
-                self.web_driver.get(url)
                 try:
+                    self.web_driver.get(url)
                     assert self.ui_utils.waitForTextOnPage(self.wait_for_text, 15), "Failed to find text '{}'".format(self.wait_for_text)
                     break
                 except:
