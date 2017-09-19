@@ -2,6 +2,7 @@ from common.ui_utils import ui_utils
 import re
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
+from common.navigate import navigate
 
 class topology():
     web_session = None
@@ -342,5 +343,5 @@ class topology():
         return el[1].is_displayed()
 
     def __navigate_to_topology__(self):
-        self.web_driver.get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
-        self.ui_utils.waitForTextOnPage('Server Groups', 10)
+        navigate(self.web_session).get("{}/middleware_topology/show".format(self.web_session.MIQ_URL))
+        self.ui_utils.wait_until_element_displayed(self.web_driver.find_element_by_class_name('btn-default'), 10)

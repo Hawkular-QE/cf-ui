@@ -11,6 +11,7 @@ import datetime
 import socket
 import pytest
 from common.db import db
+from common.navigate import navigate
 
 class servers():
     web_session = None
@@ -46,7 +47,7 @@ class servers():
     def __init__(self, web_session):
         self.web_session = web_session
         self.web_driver = web_session.web_driver
-        self.ui_utils = ui_utils(self.web_session)
+        self.ui_utils = ui_utils(web_session)
         self.hawkular_api = hawkular_api(self.web_session)
         self.appliance_version = self.web_session.appliance_version
 
@@ -59,7 +60,7 @@ class servers():
         origValue = -1
         server = None
 
-        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         servers_ui = self.ui_utils.get_list_table()
         assert servers_ui, "No servers found."
@@ -71,7 +72,8 @@ class servers():
                 server = self.ui_utils.find_row_in_list(servers_ui, 'Product', eap)
                 if server: break
 
-        assert server, "No server {} found.".format(server)
+        if not server:
+            pytest.skip("No server {} found.".format(server_type))
 
         # Feed is unique ID for this server
         self.ui_utils.click_on_row_containing_text(server.get('Feed'))
@@ -123,7 +125,7 @@ class servers():
 
 
     def validate_server_details(self):
-        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
 
         servers_ui = self.ui_utils.get_list_table()
@@ -131,7 +133,7 @@ class servers():
 
         for serv_ui in servers_ui:
             feed = serv_ui.get('Feed')  # Unique Server identifier
-            self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+            navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
             assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
 
 
@@ -152,7 +154,7 @@ class servers():
 
     def validate_servers_list(self):
         servers_db = None
-        self.web_session.web_driver.get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         servers_ui = self.ui_utils.get_list_table()
         servers_hawk = self.hawkular_api.get_hawkular_servers()
@@ -346,9 +348,10 @@ class servers():
 
         feed = eap_hawk.get('Feed') # Unique server id
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        self.ui_utils.waitForTextOnPage('Feed', 15)
 
-        self.ui_utils.click_on_row_containing_text(eap_hawk.get('Feed'))
+        self.ui_utils.click_on_row_containing_text(feed)
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Power']").click()
@@ -363,7 +366,8 @@ class servers():
 
     def deploy_application_archive(self, app_to_deploy = APPLICATION_WAR):
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
         # Find EAP on which to deploy
         eap= self.find_eap_in_state("Running", check_if_resolvable_hostname=True)
@@ -377,7 +381,7 @@ class servers():
         self.web_session.logger.info("Waiting for the archive to appear")
 
         # Validate UI
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_WAR, 300)
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
@@ -385,7 +389,7 @@ class servers():
         else:
             self.web_session.logger.info("Waiting for the archive to be enabled")
 
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
 
         # Validate DB
@@ -400,7 +404,8 @@ class servers():
 
     def undeploy_application_archive(self, app_to_undeploy=APPLICATION_WAR):
 
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
 
         if self.ui_utils.get_elements_containing_text(app_to_undeploy):
             self.ui_utils.click_on_row_containing_text(app_to_undeploy)
@@ -413,9 +418,8 @@ class servers():
         self.navigate_and_refresh_provider()
 
         # Validate that application is "Removed from the deployments list"
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH,
-                                                               "//td[contains(.,'{}')]".format(app_to_undeploy), 120,
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForElementOnPage(By.XPATH, "//td[contains(.,'{}')]".format(app_to_undeploy), 120,
                                                                exist=False)
         if not self.ui_utils.get_elements_containing_text(app_to_undeploy):
             self.web_session.logger.info("The archive is removed successfully.")
@@ -425,8 +429,8 @@ class servers():
     def restart_application_archive(self, app_to_redeploy=APPLICATION_WAR):
 
         # Find EAP with application to redeploy
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
 
         if self.ui_utils.get_elements_containing_text(app_to_redeploy):
             self.ui_utils.click_on_row_containing_text(app_to_redeploy)
@@ -444,7 +448,8 @@ class servers():
 
         # Validate that application status is enabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/9876, Issue#10138 )
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_redeploy)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         return True
@@ -452,8 +457,8 @@ class servers():
     def disable_application_archive(self, app_to_stop=APPLICATION_WAR):
 
         # Find EAP with application to stop
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_stop)
 
         # Stop the application archive
@@ -467,7 +472,8 @@ class servers():
 
         # Validate that application status is Disabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_stop)
         assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
         return True
@@ -475,8 +481,8 @@ class servers():
     def enable_application_archive(self, app_to_start=APPLICATION_WAR):
 
         # Find EAP with application to start
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_start)
 
         # Start the application archive
@@ -490,7 +496,8 @@ class servers():
 
         # Validate that application status is Enabled:
         # ( Existing issues: https://github.com/ManageIQ/manageiq/issues/10138 )
-        self.web_session.web_driver.get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_start)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         return True
@@ -667,18 +674,19 @@ class servers():
         return True
 
     def navigate_and_refresh_provider(self):
-        self.web_session.web_driver.get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage('Middleware Providers', 15)
         view(self.web_session).list_View()
         assert self.ui_utils.waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 15)
-        ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
+        self.ui_utils.click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         providers(self.web_session).refresh_provider()
 
     def add_jdbc_driver(self):
 
         # Adds PostgreSQL JDBC driver to EAP server and validates success message in UI
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
         # Find running EAP server
         eap = self.find_eap_in_state("any", check_if_resolvable_hostname=True)
@@ -725,7 +733,8 @@ class servers():
         # verifies if the added datasource is listed in datasource list page
         # Add datasource form may change in future to accommodate selection of existing JDBC drivers
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
         # Find running EAP server
         eap = self.find_eap_in_state("any", check_if_resolvable_hostname=True)
@@ -747,7 +756,7 @@ class servers():
         # Validate UI if added datasource is available in the datasource list
         # Reference existing bug: https://bugzilla.redhat.com/show_bug.cgi?id=1383414
 
-        self.web_session.web_driver.get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_datasource/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(datasourceName, 60)
 
         return True
@@ -807,7 +816,8 @@ class servers():
 
     def add_deployment_disable(self, app_to_deploy=APPLICATION_JAR):
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
         # Find EAP on which to deploy
         eap = self.find_eap_in_state("Running", check_if_resolvable_hostname=True)
@@ -821,53 +831,56 @@ class servers():
         self.web_session.logger.info("Waiting for the archive to appear")
 
         # Validate UI
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_JAR, 300)
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
             self.navigate_and_refresh_provider()
         else:
             self.web_session.logger.info("Waiting for the archive to be disabled")
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Disabled', 300)
 
         return True
 
     def add_deployment_overwrite(self, app_to_deploy=APPLICATION_JAR):
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
         eap = self.find_eap_in_state("Running", check_if_resolvable_hostname=True)
         assert eap, "No EAP found in desired state."
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
         self.add_server_deployment(self.APPLICATION_JAR, overwrite=True)
         self.navigate_and_refresh_provider()
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.APPLICATION_JAR, 300)
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
             self.navigate_and_refresh_provider()
         else:
             self.web_session.logger.info("Waiting for the archive to be enabled")
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
 
         return True
 
     def add_deployment_runtime_name(self, app_to_deploy=APPLICATION_JAR):
 
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         if self.ui_utils.get_elements_containing_text(self.APPLICATION_JAR):
             self.undeploy_application_archive(self.APPLICATION_JAR)
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
         eap = self.find_eap_in_state("Running", check_if_resolvable_hostname=True)
         assert eap, "No EAP found in desired state."
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         assert self.ui_utils.waitForTextOnPage('Version', 15)
         self.add_server_deployment(self.APPLICATION_JAR, self.runtime_name)
         self.navigate_and_refresh_provider()
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears(self.runtime_name, 300)
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
@@ -875,14 +888,14 @@ class servers():
         else:
             self.web_session.logger.info("Waiting for the archive to be enabled")
 
-        self.web_session.web_driver.get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_deployment/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
         self.undeploy_application_archive(self.runtime_name)
 
         return True
 
     def add_deployment_cancel(self, app_to_deploy=APPLICATION_JAR):
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
         eap = self.find_eap_in_state("Running", check_if_resolvable_hostname=True)
         assert eap, "No EAP found in desired state."
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
@@ -918,7 +931,7 @@ class servers():
 
     def navigate_to_non_container_eap(self):
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
 
         eap = servers(self.web_session).find_eap_in_state("any", check_if_resolvable_hostname=True)
         assert eap, "No EAP found in desired state."
@@ -934,7 +947,7 @@ class servers():
 
         self.web_session.logger.info("Beginning UI verification")
 
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage(feed, 15)
         self.ui_utils.click_on_row_containing_text(feed)
         assert self.ui_utils.waitForTextOnPage("Properties", 15)
@@ -944,7 +957,8 @@ class servers():
     def validate_jdbc_driver(self):
 
         self.web_session.logger.info("Verify if the jdbc driver is shown while adding datasource")
-        self.web_session.web_driver.get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
         # Find running EAP server
         eap = self.find_eap_in_state("any", check_if_resolvable_hostname=True)

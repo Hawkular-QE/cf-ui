@@ -6,6 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from views.servers import servers
 import os
+from common.navigate import navigate
 
 from common.ui_utils import ui_utils
 from hawkular.hawkular_api import hawkular_api
@@ -29,7 +30,7 @@ class server_group_deploymnt():
 
         app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
 
-        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Domains", 15)
         self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Unnamed Domain')]").click()
         assert ui_utils(self.web_session).waitForTextOnPage("Unnamed Domain (Summary)", 15)

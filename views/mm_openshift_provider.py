@@ -8,6 +8,7 @@ from common.db import db
 from common.openshift_utils import openshift_utils
 import time
 from common.timeout import timeout
+from common.navigate import navigate
 
 class mm_openshift_providers():
     web_session = None
@@ -39,7 +40,7 @@ class mm_openshift_providers():
         else:
             self.web_session.logger.info("Adding openshift Middleware Provider to ManageIQ instance")
 
-        self.web_session.web_driver.get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 15)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
@@ -124,7 +125,7 @@ class mm_openshift_providers():
         # Test to validate provider list page in UI and validate matching providers hostname, port number
 
         self.web_session.logger.info("Begin providers list test.")
-        self.web_session.web_driver.get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
         providers_ui = self.ui_utils.get_list_table()
         assert len(providers_ui) > 0, "Providers list is empty."
 
