@@ -15,7 +15,7 @@ class navigate():
         self.ui_utils = ui_utils(web_session)
 
     def get(self, url):
-        self.web_sesssion.logger.debug("Navigate to URL {}".format(url))
+        self.web_session.logger.debug("Navigate to URL {}".format(url))
         with timeout(seconds=self.minutes_to_wait, error_message="Timed Navigating \"{}\"".format(url)):
             while True:
                 try:
