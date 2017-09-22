@@ -3,6 +3,7 @@ from common.view import view
 from views.servers import servers
 from selenium.webdriver.common.by import By
 from common.navigate import navigate
+import pytest
 
 class monitoring():
     web_session = None
@@ -60,6 +61,9 @@ class monitoring():
     def validate_messagings_monitoring_utilization_jms_queues(self):
 
         servers(self.web_session).navigate_to_non_container_eap()
+        if self.ui_utils.get_generic_table_as_dict().get('Middleware Messagings') =='0':
+            pytest.skip("Skip test - EAP has \"0\" Middleware Messagings")
+
         self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Messagings')]").click()
         assert self.ui_utils.waitForTextOnPage('JMS Queue', 30)
 

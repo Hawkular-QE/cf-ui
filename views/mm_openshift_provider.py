@@ -31,12 +31,9 @@ class mm_openshift_providers():
 
         # Check if any provider already exist. If exist, first delete all the providers and then add a provider.
 
-        if self.does_provider_exist():
-            self.web_session.logger.info("Middleware Provider already exist.")
-            if delete_if_provider_present:
-                self.delete_provider(delete_all_providers=True)
-            else:
-                return
+        if db(self.web_session).is_container_provider_present(self.web_session.OPENSHIFT_PROVIDER_NAME):
+            self.web_session.logger.info("Container Provider already exist.")
+            return
         else:
             self.web_session.logger.info("Adding openshift Middleware Provider to ManageIQ instance")
 
@@ -78,18 +75,6 @@ class mm_openshift_providers():
         if validate_provider:
             self.validate_provider()
         self.save_provider()
-
-
-    def does_provider_exist(self):
-        self.web_session.logger.info("Checking if provider exists")
-
-         # For performance reasons, check if the provider is present via DB
-        providers = db(self.web_session).get_providers()
-        provider = ui_utils(self.web_session).find_row_in_list(providers, 'name', self.web_session.OPENSHIFT_PROVIDER_NAME)
-        if provider:
-            return True
-        else:
-            return False
 
 
     def verify_refresh_status_success(self):
@@ -178,17 +163,3 @@ class mm_openshift_providers():
 
                 time.sleep(1)
 
-
-    def add_provider_invalid_port(self):
-        if self.does_provider_exist():
-            self.web_session.logger.info("Container Provider exist - Delete the provider.")
-            self.delete_provider(delete_all_providers=True)
-
-        try:
-            self.add_provider(port="1234")
-            raise Exception('Add Provider Unexpectedly passed.')
-        except:
-            # Expected timeout waiting for form Add button to be clickable, since button should not be clickable.
-            pass
-
-        return True;
