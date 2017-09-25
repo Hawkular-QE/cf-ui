@@ -113,15 +113,6 @@ class session(properties):
         assert self.appliance_version, "Appliance version not found"
         self.logger.info("MIQ/CFME Version: %s", self.appliance_version)
 
-        with timeout(15, error_message="Timed out with \"We're sorry, but something went wrong\"."):
-             while True:
-                if not ui_utils(self).isTextOnPage('sorry, but something went'):
-                    break;
-
-                self.logger.info('Encountered "Sorry" message.')
-                ui_utils(self).sleep(2)
-                self.web_driver.refresh()
-
         if (self.login):
             miq_login(self).login(self.MIQ_USERNAME, self.MIQ_PASSWORD)
 
