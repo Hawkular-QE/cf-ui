@@ -3,6 +3,7 @@ import re
 from hawkular.hawkular_api import hawkular_api
 from common.db import db
 from common.navigate import navigate
+from common.timeout import timeout
 
 class topology():
     web_session = None
@@ -273,25 +274,30 @@ class topology():
         self.ui_utils.sleep(1)
 
     def __select_entities_view__(self, entities_to_view, name):
+        with timeout(seconds=15, error_message="Timeout - Entity button {} failed to display entity {}.".format(entities_to_view, name)):
+            while True:
+                try:
+                    # Currently, not able to determine if Entity button is already selected:
+                    # 1) If "name" is already visible - Entity button already selected
+                    # 2) If "name" is not visible - Click entity button
+                    # 3) If "name" still not visible - assert
 
-        # Currently, not able to determine if Entity button is already selected:
-        # 1) If "name" is already visible - Entity button already selected
-        # 2) If "name" is not visible - Click entity button
-        # 3) If "name" still not visible - assert
+                    if self.__is_name_displayed__(name):
+                        return
 
-        if self.__is_name_displayed__(name):
-            return
+                    # Select Entities view (aka: buttons "Middleware Servers" and "Middleware Deployments"):
+                    #  1) Get elements by Name (list of elements)
+                    #  2) 2nd element contains needed entities element
 
-        # Select Entities view (aka: buttons "Middleware Servers" and "Middleware Deployments"):
-        #  1) Get elements by Name (list of elements)
-        #  2) 2nd element contains needed entities element
+                    self.__get_legond__(entities_to_view).click()
 
-        self.__get_legond__(entities_to_view).click()
+                    if self.__is_name_displayed__(name):
+                        return
 
-        if self.__is_name_displayed__(name):
-            return
-
-        assert False, "Entity button {} failed to display entity {}.".format(entities_to_view, name)
+                    raise Exception('Display \"{}\" not found.'.format(name))
+                except:
+                    self.web_session.logger.warning("Entity button {} failed to display entity {}.".format(entities_to_view, name))
+                    self.ui_utils.sleep(2)
 
     def __deselect_entities_view__(self, entities_to_view, name):
 

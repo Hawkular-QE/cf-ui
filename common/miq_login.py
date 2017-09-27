@@ -1,5 +1,6 @@
 from selenium.webdriver.common.keys import Keys
 from common.ui_utils import ui_utils
+from common.navigate import navigate
 
 LOGIN_TEXT = "Compute"
 
@@ -12,6 +13,8 @@ class miq_login(object):
         self.web_driver = web_session.web_driver
 
     def login(self, username, password):
+        navigate(self.web_session).get("{}".format(self.web_session.MIQ_URL), wait_for="Username")
+
         self.username = username
         self.password = password
 

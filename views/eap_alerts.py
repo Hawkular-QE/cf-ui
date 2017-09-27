@@ -31,7 +31,8 @@ class eap_alerts():
 
         navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("All Policy Profiles", 15)
-        self.web_session.web_driver.find_element_by_xpath("//a[contains(.,'Alerts')]").click()
+        #self.web_session.web_driver.find_element_by_xpath("//a[contains(.,'Alerts')]").click()
+        self.click_alerts()
         assert ui_utils(self.web_session).waitForTextOnPage("All Alerts", 80)
 
         assert ui_utils(self.web_session).waitForTextOnPage("Description", 80)
@@ -119,3 +120,7 @@ class eap_alerts():
         assert ui_utils(self.web_session).waitForTextOnPage("All Alerts", 15)
         self.web_session.web_driver.find_element_by_xpath("//li[@title='All Alerts']").click()
         ui_utils(self.web_session).sleep(20)
+
+    def click_alerts(self):
+        self.web_session.web_driver.find_element_by_xpath('//*[@id="accordion"]/div[7]/div[1]/h4/a').click()
+        ui_utils(self.web_session).sleep(1)

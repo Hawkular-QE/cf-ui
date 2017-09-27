@@ -1,4 +1,6 @@
 from mgmtsystem.hawkular import Hawkular
+from common.timeout import timeout
+from common.ui_utils import ui_utils
 
 class hawkular_api():
     web_session = None
@@ -65,17 +67,22 @@ class hawkular_api():
     def get_hawkular_deployments(self):
         deployments = []
 
-        try:
-            rows = self.__hawkular__.inventory.list_server_deployment()
-        except Exception, e:
-            self.__exception_handler(e)
-
-        for deployment in rows:
-            dict = {}
-            dict['Nativeid'] = deployment.id
-            dict['Name'] = deployment.name
-            dict['path'] = deployment.path
-            deployments.append(dict)
+        with timeout(seconds=30, error_message="Timed out - No Deployments Returned"):
+            while True:
+                try:
+                    rows = self.__hawkular__.inventory.list_server_deployment()
+                    if rows:
+                        for deployment in rows:
+                            dict = {}
+                            dict['Nativeid'] = deployment.id
+                            dict['Name'] = deployment.name
+                            dict['path'] = deployment.path
+                            deployments.append(dict)
+                        break
+                    else:
+                        ui_utils(self.web_session).sleep(2)
+                except Exception, e:
+                    self.__exception_handler(e)
 
         return deployments
 
