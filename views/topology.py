@@ -137,7 +137,7 @@ class topology():
         self.__select_entities_view__(self.entities.get('datasources'), datasources_list[0].get('Name'))
 
         for datasource in datasources_list:
-            name = datasource.get('Name')
+            name = str(datasource.get('Name'))
             assert self.ui_utils.waitForTextOnPage(name, 5), "Datasource not found in Topology: {}".format(name)
 
         return True
@@ -261,7 +261,8 @@ class topology():
     def __display_names__(self, select = True):
 
         if not self.MIQ_BASE_VERSION == self.appliance_version:
-            el = self.web_session.web_driver.find_element_by_xpath('//*[@id="box"]')
+            #el = self.web_session.web_driver.find_element_by_xpath('//*[@id="box"]')
+            el = self.web_session.web_driver.find_element_by_id('box_display_names')
         else:
             el = self.web_session.web_driver.find_element_by_xpath('//*[@id="box_display_names"]')
 
@@ -274,30 +275,25 @@ class topology():
         self.ui_utils.sleep(1)
 
     def __select_entities_view__(self, entities_to_view, name):
-        with timeout(seconds=15, error_message="Timeout - Entity button {} failed to display entity {}.".format(entities_to_view, name)):
-            while True:
-                try:
-                    # Currently, not able to determine if Entity button is already selected:
-                    # 1) If "name" is already visible - Entity button already selected
-                    # 2) If "name" is not visible - Click entity button
-                    # 3) If "name" still not visible - assert
 
-                    if self.__is_name_displayed__(name):
-                        return
+        # Currently, not able to determine if Entity button is already deselected:
+        # 1) If "name" is not visible - Entity button already deselected
+        # 2) If "name" is visible - Click entity button
+        # 3) If "name" still visible - assert
 
-                    # Select Entities view (aka: buttons "Middleware Servers" and "Middleware Deployments"):
-                    #  1) Get elements by Name (list of elements)
-                    #  2) 2nd element contains needed entities element
+        if not self.__is_name_displayed__(name):
+            return
 
-                    self.__get_legond__(entities_to_view).click()
+        # Click Entities view (aka: buttons "Middleware Servers" or "Middleware Deployments"):
+        #  1) Get elements by Name (list of elements)
+        #  2) 2nd element contains needed entities element
 
-                    if self.__is_name_displayed__(name):
-                        return
+        self.__get_legond__(entities_to_view).click()
 
-                    raise Exception('Display \"{}\" not found.'.format(name))
-                except:
-                    self.web_session.logger.warning("Entity button {} failed to display entity {}.".format(entities_to_view, name))
-                    self.ui_utils.sleep(2)
+        if not self.__is_name_displayed__(name):
+            return
+
+        assert False, "Entity button {} unexpectedly displaying entity {}.".format(entities_to_view, name)
 
     def __deselect_entities_view__(self, entities_to_view, name):
 

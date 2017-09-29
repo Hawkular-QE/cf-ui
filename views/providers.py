@@ -79,8 +79,8 @@ class providers():
         self.web_driver.find_element_by_xpath("//input[@id='default_password']").send_keys(
             self.hawkular_password)
 
-        if not self.MIQ_BASE_VERSION == self.appliance_version:
-            self.web_driver.find_element_by_xpath("//input[@id='default_verify']").send_keys(self.hawkular_password)
+        #if not self.MIQ_BASE_VERSION == self.appliance_version:
+        #    self.web_driver.find_element_by_class_name("validate_button").click()
 
         if validate_provider:
             self.validate_provider()
@@ -371,9 +371,10 @@ class providers():
         assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
 
     def validate_provider(self):
-        validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
-            (By.XPATH, "//button[@title='Validate the credentials by logging into the Server']")))
-        validate.click()
+        #validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
+        #   (By.XPATH, "//button[@title='Validate the credentials by logging into the Server']")))
+        #validate.click()
+        self.web_driver.find_element_by_class_name("validate_button").click()
         assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
 
     def save_provider(self):
