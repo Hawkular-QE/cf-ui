@@ -132,7 +132,7 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
 
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Domain*.pdf'))
 
-def _test_cfui_server_detail_download_pdf(web_session, delete_files):
+def test_cfui_server_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
         web_session.logger.debug("Download feature not supported for Server Detail.")
         pytest.skip("Skip test - Download feature not supported for Server Detail - version: master.")
@@ -140,13 +140,13 @@ def _test_cfui_server_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Server detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_server/show_list".format(web_session.MIQ_URL))
-    assert utils.waitForTextOnPage("Server Name", 10)
+    assert utils.waitForTextOnPage(web_session.HAWKULAR_PROVIDER_NAME, 10)
     servers = utils.get_list_table()
     utils.click_on_row_containing_text(servers[0].get('Feed'))
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Server*.pdf'))
 
 def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
