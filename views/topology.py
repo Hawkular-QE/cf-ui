@@ -281,7 +281,7 @@ class topology():
         # 2) If "name" is visible - Click entity button
         # 3) If "name" still visible - assert
 
-        if not self.__is_name_displayed__(name):
+        if self.__is_name_displayed__(name):
             return
 
         # Click Entities view (aka: buttons "Middleware Servers" or "Middleware Deployments"):
@@ -290,7 +290,7 @@ class topology():
 
         self.__get_legond__(entities_to_view).click()
 
-        if not self.__is_name_displayed__(name):
+        if self.__is_name_displayed__(name):
             return
 
         assert False, "Entity button {} unexpectedly displaying entity {}.".format(entities_to_view, name)
