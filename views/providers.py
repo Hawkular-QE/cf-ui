@@ -208,9 +208,9 @@ class providers():
         if not self.appliance_version == self.MIQ_BASE_VERSION:
 
             assert self.ui_utils.waitForElementOnPage(By.XPATH,
-                                                      "//a[@title='Remove selected Middleware Providers']", 5)
+                                                      "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']", 5)
             self.web_driver.find_element_by_xpath(
-                "//a[@title='Remove selected Middleware Providers']").click()
+                "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']").click()
         else:
 
             assert self.ui_utils.waitForElementOnPage(By.XPATH,
@@ -233,12 +233,12 @@ class providers():
         self.web_session.logger.info("Deleting all the providers from providers list.")
 
         if not self.appliance_version == self.MIQ_BASE_VERSION:
-            self.web_driver.find_element_by_xpath("//input[@id='masterToggle']").click()
+            self.web_driver.find_element_by_xpath("//input[@title='Select All']").click()
             self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
             assert self.ui_utils.waitForElementOnPage(By.XPATH,
-                                                      "//a[@title='Remove selected Middleware Providers']", 5)
+                                                      "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']", 5)
             self.web_driver.find_element_by_xpath(
-                "//a[@title='Remove selected Middleware Providers']").click()
+                "//a[@id='ems_middleware_vmdb_choice__ems_middleware_delete']").click()
         else:
             self.ui_utils.waitForElementOnPage(By.XPATH, "//input[@ng-click='paginationCtrl.onSelectAll({isSelected: isChecked})']", 5)
             self.web_driver.find_element_by_xpath("//input[@ng-click='paginationCtrl.onSelectAll({isSelected: isChecked})']").click()
