@@ -87,13 +87,7 @@ class datasources():
 
             self.web_session.logger.info("Attempt to delete Dastasource: Name: {}  Server: {}  Host Name: {}".
                                           format(datasource_name, server, host_name))
-
-            if not self.appliance_version == self.MIQ_BASE_VERSION:
-                self.web_session.web_driver.find_element_by_xpath(
-                    "//td[contains(text(),'{}')]/preceding-sibling::td/input[@type='checkbox']".format(
-                        datasource_name)).click()
-            else:
-                self.web_session.web_driver.find_element_by_xpath("//tr[2]/td[1]/input").click()
+            self.web_session.web_driver.find_element_by_xpath("//tr[2]/td[1]/input").click()
 
 
             self.ui_utils.web_driver.find_element_by_xpath('.//*[@title="Operations"]').click()
