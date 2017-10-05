@@ -33,7 +33,7 @@ def delete_files():
     return
 
 def test_cfui_providers_download_txt(web_session, delete_files):
-    web_session.web_driver.get("{}//ems_middleware/show_list".format(web_session.MIQ_URL))
+    web_session.web_driver.get("{}/ems_middleware/show_list".format(web_session.MIQ_URL))
     web_session.logger.info("Begin download provider report as text test")
     assert download_report(web_session,"ems_middleware").text_format()
 
@@ -140,12 +140,13 @@ def test_cfui_server_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Server detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_server/show_list".format(web_session.MIQ_URL))
+    assert utils.waitForTextOnPage(web_session.HAWKULAR_PROVIDER_NAME, 10)
     servers = utils.get_list_table()
     utils.click_on_row_containing_text(servers[0].get('Feed'))
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Server*.pdf'))
 
 def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
@@ -155,12 +156,13 @@ def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Deployment detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_deployment/show_list".format(web_session.MIQ_URL))
-    servers = utils.get_list_table()
-    utils.click_on_row_containing_text(servers[0].get('Deployment Name'))
+    assert utils.waitForTextOnPage("Deployment Name", 10)
+    deployments = utils.get_list_table()
+    utils.click_on_row_containing_text(deployments[0].get('Deployment Name'))
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Deployment*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Deployment_hawkular*.pdf'))
 
 def test_cfui_datasource_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
@@ -170,12 +172,13 @@ def test_cfui_datasource_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Datasource detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_datasource/show_list".format(web_session.MIQ_URL))
-    servers = utils.get_list_table()
-    utils.click_on_row_containing_text(servers[0].get('Datasource Name'))
+    assert utils.waitForTextOnPage("Datasource Name", 10)
+    datasources = utils.get_list_table()
+    utils.click_on_row_containing_text(datasources[0].get('Datasource Name'))
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Datasource*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Datasource_Datasource*.pdf'))
 
 def test_cfui_messaging_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
@@ -185,12 +188,13 @@ def test_cfui_messaging_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Messaging detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_messaging/show_list".format(web_session.MIQ_URL))
-    servers = utils.get_list_table()
-    utils.click_on_row_containing_text(servers[0].get('Messaging Name'))
+    assert utils.waitForTextOnPage("Messaging Name", 10)
+    messagings = utils.get_list_table()
+    utils.click_on_row_containing_text(messagings[0].get('Messaging Name'))
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Messaging*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Messaging*.pdf'))
 
 def test_cfui_server_groups(web_session, delete_files):
     web_session.logger.info("Begin download Server Groups PDF text")

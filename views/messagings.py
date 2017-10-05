@@ -17,7 +17,7 @@ class messagings():
 
     def validate_messagings_view(self):
         self.__navigate_to_messagings_view()
-
+        assert self.ui_utils.waitForTextOnPage("Messaging Name", 10)
         ui_messagings = self.ui_utils.get_list_table()
         assert ui_messagings, "No UI Messagings."
         hawk_messagings = self.hawkular_api.get_hawkular_messagings()
@@ -34,7 +34,7 @@ class messagings():
 
     def validate_messageing_details(self):
         self.__navigate_to_messagings_view()
-
+        assert self.ui_utils.waitForTextOnPage("Messaging Name", 10)
         ui_messagings = self.ui_utils.get_list_table()
         assert ui_messagings, "No UI Messagings."
         hawk_messagings = self.hawkular_api.get_hawkular_messagings()
@@ -69,6 +69,7 @@ class messagings():
         server_to_test = 'server-one'
 
         navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL))
+        assert self.ui_utils.waitForTextOnPage("Server Name", 10)
 
         # Check that server to test is present
         if not self.ui_utils.isTextOnPage(server_to_test):
