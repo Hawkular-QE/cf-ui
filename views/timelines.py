@@ -94,6 +94,7 @@ class timelines():
     def navigate_to_timeline(self):
 
         navigate(self.web_session).get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
+        ui_utils(self.web_session).waitForTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME, 10)
         ui_utils(self.web_session).click_on_row_containing_text(self.web_session.HAWKULAR_PROVIDER_NAME)
         ui_utils(self.web_session).waitForTextOnPage('Relationships', 10)
         self.web_driver.find_element_by_xpath("//button[@title='Monitoring']").click()
@@ -104,9 +105,11 @@ class timelines():
         self.ui_utils.waitForTextOnPage('Options', 120)
 
     def verify_event(self, event_type):
-
-        el = self.web_driver.find_element_by_xpath(
-                "//*[@id = 'chart_placeholder']//*[name() = 'svg']//*[name() = 'text']")
+        try:
+            el = self.web_driver.find_element_by_xpath(
+                    "//*[@id = 'chart_placeholder']//*[name() = 'svg']//*[name() = 'text']")
+        except:
+            assert False, 'No Timeline events found'
 
         # Verify event where type for successful event is 'ok' and for unsuccessful event is 'error'
         self.ui_utils.wait_until_element_displayed(el, 60)
