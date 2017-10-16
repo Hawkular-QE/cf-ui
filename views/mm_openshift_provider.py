@@ -8,7 +8,6 @@ from common.db import db
 from common.openshift_utils import openshift_utils
 import time
 from common.timeout import timeout
-from common.navigate import navigate
 
 class mm_openshift_providers():
     web_session = None
@@ -31,27 +30,27 @@ class mm_openshift_providers():
 
         # Check if any provider already exist. If exist, first delete all the providers and then add a provider.
 
-        if db(self.web_session).is_container_provider_present(self.web_session.OPENSHIFT_PROVIDER_NAME):
-            self.web_session.logger.info("Container Provider already exist.")
+        if self.does_provider_exist():
+            self.web_session.logger.info("Openshift Provider already exist.")
             return
         else:
-            self.web_session.logger.info("Adding openshift Middleware Provider to ManageIQ instance")
+            self.web_session.logger.info("Adding openshift Provider to ManageIQ instance")
 
-        navigate(self.web_session).get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
-        assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 15)
+            self.web_session.web_driver.get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
+            assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 15)
 
-        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        self.ui_utils.waitForElementOnPage(By.XPATH,"//a[@title='Add a new Containers Provider']", 5)
-        elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a new Containers Provider']")
-        elem_add_new_provider.click()
-        self.web_driver.implicitly_wait(15)
-        assert ui_utils(self.web_session).waitForTextOnPage("Add New Containers Provider", 50)
-        ui_utils(self.web_session).sleep(2)
+            self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+            self.ui_utils.waitForElementOnPage(By.XPATH,"//a[@title='Add a new Containers Provider']", 5)
+            elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a new Containers Provider']")
+            elem_add_new_provider.click()
+            self.web_driver.implicitly_wait(15)
+            assert ui_utils(self.web_session).waitForTextOnPage("Add New Containers Provider", 50)
+            ui_utils(self.web_session).sleep(2)
 
-        self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
+            self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
 
-        self.submit_provider_form_cfme(validate_provider)
-        self.verify_add_provider_success()
+            self.submit_provider_form_cfme(validate_provider)
+            self.verify_add_provider_success()
 
 
     def submit_provider_form_cfme(self, validate_provider=True):
@@ -77,50 +76,28 @@ class mm_openshift_providers():
         self.save_provider()
 
 
-    def verify_refresh_status_success(self):
-        refresh_value_success = "Success"
+    def does_provider_exist(self):
+        self.web_session.logger.info("Checking if provider exists")
 
-        self.refresh_provider()
-
-        # Refresh the page till till the table value for Last Refresh shows the value - Success
-
-        assert self.wait_for_provider_refresh_status(refresh_value_success, 600)
-        provider_details = ui_utils(self.web_session).get_generic_table_as_dict()
-
-        # Verify if the 'Last Refresh' value from table contains 'Success:
-        refresh_status = provider_details.get("Last Refresh")
-
-        if str(refresh_status).__contains__(refresh_value_success):
-            self.web_session.logger.info("The Last refresh status is - " + refresh_status)
-            return True
+         # For performance reasons, check if the provider is present via DB
+        if db(self.web_session).is_container_provider_present(self.provider_name):
+            self.web_session.logger.info("Container Provider already exist.")
+            return
         else:
-            return False
+            self.web_session.logger.info("Adding Container Provider to ManageIQ instance")
 
+    def delete_provider(self, delete_all_providers=True):
 
-    def refresh_provider(self):
-        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        el = self.web_driver.find_element_by_xpath("//a[@id='ems_container_vmdb_choice__ems_container_refresh']")
-        assert self.ui_utils.wait_until_element_displayed(el, 5)
-        el.click()
-        ui_utils(self.web_session).accept_alert(10)
-        ui_utils(self.web_session).waitForTextOnPage("Refresh Provider initiated", 15)
+        self.web_session.web_driver.get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
+        assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 30)
+        # self.ui_utils.sleep(15)
 
-    def validate_providers_list(self):
+        # Delete the provider
+        if delete_all_providers:
+            self.clear_all_providers()
+        else:
+            self.delete_hawkular_provider()
 
-        # Test to validate provider list page in UI and validate matching providers hostname, port number
-
-        self.web_session.logger.info("Begin providers list test.")
-        navigate(self.web_session).get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
-        providers_ui = self.ui_utils.get_list_table()
-        assert len(providers_ui) > 0, "Providers list is empty."
-
-        for prov_ui in providers_ui:
-
-            if prov_ui.get('Name') == self.web_session.OPENSHIFT_PROVIDER_NAME:
-               assert (prov_ui.get('Hostname') == self.web_session.OPENSHIFT_HOSTNAME), "Hostname mismatch"
-               assert (prov_ui.get('Port') == self.web_session.OPENSHIFT_PORT), "Port Number mismatch"
-
-            return True
 
     def verify_add_provider_success(self):
 
@@ -162,4 +139,5 @@ class mm_openshift_providers():
                     self.web_session.logger.info("No Provider save message.")
 
                 time.sleep(1)
+
 
