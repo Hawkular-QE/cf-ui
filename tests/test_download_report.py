@@ -121,6 +121,7 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
     web_session.logger.info("Begin download Domain detail PDF text")
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
+    assert utils.waitForTextOnPage("Feed", 30)
     domains = utils.get_list_table()
     if not domains:
         web_session.logger.warning("No Domains found.")
@@ -233,6 +234,7 @@ def assert_download_exist(file, waitTime = 15):
 def nav_to_server_groups(web_session):
     utils = ui_utils(web_session)
     web_session.web_driver.get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
+    assert utils.waitForTextOnPage("Feed", 30)
     domains_ui = utils.get_list_table()
     if not domains_ui:
         web_session.logger.warning("No Domains found.")

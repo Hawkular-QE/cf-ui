@@ -81,7 +81,7 @@ class domain_eap_operations():
         power = self.power_suspend
         self.nav_to_single_server()
         self.web_session.logger.info("About to Suspend EAP server one")
-        self.eapdomain_power_action(power)
+        self.eapdomain_power_action(power, alert_button_name='Suspend')
         self.ui_utils.sleep(5)
 
         return True
@@ -111,7 +111,7 @@ class domain_eap_operations():
         self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Feed", 30)
         domains_ui = self.ui_utils.get_list_table()
-        print domains_ui
+
         if not domains_ui:
             self.web_session.logger.warning("No Domains found.")
             pytest.skip("Skip test - No Domains found.")
