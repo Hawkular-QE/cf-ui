@@ -37,7 +37,7 @@ def test_eap_resume(web_session):
     web_session.logger.info("Begin eap Resume Test")
     assert domain_eap_operations(web_session).resume_eap()
 
-def test_eap_reload(web_session):
+def _test_eap_reload(web_session):
     web_session.logger.info("Begin eap Reload Test")
     assert domain_eap_operations(web_session).reload_eap()
 

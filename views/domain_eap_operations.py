@@ -35,6 +35,7 @@ class domain_eap_operations():
         self.ui_utils = ui_utils(self.web_session)
         self.domains = domains(self.web_session)
         self.servers = servers(self.web_session)
+        self.provider_name = self.web_session.HAWKULAR_PROVIDER_NAME
 
     def stop_eap(self):
 
@@ -109,7 +110,7 @@ class domain_eap_operations():
     def nav_to_single_server(self):
 
         self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
-        assert ui_utils(self.web_session).waitForTextOnPage("Feed", 30)
+        assert self.ui_utils.waitForTextOnPage(self.provider_name, 30)
         domains_ui = self.ui_utils.get_list_table()
 
         if not domains_ui:
