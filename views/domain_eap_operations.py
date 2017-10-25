@@ -8,6 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from common.session import session
 import pytest
+from common.navigate import navigate
 
 class domain_eap_operations():
 
@@ -108,8 +109,7 @@ class domain_eap_operations():
         return True
 
     def nav_to_single_server(self):
-
-        self.web_session.web_driver.get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
+        navigate(self.web_session).get("{}/middleware_domain/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage(self.provider_name, 30)
         domains_ui = self.ui_utils.get_list_table()
 
