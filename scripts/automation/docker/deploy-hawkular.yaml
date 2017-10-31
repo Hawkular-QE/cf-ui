@@ -6,23 +6,26 @@
 
   vars:
     OC: "/usr/bin/oc"
-
-    HAWKULAR_APP: "https://raw.githubusercontent.com/hawkular/hawkular-services/master/openshift/hawkular-services-ephemeral.yaml"
-    HAWKULAR_IMAGE: "jboss-mm-7-tech-preview/middleware-manager"
-    HAWKULAR_USERNAME: "jdoe"
-    HAWKULAR_PASSWORD: "password"
     HAWKULAR_ROUTE_FILE: "./hawkular-route.txt"
 
   tasks:
     - block:
       - name: Set Facts
         set_fact:
+          HAWKULAR_APP: "{{hawkular_app}}"
+          HAWKULAR_USERNAME: "{{hawkular_username}}"
+          HAWKULAR_PASSWORD: "{{hawkukar_password}}"
+          HAWKULAR_IMAGE: "{{hawkular_image}}"
           OS_URL: "{{os_url}}"
           OS_USERNAME: "{{os_username}}"
           OS_PASSWORD: "{{os_password}}"
           OS_PROJECT: "{{os_project}}"
 
     - block:
+      - name: Check HAWKULAR_IMAGE
+        shell: "echo {{HAWKULAR_IMAGE}}"
+        register: echo
+        failed_when: (echo.stdout|length == 0)
       - name: Check OS_URL
         shell: "echo {{OS_URL}}"
         register: echo
