@@ -2,6 +2,11 @@
 <IP of 'oc' host>
 
 [OpenShiftServers:vars]
+hawkular_image="jboss-mm-7-tech-preview/middleware-manager"
+hawkular_app="https://raw.githubusercontent.com/hawkular/hawkular-services/master/openshift/hawkular-services-ephemeral.yaml"
+hawkular_username="jdoe"
+hawkukar_password="password"
+
 os_url="https://changeme.openshift.ui.com:8443"
 os_username="username"
 os_password="password"
