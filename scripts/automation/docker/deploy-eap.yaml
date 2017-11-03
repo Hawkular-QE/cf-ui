@@ -54,14 +54,14 @@
       - name: Detete Project "{{OS_PROJECT}}"
         shell: "{{OC}} delete project {{OS_PROJECT}}"
         register: delete_project
-        when: OS_DELETE_PROJECT == 'yes'
+        when: OS_DELETE_PROJECT != 'yes'
         failed_when: "('Now using project' not in delete_project.stdout) and ('not found' in delete_project.stdout)"
 
     - block:
       - name: Wait for Project "{{OS_PROJECT}}" to be deleted
         shell: "{{OC}} get project {{OS_PROJECT}}"
         register: get_project
-        when: OS_DELETE_PROJECT == 'yes'
+        when: OS_DELETE_PROJECT != 'yes'
         failed_when: (get_project.stderr.find("Error from server") == -1) and (get_project.stdout.find("Terminating") == -1)
         until: ("Error from server" in get_project.stderr)
         retries: 100
