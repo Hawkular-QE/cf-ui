@@ -33,24 +33,24 @@ class mm_openshift_providers():
         if self.does_provider_exist():
             self.web_session.logger.info("Openshift Provider already exist.")
             return
-        else:
-            self.web_session.logger.info("Adding openshift Provider to ManageIQ instance")
 
-            self.web_session.web_driver.get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
-            assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 15)
+        self.web_session.logger.info("Adding openshift Provider to ManageIQ instance")
 
-            self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-            self.ui_utils.waitForElementOnPage(By.XPATH,"//a[@title='Add a new Containers Provider']", 5)
-            elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a new Containers Provider']")
-            elem_add_new_provider.click()
-            self.web_driver.implicitly_wait(15)
-            assert ui_utils(self.web_session).waitForTextOnPage("Add New Containers Provider", 50)
-            ui_utils(self.web_session).sleep(2)
+        self.web_session.web_driver.get("{}//ems_container/show_list".format(self.web_session.MIQ_URL))
+        assert ui_utils(self.web_session).waitForTextOnPage("Containers Providers", 15)
 
-            self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
+        self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        self.ui_utils.waitForElementOnPage(By.XPATH,"//a[@title='Add a new Containers Provider']", 5)
+        elem_add_new_provider = self.web_driver.find_element_by_xpath("//a[@title='Add a new Containers Provider']")
+        elem_add_new_provider.click()
+        self.web_driver.implicitly_wait(15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Add New Containers Provider", 50)
+        ui_utils(self.web_session).sleep(2)
 
-            self.submit_provider_form_cfme(validate_provider)
-            self.verify_add_provider_success()
+        self.web_session.logger.info("The appliance version in use is: {} ".format(self.web_session.appliance_version))
+
+        self.submit_provider_form_cfme(validate_provider)
+        self.verify_add_provider_success()
 
 
     def submit_provider_form_cfme(self, validate_provider=True):
@@ -80,11 +80,13 @@ class mm_openshift_providers():
         self.web_session.logger.info("Checking if provider exists")
 
          # For performance reasons, check if the provider is present via DB
+
         if db(self.web_session).is_container_provider_present(self.provider_name):
             self.web_session.logger.info("Container Provider already exist.")
-            return
+            return True
         else:
             self.web_session.logger.info("Adding Container Provider to ManageIQ instance")
+            return False
 
     def delete_provider(self, delete_all_providers=True):
 
