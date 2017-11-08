@@ -19,7 +19,7 @@ Edit the following property values in the conf/properties.properties file so tha
 ```
 ## Validate the Setup / Configuration
 ```shell
-The following test is expected to successful add the Middleware Manager Providr:
+The following test is expected to successful add the Middleware Manager Provider:
 
 python -m pytest tests/framework/test_test.py::test_cfui_test
 ```
