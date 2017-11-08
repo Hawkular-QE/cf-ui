@@ -17,12 +17,13 @@ Edit the following property values in the conf/properties.properties file so tha
     SSH_<...>
     DB_<...>
 ```
-### Validate the Setup / Configuration
+## Validate the Setup / Configuration
 The following test is expected to successful add the Middleware Manager Providr:
 
 python -m pytest tests/framework/test_test.py::test_cfui_test
+
 ```
-### Using Chrome web driver
+## Using Chrome web driver
 Chrome driver is by default installed into .cf-ui directory and it is necessary to set PATH to it so Python Interpreter would know where to find the driver.
 ```shell
 export PATH=$PATH:${PATH_TO_CF_UI}/.cf-ui
