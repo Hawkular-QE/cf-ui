@@ -47,5 +47,5 @@ export HAWKULAR_PORT=80
 
 source .cf-ui/bin/activate
 
-python -m pytest tests/framework/test_fast_navigation.py::test_cfui_provider_details
+python -m pytest tests/framework/test_test.py::test_cfui_test
 ```
