@@ -11,12 +11,16 @@ source .cf-ui/bin/activate
 ```shell
 Edit the following property values in the conf/properties.properties file so that they represent the configuration under test:
 
-    MIQ_HOSTNAME=
-    HAWKULAR_HOSTNAME=
-    HAWKULAR_PORT=
-    OPENSHIFT_HOSTNAME=
-    OPENSHIFT_USERNAME=
-    OPENSHIFT_PASSWORD=
+    MIQ_<...>
+    HAWKULAR_<...>
+    OPENSHIFT_<...>
+    SSH_<...>
+    DB_<...>
+```
+### Validate the Setup / Configuration
+The following test is expected to successful add the Middleware Manager Providr:
+
+python -m pytest tests/framework/test_test.py::test_cfui_test
 ```
 ### Using Chrome web driver
 Chrome driver is by default installed into .cf-ui directory and it is necessary to set PATH to it so Python Interpreter would know where to find the driver.
@@ -46,6 +50,4 @@ export HAWKULAR_HOSTNAME=<your_HAWKULAR_HOSTNAME>
 export HAWKULAR_PORT=80
 
 source .cf-ui/bin/activate
-
-python -m pytest tests/framework/test_test.py::test_cfui_test
 ```
