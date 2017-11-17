@@ -46,14 +46,17 @@ class ui_utils():
 
     # if exist=False then refresh the page and wait till element disappears
 
-    def waitForElementOnPage(self, locatormethod, locatorvalue, waitTime, exist=True):
+    def waitForElementOnPage(self, locatormethod, locatorvalue, waitTime, exist=True, show_as_error=True):
         currentTime = time.time()
 
         isElementPresent = self.isElementPresent(locatormethod, locatorvalue)
         while ((not isElementPresent and exist) or
                    (isElementPresent and not exist)):
             if time.time() - currentTime >= waitTime:
-                self.web_session.logger.error("Timed out waiting for: %s", locatorvalue)
+                if show_as_error:
+                    self.web_session.logger.error("Timed out waiting for: %s", locatorvalue)
+                else:
+                    self.web_session.logger.info("Timed out waiting for: %s", locatorvalue)
                 return False
             else:
                 if not exist:
