@@ -50,12 +50,20 @@ class eap_alerts():
         self.web_session.web_driver.find_element_by_xpath("//button[@data-original-title='Nothing']").click()
         self.web_session.web_driver.find_element_by_xpath("//span[contains(.,'JVM Heap Used')]").click()
         assert ui_utils(self.web_session).waitForTextOnPage("> Heap Max (%)", 90)
+
+        self.web_session.web_driver.find_element_by_xpath("//button[@data-id='miq_alert_severity']").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Info", 90)
+        self.web_session.web_driver.find_element_by_xpath("//a[contains(.,'Info')]").click()
+
         self.web_session.web_driver.find_element_by_xpath(".//*[@id='value_mw_greater_than']").send_keys('4')
         self.web_session.web_driver.find_element_by_xpath(".//*[@id='value_mw_less_than']").send_keys('2')
-        self.web_session.web_driver.find_element_by_xpath(".//*[@id='send_evm_event_cb']").click()
-        ui_utils(self.web_session).sleep(20)
+        ui_utils(self.web_session).sleep(10)
+        self.web_session.web_driver.find_element_by_xpath("//input[@id='send_evm_event_cb']").click()
+        ui_utils(self.web_session).sleep(10)
         self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").send_keys(self.alert_desc)
+
         self.web_session.web_driver.find_element_by_xpath("//button[contains(.,'Add')]").click()
+
         assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}" was added'.format(self.alert_desc),90)
 
         return True
@@ -65,9 +73,10 @@ class eap_alerts():
         ui_utils(self.web_session).get_list_table_as_elements()
         ui_utils(self.web_session).click_on_row_containing_text(self.alert_desc)
 
-        assert ui_utils(self.web_session).waitForTextOnPage("Info", 90)
+        assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}"'.format(self.alert_desc), 90)
         self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        self.web_session.web_driver.find_element_by_xpath("//a[@data-click='miq_alert_vmdb_choice__alert_copy']").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Copy", 90)
+        self.web_session.web_driver.find_element_by_xpath("//a[@id='miq_alert_vmdb_choice__alert_copy']").click()
         ui_utils(self.web_session).accept_alert(20)
         assert ui_utils(self.web_session).waitForTextOnPage("Adding a new Alert", 90)
         self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").clear()
@@ -82,10 +91,11 @@ class eap_alerts():
         self.navigate_to_all_alerts()
         ui_utils(self.web_session).get_list_table_as_elements()
         ui_utils(self.web_session).click_on_row_containing_text(self.alert_desc)
-        assert ui_utils(self.web_session).waitForTextOnPage("Info", 90)
+        assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}"'.format(self.alert_desc), 90)
         self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+        assert ui_utils(self.web_session).waitForTextOnPage("Copy", 90)
 
-        self.web_session.web_driver.find_element_by_xpath(".//*[@id='miq_alert_vmdb_choice__alert_edit']").click()
+        self.web_session.web_driver.find_element_by_xpath("//a[@id='miq_alert_vmdb_choice__alert_edit']").click()
         assert ui_utils(self.web_session).waitForTextOnPage("Description", 90)
         self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").clear()
         self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").send_keys(self.editalert_desc)
@@ -106,9 +116,10 @@ class eap_alerts():
 
         if ui_utils(self.web_session).get_elements_containing_text(alertdesc):
             ui_utils(self.web_session).click_on_row_containing_text(alertdesc)
-            assert ui_utils(self.web_session).waitForTextOnPage("Info", 90)
+            assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}"'.format(alertdesc), 90)
             self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-            self.web_session.web_driver.find_element_by_xpath(".//*[@id='miq_alert_vmdb_choice__alert_delete']").click()
+            assert ui_utils(self.web_session).waitForTextOnPage("Copy", 90)
+            self.web_session.web_driver.find_element_by_xpath("//a[@id='miq_alert_vmdb_choice__alert_delete']").click()
             ui_utils(self.web_session).accept_alert(20)
             assert ui_utils(self.web_session).waitForTextOnPage('Alert "{}": Delete successful'.format(alertdesc), 50)
             self.web_session.logger.info("The alert {} is removed successfully.".format(alertdesc))

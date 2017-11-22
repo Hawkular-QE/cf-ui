@@ -51,7 +51,7 @@ class search():
     def simple_search_domain(self):
 
         navigate(self.web_session).get("{}//middleware_domain/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForTextOnPage("Middleware Domains", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("master", 15)
         self.verify_search_exist()
         utils = ui_utils(self.web_session)
         domain_list = utils.get_list_table()
