@@ -133,7 +133,7 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Domain*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Domain*.pdf'))
 
 def test_cfui_server_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
@@ -165,7 +165,7 @@ def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Deployment_hawkular*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Deployment*.pdf'))
 
 def test_cfui_datasource_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
@@ -216,12 +216,13 @@ def test_cfui_server_groups_detail(web_session, delete_files):
 
     nav_to_server_groups(web_session)
     servers = utils.get_list_table()
+
     utils.click_on_row_containing_text(servers[0].get('Server Group Name'))
     utils.waitForTextOnPage("Properties", 5)
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server Group*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Server Group*.pdf'))
 
 
 def assert_download_exist(file, waitTime = 15):

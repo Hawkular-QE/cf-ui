@@ -142,4 +142,4 @@ class domains():
         except Exception, e:
             raise Exception(e)
 
-        self.ui_utils.waitForTextOnPage("All Middleware Server Groups", 15)
+        self.ui_utils.waitForTextOnPage("Feed", 15)
