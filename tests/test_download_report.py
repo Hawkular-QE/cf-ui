@@ -4,12 +4,13 @@ from common.download_report import download_report
 import os
 import glob
 import fnmatch
-from common.ui_utils import ui_utils
 from common.view import view
 from views.domains import domains
 from common.timeout import timeout
 import time
 from common.navigate import navigate
+from common.ui_utils import ui_utils
+from common.db import db
 
 @pytest.fixture (scope='session')
 def web_session(request):
@@ -123,14 +124,14 @@ def test_cfui_domain_detail_download_pdf(web_session, delete_files):
     utils = ui_utils(web_session)
     provider_name = web_session.HAWKULAR_PROVIDER_NAME
     navigate(web_session).get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
-    assert utils.waitForTextOnPage(provider_name, 15)
-    domains = utils.get_list_table()
+    utils.sleep(1)
+    domains = db(web_session).get_domains()
     if not domains:
         web_session.logger.warning("No Domains found.")
         pytest.skip("Skip test - No Domains found.")
+    assert utils.waitForTextOnPage(provider_name, 15)
 
-    utils.click_on_row_containing_text(domains[0].get('Feed'))
-
+    utils.click_on_row_containing_text(domains[0].get('feed'))
     assert download_report(web_session, '').pdf_format()
 
     assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Domain*.pdf'))
@@ -201,9 +202,8 @@ def test_cfui_messaging_detail_download_pdf(web_session, delete_files):
 
 def test_cfui_server_groups(web_session, delete_files):
     web_session.logger.info("Begin download Server Groups PDF text")
-    utils = ui_utils(web_session)
-
     nav_to_server_groups(web_session)
+    utils = ui_utils(web_session)
     utils.web_driver.find_element_by_xpath('.//*[@title="Download"]').click()
     el = web_session.web_driver.find_element_by_id("download_choice__download_pdf")
     assert utils.wait_until_element_displayed(el, 10)
@@ -236,13 +236,11 @@ def assert_download_exist(file, waitTime = 15):
 
 def nav_to_server_groups(web_session):
     utils = ui_utils(web_session)
-    provider_name = web_session.HAWKULAR_PROVIDER_NAME
-    navigate(web_session).get("{}/middleware_domain/show_list".format(web_session.MIQ_URL))
-    assert utils.waitForTextOnPage(provider_name, 15)
-    domains_ui = utils.get_list_table()
+    navigate(web_session).get("{}/middleware_domain/show_list".format(web_session.MIQ_URL), wait_for='Middleware Domains')
+    utils.sleep(3)
+    domains_ui = ui_utils(web_session).get_list_table()
     if not domains_ui:
         web_session.logger.warning("No Domains found.")
         pytest.skip("Skip test - No Domains found.")
 
     domains(web_session).nav_to_all_middleware_server_groups(domains_ui[0].get('Domain Name'))
-

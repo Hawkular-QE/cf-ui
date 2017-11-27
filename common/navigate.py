@@ -20,7 +20,7 @@ class navigate():
             while True:
                 try:
                     self.web_driver.get(url)
-                    assert self.ui_utils.waitForTextOnPage(wait_for, 15), "Failed to find text '{}'".format(self.wait_for_text)
+                    assert self.ui_utils.waitForTextOnPage(wait_for, 15), "Failed to find text '{}'".format(self.wait_for)
                     break
                 except:
                     if self.ui_utils.isTextOnPage("sorry, but something went wrong") or self.ui_utils.isTextOnPage("The server is temporarily unable"):
