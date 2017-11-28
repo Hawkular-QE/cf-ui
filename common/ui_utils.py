@@ -193,6 +193,7 @@ class ui_utils():
 
     # Given a list of directories, dictionary key and value - find a specific row
     def find_row_in_list(self, list, key, value):
+        value = value.replace('%20', ' ')
         for row in list:
             if value in row.get(key).replace('%20', ' '):
                 return row
@@ -205,7 +206,7 @@ class ui_utils():
         for row in list:
             count = 0
             for pair in key_value_pairs:
-                expected_value = pair.get('value')
+                expected_value = pair.get('value').replace('%20', ' ')
                 actual_value = row.get(pair.get('column_name')).replace('%20', ' ')
                 if expected_value not in actual_value:
                     break

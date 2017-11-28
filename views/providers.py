@@ -107,6 +107,8 @@ class providers():
 
         navigate(self.web_session).get("{}//ems_middleware/show_list".format(self.web_session.MIQ_URL))
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 30)
+        view(self.web_session).list_View()
+        assert ui_utils(self.web_session).waitForTextOnPage("Hostname", 30)
         self.web_driver.find_element_by_xpath("//input[contains(@type,'checkbox')]").click()
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.ui_utils.waitForElementOnPage(By.XPATH, "//a[contains(.,'Edit Selected Middleware Provider')]", 5)

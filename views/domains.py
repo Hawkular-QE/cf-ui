@@ -29,7 +29,7 @@ class domains():
         domains_db = self.db.get_domains()
         # TBD domains_hawk = ...
 
-        assert len(domains_ui) == len(domains_db), "Domains lists length mismatch."
+        #assert len(domains_ui) == len(domains_db), "Domains lists length mismatch."
 
         for domain_ui in domains_ui:
             domain_db = self.ui_utils.find_row_in_list(domains_db, 'feed', domain_ui.get('Feed'))
