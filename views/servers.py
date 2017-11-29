@@ -599,7 +599,7 @@ class servers():
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
         else:
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
-            assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
+            #assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
 
