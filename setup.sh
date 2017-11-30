@@ -23,12 +23,15 @@ then
     pip install setuptools --upgrade
 fi
 
-#pip uninstall --yes pycurl
-#export PYCURL_SSL_LIBRARY=nss
-#pip install pycurl
+pip uninstall --yes pycurl
+export PYCURL_SSL_LIBRARY=nss
+pip install pycurl
 
 ## Requirement for Fedora 27 (https://github.com/siznax/wptools/issues/68)
+if grep -q -i "fedora 27" /etc/os-release
+then 
 pip install --no-cache-dir --compile --ignore-installed --install-option="--with-openssl" pycurl
+fi
 
 pip install mgmtsystem==1.6.1
 
