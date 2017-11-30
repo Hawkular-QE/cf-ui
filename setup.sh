@@ -3,7 +3,7 @@
 HOME=`pwd`
 
 # Install virtualenv, libcurl-devel, gcc, wget, unzip, openssl-devel
-yum install python-virtualenv wget unzip libcurl-devel unzip gcc openssl-devel -y
+yum install python-virtualenv wget unzip libcurl-devel unzip gcc openssl-devel redhat-rpm-config -y
 
 # Setup virtual environment
 virtualenv .cf-ui
