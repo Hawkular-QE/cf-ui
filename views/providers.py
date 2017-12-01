@@ -41,7 +41,7 @@ class providers():
             self.web_session.logger.info("Adding Middleware Provider to ManageIQ instance")
 
         navigate(self.web_session).get("{}//ems_middleware/show_list?type=list".format(self.web_session.MIQ_URL))
-        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 60)
 
         self.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
         self.ui_utils.waitForElementOnPage(By.XPATH, "//a[@title='Add a New Middleware Provider']", 5)
@@ -251,8 +251,7 @@ class providers():
 
 
         ui_utils(self.web_session).accept_alert(10)
-        assert ui_utils(self.web_session).waitForTextOnPage(
-            "Delete initiated", 15)
+        assert ui_utils(self.web_session).waitForTextOnPage("Delete initiated", 30)
 
         self.verify_all_providers_deleted()
 
