@@ -107,7 +107,7 @@ class db():
         return False
 
     def is_datasource_present(self, name):
-        for row in self.get_datasource():
+        for row in self.get_datasources():
             if name in row.get('name'):
                 return True
 
