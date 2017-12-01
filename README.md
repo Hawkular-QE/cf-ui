@@ -4,7 +4,7 @@
 ```shell
 git clone https://github.com/Hawkular-QE/cf-ui.git
 cd cf-ui
-./setup.sh
+sudo ./setup.sh
 source .cf-ui/bin/activate
 ```
 ## Configuration
