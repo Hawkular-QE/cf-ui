@@ -190,6 +190,7 @@ class providers():
         if provider:
             return True
         else:
+            self.web_session.logger.info("Middleware Provider does not exist.")
             return False
 
     def delete_hawkular_provider(self):
@@ -224,9 +225,17 @@ class providers():
 
         assert ui_utils(self.web_session).waitForElementOnPage(By.XPATH, "//a[@title='{}']".format(
             self.web_session.HAWKULAR_PROVIDER_NAME), 180, exist=False)
-        if not ui_utils(self.web_session).isTextOnPage(self.web_session.HAWKULAR_PROVIDER_NAME):
-            self.web_session.logger.info(
-                "The provider - {} - is deleted successfully".format(self.web_session.HAWKULAR_HOSTNAME))
+
+        while True:
+            if not ui_utils(self.web_session).isTextOnPage(
+                    self.web_session.HAWKULAR_PROVIDER_NAME) and not self.does_provider_exist():
+                self.web_session.logger.info(
+                    "The provider - {} - is deleted successfully".format(self.web_session.HAWKULAR_HOSTNAME))
+            break
+
+        else:
+            self.web_driver.refresh()
+            ui_utils(self.web_session).sleep(5)
 
     def clear_all_providers(self):
         self.web_session.logger.info("Deleting all the providers from providers list.")
@@ -371,9 +380,7 @@ class providers():
         assert self.verify_refresh_status_success(), "The last refresh status is not - Success"
 
     def validate_provider(self):
-        #validate = WebDriverWait(self.web_driver, 10).until(EC.element_to_be_clickable(
-        #   (By.XPATH, "//button[@title='Validate the credentials by logging into the Server']")))
-        #validate.click()
+
         self.web_driver.find_element_by_class_name("validate_button").click()
         assert ui_utils(self.web_session).waitForTextOnPage('Credential validation was successful', 60)
 
@@ -442,10 +449,13 @@ class providers():
         assert ui_utils(self.web_session).waitForTextOnPage("Middleware Providers", 15)
 
         while True:
-            if self.web_driver.find_element_by_xpath("//strong[contains(.,'No Records Found.')]").is_displayed():
+            if (self.web_driver.find_element_by_xpath(
+                    "//strong[contains(.,'No Records Found.')]").is_displayed() and not self.does_provider_exist()):
                 self.web_session.logger.info("All the middleware providers are deleted successfully.")
                 break
+
             else:
                 self.web_driver.refresh()
                 ui_utils(self.web_session).sleep(5)
+
         return True
