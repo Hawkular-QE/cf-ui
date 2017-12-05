@@ -98,3 +98,17 @@ class db():
 
     def get_container_servers(self):
         return self.execute(self.sql_containers)
+
+    def is_deployment_present(self, name):
+        for row in self.get_deployments():
+            if name in row.get('name'):
+                return True
+
+        return False
+
+    def is_datasource_present(self, name):
+        for row in self.get_datasources():
+            if name in row.get('name'):
+                return True
+
+        return False
