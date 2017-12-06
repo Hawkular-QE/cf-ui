@@ -553,7 +553,8 @@ class servers():
 
         return None
 
-    def add_server_deployment(self, app_to_deploy,runtime_name=None, enable_deploy=True, overwrite=False, cancel=False):
+    def add_server_deployment(self, app_to_deploy, runtime_name=None, enable_deploy=True, overwrite=False,
+                                  cancel=False, expected_failure=False):
         app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
 
         self.web_session.logger.info("Deploying App: {}".format(app))
@@ -597,6 +598,14 @@ class servers():
             assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+
+        elif expected_failure:
+
+            self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
+            assert self.ui_utils.waitForTextOnPage('failed to complete', 15)
+            assert self.ui_utils.waitForTextOnPage(
+                'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+
         else:
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
             assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
