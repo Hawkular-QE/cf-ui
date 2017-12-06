@@ -84,7 +84,12 @@ class monitoring():
         return True
 
     def validate_messagings_monitoring_utilization_jms_topics(self):
-        navigate(self.web_session).get("{}/middleware_messaging/show_list".format(self.web_session.MIQ_URL))
+
+        servers(self.web_session).navigate_to_non_container_eap()
+        if self.ui_utils.get_generic_table_as_dict().get('Middleware Messagings') == '0':
+            pytest.skip("Skip test - EAP has \"0\" Middleware Messagings")
+
+        self.web_session.web_driver.find_element_by_xpath("//td[contains(.,'Middleware Messagings')]").click()
         assert self.ui_utils.waitForTextOnPage("Messaging Type", 10)
         self.ui_utils.click_on_row_containing_text('JMS Topic')
         assert self.ui_utils.waitForTextOnPage("Summary", 10)

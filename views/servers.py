@@ -553,7 +553,8 @@ class servers():
 
         return None
 
-    def add_server_deployment(self, app_to_deploy,runtime_name=None, enable_deploy=True, overwrite=False, cancel=False):
+    def add_server_deployment(self, app_to_deploy, runtime_name=None, enable_deploy=True, overwrite=False,
+                                  cancel=False, expected_failure=False):
         app = "{}/data/{}".format(os.getcwd(), app_to_deploy)
 
         self.web_session.logger.info("Deploying App: {}".format(app))
@@ -597,6 +598,14 @@ class servers():
             assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
             assert self.ui_utils.waitForTextOnPage(
                 'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+
+        elif expected_failure:
+
+            self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
+            assert self.ui_utils.waitForTextOnPage('failed to complete', 15)
+            assert self.ui_utils.waitForTextOnPage(
+                'Deployment "{}" has been initiated on this server.'.format(app_to_deploy), 15)
+
         else:
             self.web_driver.find_element_by_xpath("//button[@ng-click='addDeployment()']").click()
             assert self.ui_utils.waitForTextOnPage('completed successfully', 15)
@@ -717,6 +726,10 @@ class servers():
         el = self.web_driver.find_element_by_id("jdbc_driver_file")
         el.send_keys(app)
         self.ui_utils.sleep(2)
+        self.web_driver.find_element_by_xpath("//select[@id='chooose_driver_db']").click()
+        assert self.ui_utils.waitForTextOnPage('Postgres', 15)
+        self.web_driver.find_element_by_xpath("//option[@label='Postgres']").click()
+        self.web_driver.find_element_by_id("jdbc_driver_name_input").clear()
         self.web_driver.find_element_by_id("jdbc_driver_name_input").send_keys(self.JDBCDriver_Name)
         self.web_driver.find_element_by_id("jdbc_module_name_input").send_keys(self.JDBCDriver_Module_Name)
         self.web_driver.find_element_by_id("jdbc_driver_class_input").send_keys(self.JDBCDriver_Class_Name)
@@ -725,7 +738,7 @@ class servers():
 
         self.web_driver.find_element_by_xpath("//button[@ng-click='addJdbcDriver()']").click()
         assert self.ui_utils.waitForTextOnPage(
-            'JDBC Driver "{}" has been installed on this server.'.format(self.JDBCDriver_Name), 300)
+            'JDBC Driver "{}" has been submitted for installation on this server.'.format(self.JDBCDriver_Name), 300)
 
     def add_datasource(self, datasourceName, xa=False):
 

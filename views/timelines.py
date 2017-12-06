@@ -51,7 +51,7 @@ class timelines():
         self.ui_utils.click_on_row_containing_text(eap.get('Feed'))
         self.ui_utils.waitForTextOnPage('Version', 15)
 
-        servers(self.web_session).add_server_deployment(self.TextFile)
+        servers(self.web_session).add_server_deployment(self.TextFile, expected_failure=True)
 
         self.navigate_to_timeline()
         self.select_timepivot()

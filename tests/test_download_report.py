@@ -150,7 +150,7 @@ def test_cfui_server_detail_download_pdf(web_session, delete_files):
 
     assert download_report(web_session, '').pdf_format()
 
-    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/ManageIQ-Providers-Hawkular-Middleware Manager-Middleware Server*.pdf'))
+    assert_download_exist("{}{}".format(os.getenv("HOME"), '/Downloads/Middleware Server*.pdf'))
 
 def test_cfui_deployment_detail_download_pdf(web_session, delete_files):
     if web_session.appliance_version == 'master':
