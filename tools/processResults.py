@@ -48,6 +48,10 @@ skips = root.findall('testcase/skipped')
 for node in skips:
     node.getparent().getparent().remove(node.getparent())
 
+#Fix the polarion project name
+suite = root.getroot()
+suite.set('name', 'JBossON4')
+
 # Remove Node Attributes
 for e in root.iter():
     # print e.tag, e.attrib
