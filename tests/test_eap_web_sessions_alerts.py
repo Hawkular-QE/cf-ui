@@ -31,7 +31,6 @@ def test_add_remove_web_session_alert(web_session):
     assert eap_web_session_alerts(web_session, alert).add_alert()
     assert eap_web_session_alerts(web_session, alert).remove_alert()
 
-
 def test_add_jvm_alert(web_session):
     alert = AlertFactory().create_alert("Alert-" + str(uuid.uuid4()), "jvm_heap_used", ['90', '10'])
     web_session.logger.info("Begin " + alert.category + " Test")
