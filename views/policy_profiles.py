@@ -89,15 +89,11 @@ class policy_profiles():
                 self.web_session.logger.warning('Element not found for Profile Name "{}"'.format(policy_name))
 
 
-    def add_policy_profile_to_server(self, policy_profile_name, server_name = None, server_state = 'Running'):
+    def add_policy_profile_to_server(self, policy_profile_name, server_name):
         navigate(self.web_session).get("{}/middleware_server/show_list".format(self.web_session.MIQ_URL),
                                        wait_for=self.web_session.HAWKULAR_PROVIDER_NAME)
 
-        # Attempt to find EAP Server on which to add Policy Profile, if a Server is not provided
-        if not server_name:
-            server = servers(self.web_session).find_eap_in_state(server_state)
-            assert server, 'No EAP server found in state \n"{}\n"'.format(server_state)
-            server_name = server.get('Host Name')
+        assert server_name, 'No Server Name'
 
         # Drill into Server details
         self.ui_utils.click_on_row_containing_text(server_name)
