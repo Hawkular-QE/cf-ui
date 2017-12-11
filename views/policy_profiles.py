@@ -96,7 +96,7 @@ class policy_profiles():
         # Attempt to find EAP Server on which to add Policy Profile, if a Server is not provided
         if not server_name:
             server = servers(self.web_session).find_eap_in_state(server_state)
-            assert server, "No server found in state Running"
+            assert server, 'No EAP server found in state \n"{}\n"'.format(server_state)
             server_name = server.get('Host Name')
 
         # Drill into Server details
