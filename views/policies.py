@@ -79,7 +79,7 @@ class policies():
 
         if not db(self.web_session).is_policy_present(policy_name):
             self.web_session.logger.warning('Policy "{}" does not exists.'.format(policy_name))
-            return
+            return False
 
         if navigate:
             self.navigate_to_middleware_server_control_policies(policy_name=policy_name)

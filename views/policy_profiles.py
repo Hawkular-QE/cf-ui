@@ -15,8 +15,6 @@ class policy_profiles():
     def add_middleware_policy_profile(self, policy_name, policy_profile_name, delete_profile=False):
         self.navigate_to_policy_profiles(policy_name=policy_profile_name)
 
-        policy_profile_name = policy_profile_name + " profile"
-
         if delete_profile:
             if self.ui_utils.isTextOnPage(policy_profile_name):
                 if not self.delete_policy_profile(policy_profile_name):
@@ -24,6 +22,8 @@ class policy_profiles():
         else:
             self.web_session.logger.info('Policy Profile "{}" already exists.'.format(policy_profile_name))
             return True
+
+        policy_profile_name = policy_profile_name + " mwmprofile"
 
         self.web_driver.find_element_by_xpath('//*[@title="Configuration"]').click()
         self.ui_utils.sleep(1)
@@ -51,10 +51,11 @@ class policy_profiles():
         return True
 
     def delete_policy_profile(self, policy_profile_name, navigate=True):
-        policy_profile_name = policy_profile_name + " profile"
 
         if navigate:
             self.navigate_to_policy_profiles(policy_profile_name)
+
+        policy_profile_name = policy_profile_name + " mwmprofile"
 
         self.web_driver.find_element_by_xpath('//*[@title="Configuration"]').click()
         self.ui_utils.sleep(1)
@@ -73,6 +74,7 @@ class policy_profiles():
     def navigate_to_policy_profiles(self, policy_name=None):
         navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL), wait_for='Policies')
 
+        policy_name = policy_name + " mwmprofile"
         el = self.web_driver.find_element_by_xpath('//*[@title="All Policy Profiles"]')
         if not el.is_displayed():
             self.web_driver.find_element_by_xpath("//a[contains(@href,'#policy_profile_accord')]").click()
