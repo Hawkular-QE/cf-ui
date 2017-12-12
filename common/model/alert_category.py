@@ -40,3 +40,7 @@ class AlertCategory(Enum):
     web_sessions_active = 'Web sessions - Active'
     web_sessions_expired = 'Web sessions - Expired'
     web_sessions_rejected = 'Web sessions - Rejected'
+
+    @staticmethod
+    def list():
+        return map(lambda c: c.value, AlertCategory)

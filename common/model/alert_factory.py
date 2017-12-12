@@ -1,3 +1,5 @@
+import uuid
+
 from alert import Alert
 from alert_category import AlertCategory
 
@@ -19,10 +21,42 @@ class AlertFactory:
         alert = Alert()
         alert.description = description
         alert.category = alertCategory.value
+        alert.category_key = alertCategory.name
         alert.fields = self.fields_for_ui(alertCategory.name, values)
 
         return alert
 
 
+    def all_alerts(self):
+        alerts = []
+        for category in AlertCategory:
+            alert = Alert()
+
+            if category.name == 'jvm_heap_used' or category.name == 'jvm_non_heap_used':
+                values = [20, 10]
+            else:
+                values = [0]
+                alert.operator = '>='
+
+            alert.category = category.value
+            alert.category_key = category.name
+            alert.description = "Alert-" + str(uuid.uuid4())
+            alert.fields = self.fields_for_ui(category.name, values)
+            alerts.append(alert)
+        return alerts
 
 
+    def jvm_alerts(self):
+        return list(filter(lambda element: element.category_key.startswith("jvm"), self.all_alerts()))
+
+    def web_sessions_alerts(self):
+        return list(filter(lambda element: element.category_key.startswith("web_sessions"), self.all_alerts()))
+
+    def eap_transactions_alerts(self):
+        return list(filter(lambda element: element.category_key.startswith("eap_transactions"), self.all_alerts()))
+
+    def messaging_alerts(self):
+        return list(filter(lambda element: element.category_key.startswith("messaging"), self.all_alerts()))
+
+    def datasource_alerts(self):
+        return list(filter(lambda element: element.category_key.startswith("datasource"), self.all_alerts()))
