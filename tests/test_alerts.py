@@ -1,6 +1,6 @@
 import pytest
 from common.session import session
-from views.eap_web_sessions_alerts import eap_web_session_alerts
+from views.alerts import eap_web_session_alerts
 from common.model.alert_factory import AlertFactory
 
 
@@ -46,7 +46,7 @@ def test_add_and_remove_messaging(web_session):
         assert eap_web_session_alerts(web_session, alert).add_alert()
         assert eap_web_session_alerts(web_session, alert).remove_alert()
 
-def test_add_and_remove_messaging(web_session):
+def test_add_and_remove_datasource(web_session):
     alerts = AlertFactory().datasource_alerts()
     for alert in alerts:
         web_session.logger.info("Begin Add/Remove alert {}", alert.category)

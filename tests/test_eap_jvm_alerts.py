@@ -2,6 +2,8 @@ import pytest
 from common.session import session
 from views.eap_jvm_alerts import eap_jvm_alerts
 
+# TODO @gbaufake - to be refactored and included on test_alerts (edit, copy)
+
 @pytest.fixture (scope='session')
 def web_session(request):
     web_session = session(add_provider=True)

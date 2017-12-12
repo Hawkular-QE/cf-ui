@@ -5,12 +5,19 @@ from alert_category import AlertCategory
 
 
 class AlertFactory:
-    def fields_for_ui(self, category, values):
+
+    def fields_for_ui(self, category):
         key= {
             'jvm_accumulated_gc_duration': ['value_mw_garbage_collector'],
             'jvm_heap_used': ['value_mw_greater_than', 'value_mw_less_than'],
             'jvm_non_heap_used': ['value_mw_greater_than', 'value_mw_less_than']
         }.get(category, ['value_mw_threshold'])
+
+        values = {
+            'jvm_heap_used': [20, 10],
+            'jvm_non_heap_used': [20, 10]
+        }.get(category, [0])
+
 
         return zip(key, values)
 
@@ -32,16 +39,13 @@ class AlertFactory:
         for category in AlertCategory:
             alert = Alert()
 
-            if category.name == 'jvm_heap_used' or category.name == 'jvm_non_heap_used':
-                values = [20, 10]
-            else:
-                values = [0]
+            if not (category.name == 'jvm_heap_used' or category.name == 'jvm_non_heap_used'):
                 alert.operator = '>='
 
             alert.category = category.value
             alert.category_key = category.name
             alert.description = "Alert-" + str(uuid.uuid4())
-            alert.fields = self.fields_for_ui(category.name, values)
+            alert.fields = self.fields_for_ui(category.name)
             alerts.append(alert)
         return alerts
 
