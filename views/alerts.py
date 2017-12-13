@@ -38,9 +38,8 @@ class alerts:
         assert self.ui_utils.waitForTextOnPage("Adding a new Alert", 90)
 
         self.fill_form(alert)
-
-
-        self.web_session.web_driver.find_element_by_xpath("//button[contains(.,'Add')]").click()
+        self.web_session.web_driver.find_element_by_xpath("//*[@id=\"buttons_on\"]/button[1]").click()
+        #self.web_session.web_driver.find_element_by_xpath("//button[contains(.,'Add')]").click()
         assert self.ui_utils.waitForTextOnPage('Alert "{}" was added'.format(alert.description), 60)
         self.web_session.logger.info("The alert of category: {} is added successfully.".format(alert.category))
 
@@ -55,9 +54,10 @@ class alerts:
         # Select Middleware
         Select(self.web_session.web_driver.find_element_by_id("miq_alert_db")).select_by_visible_text(
             "Middleware Server")
-        self.ui_utils.sleep(5)
+        self.ui_utils.sleep(1)
         # Category of Alert
         Select(self.web_session.web_driver.find_element_by_id("exp_name")).select_by_value(alert.category_value())
+
         # Severity
         Select(self.web_session.web_driver.find_element_by_id("miq_alert_severity")).select_by_visible_text("Info")
         self.ui_utils.sleep(1)
