@@ -1,6 +1,8 @@
 import pytest
+import time
+
 from common.session import session
-from views.alerts import eap_web_session_alerts
+from views.alerts import alerts
 from common.model.alert_factory import AlertFactory
 
 
@@ -8,6 +10,7 @@ from common.model.alert_factory import AlertFactory
 def web_session(request):
     web_session = session(add_provider=True)
     web_session.logger.info("Alerts")
+    web_session.factory = AlertFactory()
 
     def closeSession():
         web_session.logger.info("Close browser session")
@@ -18,37 +21,62 @@ def web_session(request):
     return web_session
 
 
-def test_add_and_remove_jvm_alerts(web_session):
-    alerts = AlertFactory().jvm_alerts()
-    for alert in alerts:
-        web_session.logger.info("Begin Add/Remove alert {}", alert.category)
-        assert eap_web_session_alerts(web_session, alert).add_alert()
-        assert eap_web_session_alerts(web_session, alert).remove_alert()
+def test_jvm_alerts(web_session):
+    list_alerts = web_session.factory.jvm_alerts()
+    for alert in list_alerts:
+        copy_alert = web_session.factory.copy_for_edit(alert)
+        web_session.logger.info("Begin Add alert {}".format(alert.category_description()))
+        assert alerts(web_session).add_alert(alert)
+        web_session.logger.info("Begin Edit alert {}".format(alert.category_description()))
+        assert alerts(web_session).edit_alert(alert, copy_alert)
+        web_session.logger.info("Begin Remove alert {}".format(alert.category_description()))
+        assert alerts(web_session).remove_alert(copy_alert)
+        time.sleep(2)
 
-def test_add_and_remove_web_session_alerts(web_session):
-    alerts = AlertFactory().web_sessions_alerts()
-    for alert in alerts:
-        web_session.logger.info("Begin Add/Remove alert {}", alert.category)
-        assert eap_web_session_alerts(web_session, alert).add_alert()
-        assert eap_web_session_alerts(web_session, alert).remove_alert()
+def test_web_session_alerts(web_session):
+    list_alerts = web_session.factory.web_sessions_alerts()
+    for alert in list_alerts:
+        copy_alert = web_session.factory.copy_for_edit(alert)
+        web_session.logger.info("Begin Add alert {}".format(alert.category_description()))
+        assert alerts(web_session).add_alert(alert)
+        web_session.logger.info("Begin Edit alert {}".format(alert.category_description()))
+        assert alerts(web_session).edit_alert(alert, copy_alert)
+        web_session.logger.info("Begin Remove alert {}".format(alert.category_description()))
+        assert alerts(web_session).remove_alert(copy_alert)
+        time.sleep(2)
 
-def test_add_and_remove_eap_transactions_alerts(web_session):
-    alerts = AlertFactory().eap_transactions_alerts()
-    for alert in alerts:
-        web_session.logger.info("Begin Add/Remove alert {}", alert.category)
-        assert eap_web_session_alerts(web_session, alert).add_alert()
-        assert eap_web_session_alerts(web_session, alert).remove_alert()
+def test_eap_transactions_alerts(web_session):
+    list_alerts = web_session.factory.eap_transactions_alerts()
+    for alert in list_alerts:
+        copy_alert = web_session.factory.copy_for_edit(alert)
+        web_session.logger.info("Begin Add alert {}".format(alert.category_description()))
+        assert alerts(web_session).add_alert(alert)
+        web_session.logger.info("Begin Edit alert {}".format(alert.category_description()))
+        assert alerts(web_session).edit_alert(alert, copy_alert)
+        web_session.logger.info("Begin Remove alert {}".format(alert.category_description()))
+        assert alerts(web_session).remove_alert(copy_alert)
+        time.sleep(2)
 
-def test_add_and_remove_messaging(web_session):
-    alerts = AlertFactory().messaging_alerts()
-    for alert in alerts:
-        web_session.logger.info("Begin Add/Remove alert {}", alert.category)
-        assert eap_web_session_alerts(web_session, alert).add_alert()
-        assert eap_web_session_alerts(web_session, alert).remove_alert()
+def test_messaging_alerts(web_session):
+    list_alerts = web_session.factory.messaging_alerts()
+    for alert in list_alerts:
+        copy_alert = web_session.factory.copy_for_edit(alert)
+        web_session.logger.info("Begin Add alert {}".format(alert.category_description()))
+        assert alerts(web_session).add_alert(alert)
+        web_session.logger.info("Begin Edit alert {}".format(alert.category_description()))
+        assert alerts(web_session).edit_alert(alert, copy_alert)
+        web_session.logger.info("Begin Remove alert {}".format(alert.category_description()))
+        assert alerts(web_session).remove_alert(copy_alert)
+        time.sleep(2)
 
-def test_add_and_remove_datasource(web_session):
-    alerts = AlertFactory().datasource_alerts()
-    for alert in alerts:
-        web_session.logger.info("Begin Add/Remove alert {}", alert.category)
-        assert eap_web_session_alerts(web_session, alert).add_alert()
-        assert eap_web_session_alerts(web_session, alert).remove_alert()
+def test_datasource_alerts(web_session):
+    list_alerts = web_session.factory.datasource_alerts()
+    for alert in list_alerts:
+        copy_alert = web_session.factory.copy_for_edit(alert)
+        web_session.logger.info("Begin Add alert {}".format(alert.category_description()))
+        assert alerts(web_session).add_alert(alert)
+        web_session.logger.info("Begin Edit alert {}".format(alert.category_description()))
+        assert alerts(web_session).edit_alert(alert, copy_alert)
+        web_session.logger.info("Begin Remove alert {}".format(alert.category_description()))
+        assert alerts(web_session).remove_alert(copy_alert)
+        time.sleep(2)
