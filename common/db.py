@@ -23,6 +23,7 @@ class db():
     sql_server_groups = 'select * from  middleware_server_groups'
     sql_messagings = 'select * from middleware_messagings'
     sql_containers = "select * from middleware_servers where lives_on_type LIKE '%Container%'"
+    sql_policies = "select * from miq_policies"
 
     def __init__(self, web_session, miq_ip = None, username = None, password = None, db_port = None):
 
@@ -85,6 +86,9 @@ class db():
     def get_messagings(self):
         return self.execute(self.sql_messagings)
 
+    def get_policies(self):
+        return self.execute(self.sql_policies)
+
     # Container Provider
 
     def is_container_provider_present(self, name):
@@ -109,6 +113,13 @@ class db():
     def is_datasource_present(self, name):
         for row in self.get_datasources():
             if name in row.get('name'):
+                return True
+
+        return False
+
+    def is_policy_present(self, name):
+        for row in self.get_policies():
+            if name in row.get('description'):
                 return True
 
         return False
