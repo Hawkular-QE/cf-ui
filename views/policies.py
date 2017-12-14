@@ -61,7 +61,7 @@ class policies():
         el.send_keys(product_name)
 
         # Click on Check box
-        el = self.web_driver.find_element_by_class_name('fa-check').click()
+        el = self.web_driver.find_element_by_xpath('//*[@title="Commit expression element changes"]').click()
         assert self.ui_utils.waitForTextOnPage('Middleware Server : Product INCLUDES "{}"'.format(product_name), 10)
 
         # Add Policy
@@ -101,6 +101,15 @@ class policies():
         assert self.ui_utils.waitForTextOnPage('Policy "{}": Delete successful'.format(policy_name), 10)
 
         return True
+
+    def assign_middleware_policy_deployment_events(self, policy_name):
+        self.assign_middleware_policy_events(policy_name, 'deployments')
+
+    def assign_middleware_policy_datasources_events(self, policy_name):
+        self.assign_middleware_policy_events(policy_name, 'datasources')
+
+    def assign_middleware_policy_jdbc_events(self, policy_name):
+        self.assign_middleware_policy_events(policy_name, 'jdbc')
 
     def assign_middleware_policy_events(self, policy_name, event_type):
         self.web_session.logger.info('Assign Policy Events: "{}", Policy Name: "{}"'.format(event_type, policy_name))

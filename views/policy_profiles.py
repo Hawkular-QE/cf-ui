@@ -1,6 +1,5 @@
 from common.ui_utils import ui_utils
 from common.navigate import navigate
-from views.servers import servers
 
 class policy_profiles():
     web_session = None
@@ -132,5 +131,5 @@ class policy_profiles():
                 return True
 
         # Will reach here if the Policy was not found
-        self.web_session.logger.info("Policy Profile \"{}\"on Server \"{}\" was NOT found".format(policy_profile_name, server_name))
+        self.web_session.logger.warning("Policy Profile \"{}\"on Server \"{}\" was NOT found".format(policy_profile_name, server_name))
         return False
