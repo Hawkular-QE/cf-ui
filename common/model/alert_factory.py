@@ -10,7 +10,7 @@ class AlertFactory:
     def create_alert(self, category):
         return Alert(category)
 
-    def copy_for_edit(self, alert):
+    def copy_alert(self, alert):
         return Alert(alert.category)
 
     # Create All Alerts Available
