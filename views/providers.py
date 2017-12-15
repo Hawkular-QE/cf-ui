@@ -227,8 +227,7 @@ class providers():
             self.web_session.HAWKULAR_PROVIDER_NAME), 180, exist=False)
 
         while True:
-            if not ui_utils(self.web_session).isTextOnPage(
-                    self.web_session.HAWKULAR_PROVIDER_NAME) and not self.does_provider_exist():
+            if not self.does_provider_exist():
                 self.web_session.logger.info(
                     "The provider - {} - is deleted successfully".format(self.web_session.HAWKULAR_HOSTNAME))
             break
@@ -270,7 +269,7 @@ class providers():
 
         # Refresh the page till till the table value for Last Refresh shows the value - Success
 
-        assert self.wait_for_provider_refresh_status(refresh_value_success, 600)
+        assert self.wait_for_provider_refresh_status(refresh_value_success, 300)
         provider_details = ui_utils(self.web_session).get_generic_table_as_dict()
 
         # Verify if the 'Last Refresh' value from table contains 'Success:

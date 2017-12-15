@@ -99,7 +99,7 @@ class datasources():
 
             # Hawkular Datasources can not be deleted
             try:
-                if not self.ui_utils.waitForTextOnPage('datasources were removed', 5):
+                if not self.ui_utils.waitForTextOnPage('The selected datasources removal was initiated', 5):
                     self.web_session.logger.warn("Datasource Not Removed: Name: {}  Server: {}  Host Name: {}".
                                                   format(datasource_name, server, host_name))
                     # Deselect checkbox

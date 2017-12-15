@@ -35,11 +35,11 @@ def test_cfui_server_policy_edit_eap(web_session):
 def test_cfui_eap_power_stop(web_session):
     web_session.logger.info("Begin Server Stop")
     assert servers(web_session).eap_power_stop()
-
+"""
 def test_cfui_eap_power_restart(web_session):
     web_session.logger.info("Begin Server Restart")
     assert servers(web_session).eap_power_restart()
-
+"""
 def test_cfui_eap_operation_suspend(web_session):
     web_session.logger.info("Begin Server Suspend (OPR-005 and OPR-007)")
     assert servers(web_session).eap_power_suspend()
@@ -76,6 +76,7 @@ def test_cfui_stop_application_archive(web_session):
 def test_cfui_start_application_archive(web_session):
     web_session.logger.info("Begin Start Application Archive (OPR-038)")
     assert servers(web_session).enable_application_archive()
+    assert servers(web_session).undeploy_application_archive()
 
 # Add JDBC Driver
 def test_cfui_add_jdbc_driver(web_session):
@@ -113,4 +114,7 @@ def test_cfui_add_application_archive_runtime_name(web_session):
 def test_cfui_add_application_archive_cancel(web_session):
     web_session.logger.info("Begin test to cancel the addition of Application Archive")
     assert servers(web_session).add_deployment_cancel()
+
+
+
 

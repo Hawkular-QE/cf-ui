@@ -366,6 +366,9 @@ class servers():
 
     def deploy_application_archive(self, app_to_deploy = APPLICATION_WAR):
 
+        if db(self.web_session).is_deployment_present(self.APPLICATION_WAR):
+            self.undeploy_application_archive(self.APPLICATION_WAR)
+
         navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage('Server Name', 20)
 
@@ -377,6 +380,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Version', 15)
 
         self.add_server_deployment(self.APPLICATION_WAR)
+
         self.navigate_and_refresh_provider()
         self.web_session.logger.info("Waiting for the archive to appear")
 
@@ -419,10 +423,17 @@ class servers():
 
         # Validate that application is "Removed from the deployments list"
         navigate(self.web_session).get("{}//middleware_deployment/show_list".format(self.web_session.MIQ_URL))
-        assert self.ui_utils.waitForElementOnPage(By.XPATH, "//td[contains(.,'{}')]".format(app_to_undeploy), 120,
-                                                               exist=False)
-        if not self.ui_utils.get_elements_containing_text(app_to_undeploy):
-            self.web_session.logger.info("The archive is removed successfully.")
+        assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
+
+        while True:
+            timeout = time.time() + 60 * 5
+            if not self.ui_utils.get_elements_containing_text(app_to_undeploy):
+                self.web_session.logger.info("The archive is removed successfully.")
+                break
+            elif time.time() > timeout:
+                break
+            else:
+                self.web_driver.refresh()
 
         return True
 
@@ -500,6 +511,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Deployment Name', 20)
         self.ui_utils.click_on_row_containing_text(app_to_start)
         assert self.ui_utils.refresh_until_text_appears('Enabled', 300)
+
         return True
 
     def wait_for_eap_state(self, feed, expected_state, wait_time):
@@ -823,11 +835,15 @@ class servers():
             eap_hawk = self.find_eap_in_state('reload-required')
             assert eap_hawk
             self.eap_power_action(power, eap_hawk)
+            self.verify_eap_status_in_ui(eap_hawk, "Running")
         else:
             self.web_session.logger.info("No Eap server in 'reload-required' state")
         return True
 
     def add_deployment_disable(self, app_to_deploy=APPLICATION_JAR):
+
+        if db(self.web_session).is_deployment_present(self.APPLICATION_JAR):
+            self.undeploy_application_archive(self.APPLICATION_JAR)
 
         navigate(self.web_session).get("{}//middleware_server/show_list".format(self.web_session.MIQ_URL))
         assert self.ui_utils.waitForTextOnPage('Server Name', 20)
@@ -840,6 +856,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Version', 15)
 
         self.add_server_deployment(self.APPLICATION_JAR, enable_deploy=False)
+
         self.navigate_and_refresh_provider()
         self.web_session.logger.info("Waiting for the archive to appear")
 
@@ -915,6 +932,7 @@ class servers():
         assert self.ui_utils.waitForTextOnPage('Version', 15)
         self.add_server_deployment(self.APPLICATION_JAR, cancel=True)
         assert self.ui_utils.waitForTextOnPage('Version', 15)
+        self.undeploy_application_archive(self.APPLICATION_JAR)
 
         return True
 
