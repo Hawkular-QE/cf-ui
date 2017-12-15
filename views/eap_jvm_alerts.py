@@ -14,7 +14,7 @@ Created on September 22, 2016
 
 '''
 
-class eap_alerts():
+class eap_jvm_alerts():
 
     web_session = None
     alert_desc = "Heap-Alert"
