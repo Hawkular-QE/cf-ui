@@ -16,7 +16,7 @@ class AlertCategory(Enum):
     eap_transactions_committed = ['mw_tx_committed', 'EAP Transactions - Committed']
     eap_transactions_heuristic = ['mw_tx_heuristics', 'EAP Transactions - Heuristic']
     eap_transactions_resource_rollback = ['mw_tx_resource_rollbacks', 'EAP Transactions - Resource Rollbacks']
-    eap_transactions_timed_out = ['mw_tx_timeout', 'EAP Transactions - Timed Out']
+    #eap_transactions_timed_out = ['mw_tx_timeout', 'EAP Transactions - Timed Out']
 
 
     # JVM

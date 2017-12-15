@@ -20,28 +20,23 @@ class alerts:
         self.ui_utils = ui_utils(web_session)
 
     def add_alert(self, alert):
-        navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
-
-        self.ui_utils.sleep(5)
-        if not self.web_session.web_driver.find_element_by_xpath("//*[@id='alert_accord']").is_displayed():
-            self.web_session.web_driver.find_element_by_xpath("//a[contains(text(),'Alerts')]").click()
-
+        self.navigate_all_alerts()
         self.ui_utils.sleep(1)
 
         self.web_session.web_driver.find_element_by_xpath("//div[@id='treeview-alert_tree']/ul/li").click()
         self.ui_utils.sleep(1)
 
         self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
-        self.ui_utils.sleep(1)
+        self.ui_utils.sleep(5)
 
         self.web_session.web_driver.find_element_by_xpath("//a[@title='Add a New Alert']").click()
         assert self.ui_utils.waitForTextOnPage("Adding a new Alert", 90)
 
         self.fill_form(alert)
         self.web_session.web_driver.find_element_by_xpath("//*[@id=\"buttons_on\"]/button[1]").click()
-        #self.web_session.web_driver.find_element_by_xpath("//button[contains(.,'Add')]").click()
+        self.ui_utils.sleep(5)
         assert self.ui_utils.waitForTextOnPage('Alert "{}" was added'.format(alert.description), 60)
-        self.web_session.logger.info("The alert of category: {} is added successfully.".format(alert.category))
+        self.web_session.logger.info("The alert of category: {} is added successfully.".format(alert.category_description()))
 
         return True
 
@@ -54,11 +49,11 @@ class alerts:
         # Select Middleware
         Select(self.web_session.web_driver.find_element_by_id("miq_alert_db")).select_by_visible_text(
             "Middleware Server")
-        self.ui_utils.sleep(1)
+        self.ui_utils.sleep(2)
         # Category of Alert
         Select(self.web_session.web_driver.find_element_by_id("exp_name")).select_by_value(alert.category_value())
 
-        self.ui_utils.sleep(5)
+        self.ui_utils.sleep(2)
 
         # Severity
         Select(self.web_session.web_driver.find_element_by_id("miq_alert_severity")).select_by_visible_text("Info")
@@ -90,10 +85,7 @@ class alerts:
 
     def edit_alert(self, alert1, alert2):
 
-        navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
-
-        if not self.web_session.web_driver.find_element_by_xpath("//*[@id='alert_accord']").is_displayed():
-            self.web_session.web_driver.find_element_by_xpath("//a[contains(text(),'Alerts')]").click()
+        self.navigate_all_alerts()
 
         self.ui_utils.sleep(1)
 
@@ -115,13 +107,9 @@ class alerts:
         else:
             return False
 
-
     def remove_alert(self,alert):
 
-        navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
-
-        if not self.web_session.web_driver.find_element_by_xpath("//*[@id='alert_accord']").is_displayed():
-            self.web_session.web_driver.find_element_by_xpath("//a[contains(text(),'Alerts')]").click()
+        self.navigate_all_alerts()
 
         self.ui_utils.sleep(1)
 
@@ -136,6 +124,33 @@ class alerts:
             self.ui_utils.accept_alert(20)
             assert self.ui_utils.waitForTextOnPage('Alert "{}": Delete successful'.format(alert.description), 5)
             self.web_session.logger.info(
-                "The alert of category: {} is removed successfully.".format(alert.category))
+                "The alert of category: {} is removed successfully.".format(alert.category_description()))
 
         return True
+
+    def navigate_all_alerts(self):
+        navigate(self.web_session).get("{}/miq_policy/explorer".format(self.web_session.MIQ_URL))
+        self.ui_utils.sleep(5)
+        if not self.web_session.web_driver.find_element_by_xpath("//*[@id='alert_accord']").is_displayed():
+            self.web_session.web_driver.find_element_by_xpath("//a[contains(text(),'Alerts')]").click()
+
+    def copy_alert(self,alert, copied_alert):
+        self.navigate_all_alerts()
+
+        element = self.ui_utils.get_elements_containing_text(alert.description)
+        if element:
+            element[0].click()
+            self.ui_utils.sleep(1)
+            self.web_session.web_driver.find_element_by_xpath("//button[@title='Configuration']").click()
+            self.web_session.web_driver.find_element_by_xpath("//a[@id='miq_alert_vmdb_choice__alert_copy']").click()
+            self.ui_utils.accept_alert(30)
+            self.ui_utils.sleep(5)
+            self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").clear()
+            self.web_session.web_driver.find_element_by_xpath("//input[@id='description']").send_keys(copied_alert.description)
+            self.web_session.web_driver.find_element_by_xpath(".//*[@id='buttons_on']/button[1]").click()
+            assert self.ui_utils.waitForTextOnPage('Alert "{}" was added'.format(copied_alert.description), 20)
+            self.web_session.logger.info(
+                "The alert of category: {} is copied successfully.".format(alert.category_description()))
+            return True
+        else:
+            return False
