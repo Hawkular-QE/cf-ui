@@ -58,6 +58,8 @@ class alerts:
         # Category of Alert
         Select(self.web_session.web_driver.find_element_by_id("exp_name")).select_by_value(alert.category_value())
 
+        self.ui_utils.sleep(5)
+
         # Severity
         Select(self.web_session.web_driver.find_element_by_id("miq_alert_severity")).select_by_visible_text("Info")
         self.ui_utils.sleep(1)
